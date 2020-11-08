@@ -20,5 +20,5 @@ export default {
 			targets: [{ src: "src/types.d.ts", dest: "dist" }],
 		}),
 	],
-	external: ["graphql-parse-resolve-info"],
+	external: ["graphql-parse-resolve-info", "objection"],
 }
