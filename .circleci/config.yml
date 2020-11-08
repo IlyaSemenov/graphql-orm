@@ -10,7 +10,7 @@ jobs:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
-          name: install
+          name: Install
           command: yarn --frozen-lockfile
       - save_cache:
           name: Save Yarn Package Cache
@@ -18,5 +18,8 @@ jobs:
           paths:
             - ~/.cache/yarn
       - run:
-          name: release
+          name: Test
+          command: yarn test
+      - run:
+          name: Release
           command: yarn semantic-release
