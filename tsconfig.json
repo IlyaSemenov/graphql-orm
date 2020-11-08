@@ -4,7 +4,8 @@
 		"esModuleInterop": true,
 		"moduleResolution": "node",
 		"strict": true,
-		"target": "ES2020",
+		// Target Node 10
+		"target": "ES2018",
 		"baseUrl": ".",
 		"paths": {
 			"objection-fetch-graphql": ["./src"]
