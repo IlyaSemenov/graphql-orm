@@ -2,7 +2,26 @@ import { GraphQLResolveInfo } from "graphql"
 import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
 import { AnyQueryBuilder, QueryBuilder, RelationMappings } from "objection"
 
-import { FetchOptions, Filter, Modifiers } from "./types"
+export type FilterNonNullScalarValue = string | number | boolean
+export type FilterScalarValue = null | FilterNonNullScalarValue
+export type FilterValue =
+	| FilterScalarValue
+	| FilterNonNullScalarValue[]
+	| Filter
+export type Filter = { [property: string]: FilterValue }
+
+export type QueryModifier<QB extends QueryBuilder<any> = QueryBuilder<any>> = (
+	qb: QB,
+) => QB | void
+
+export type Modifiers = {
+	[type_name: string]: QueryModifier
+}
+
+export interface FetchOptions {
+	filter?: Filter
+	modifiers?: Modifiers
+}
 
 QueryBuilder.prototype.fetchGraphQL = function <QB extends AnyQueryBuilder>(
 	this: QB,

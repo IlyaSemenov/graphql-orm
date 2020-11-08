@@ -1,26 +1,13 @@
+// I had to move this to a separate .d.ts file
+// When placed in a .ts file, extending QueryBuilder emits error:
+// Type parameter 'M' of exported interface has or is using private name 'Model'. ts(4004)
+
 import { GraphQLResolveInfo } from "graphql"
-import { QueryBuilder } from "objection"
 
-export type FilterNonNullScalarValue = string | number | boolean
-export type FilterScalarValue = null | FilterNonNullScalarValue
-export type FilterValue =
-	| FilterScalarValue
-	| FilterNonNullScalarValue[]
-	| Filter
-export type Filter = { [property: string]: FilterValue }
+import { FetchOptions } from "."
 
-export type QueryModifier<QB extends QueryBuilder<any> = QueryBuilder<any>> = (
-	qb: QB,
-) => QB | void
-
-export type Modifiers = {
-	[type_name: string]: QueryModifier
-}
-
-export interface FetchOptions {
-	filter?: Filter
-	modifiers?: Modifiers
-}
+// Export other types, so that it's possible to refer to this file in package.json types
+export * from "."
 
 declare module "objection" {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

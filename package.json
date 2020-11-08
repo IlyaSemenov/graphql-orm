@@ -9,7 +9,7 @@
   "author": "Ilya Semenov",
   "license": "MIT",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/types.d.ts",
   "files": [
     "dist"
   ],
@@ -59,6 +59,7 @@
     "prettier": "^2.1.2",
     "rollup": "^2.33.1",
     "rollup-plugin-cleaner": "^1.0.0",
+    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-typescript2": "^0.29.0",
     "semantic-release": "^17.2.2",
     "sqlite3": "^5.0.0",
