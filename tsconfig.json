@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"strict": true,
+		"target": "ES2020",
+		"baseUrl": ".",
+		"paths": {
+			"objection-fetch-graphql": ["./src"]
+		}
+	},
+	"include": ["src"]
+}

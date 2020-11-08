@@ -1,0 +1,72 @@
+{
+  "name": "objection-fetch-graphql",
+  "description": "objection.js plugin: resolve GraphQL query using fetchGraph",
+  "version": "0.0.0-development",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IlyaSemenov/objection-fetch-graphql.git"
+  },
+  "author": "Ilya Semenov",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "tap 'src/**/*.test.ts'",
+    "build": "rollup -c",
+    "prepublish": "yarn build",
+    "lint": "eslint --fix '**/*.{js,ts}'"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.9.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@types/tap": "^14.10.1",
+    "@typescript-eslint/eslint-plugin": "^4.6.1",
+    "@typescript-eslint/parser": "^4.6.1",
+    "apollo-server": "^2.19.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-simple-import-sort": "^5.0.3",
+    "graphql": "^15.4.0",
+    "graphql-request": "^3.3.0",
+    "graphql-tag": "^2.11.0",
+    "husky": "^4.3.0",
+    "knex": "^0.21.12",
+    "lint-staged": "^10.5.1",
+    "objection": "^2.2.3",
+    "prettier": "^2.1.2",
+    "rollup": "^2.33.1",
+    "rollup-plugin-cleaner": "^1.0.0",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "semantic-release": "^17.2.2",
+    "sqlite3": "^5.0.0",
+    "tap": "^14.10.8",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.0.5"
+  },
+  "resolutions": {
+    "typescript": "^4"
+  }
+}
