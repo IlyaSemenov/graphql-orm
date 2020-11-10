@@ -41,6 +41,33 @@ Object {
 }
 `
 
+exports[`src/tests/main.test.ts TAP Main > Posts with both author and section 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "author": Object {
+        "name": "John",
+      },
+      "id": "1",
+      "section": Object {
+        "slug": "test",
+      },
+      "title": "Hello",
+    },
+    Object {
+      "author": Object {
+        "name": "Mary",
+      },
+      "id": "4",
+      "section": Object {
+        "slug": "test",
+      },
+      "title": "Bar",
+    },
+  ],
+}
+`
+
 exports[`src/tests/main.test.ts TAP Main > User with id 1 and his posts 1`] = `
 Object {
   "user": Object {

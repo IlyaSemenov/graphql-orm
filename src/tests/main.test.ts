@@ -17,11 +17,17 @@ const schema = gql`
 		posts: [Post!]!
 	}
 
+	type Section {
+		id: ID!
+		slug: String!
+	}
+
 	type Post {
 		id: ID!
+		author: User!
+		section: Section
 		title: String
 		text: String
-		author: User
 	}
 
 	scalar Filter
@@ -67,6 +73,23 @@ class UserModel extends Model {
 	declare posts?: PostModel[]
 }
 
+class SectionModel extends Model {
+	static tableName = "sections"
+	static get relationMappings() {
+		return {
+			posts: {
+				relation: Model.HasManyRelation,
+				modelClass: PostModel,
+				join: { from: "posts.section_id", to: "sections.id" },
+			},
+		}
+	}
+
+	declare id?: number
+	declare slug?: string
+	declare posts?: PostModel[]
+}
+
 class PostModel extends Model {
 	static tableName = "posts"
 	static get relationMappings() {
@@ -76,13 +99,19 @@ class PostModel extends Model {
 				modelClass: UserModel,
 				join: { from: "posts.author_id", to: "users.id" },
 			},
+			section: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: SectionModel,
+				join: { from: "posts.section_id", to: "sections.id" },
+			},
 		}
 	}
 
 	declare id?: number
-	declare title?: string
-	declare text?: string
+	declare title?: string | null
+	declare text?: string | null
 	declare author?: UserModel
+	declare section?: SectionModel
 }
 
 async function use_db(tap: Test) {
@@ -95,12 +124,18 @@ async function use_db(tap: Test) {
 		table.integer("id").primary()
 		table.string("name")
 	})
+	await knex.schema.createTable("sections", function (table) {
+		table.integer("id").primary()
+		table.string("slug").notNullable()
+	})
 	await knex.schema.createTable("posts", function (table) {
 		table.integer("id").primary()
 		table.string("title")
 		table.string("text")
 		table.integer("author_id").notNullable()
 		table.foreign("author_id").references("id").inTable("users")
+		table.integer("section_id")
+		table.foreign("section_id").references("id").inTable("sections")
 	})
 }
 
@@ -110,7 +145,6 @@ async function use_client(tap: Test) {
 		await server.stop()
 	})
 	const { url } = await server.listen(0)
-	console.log("Listening on", url)
 	return new GraphQLClient(url)
 }
 
@@ -119,23 +153,27 @@ tap.test("Main", async (tap) => {
 	const client = await use_client(tap)
 
 	await UserModel.query().insertGraph([
-		{
-			id: 1,
-			name: "John",
-			posts: [
-				{ id: 1, title: "Hello", text: "Hello, world!" },
-				{ id: 2, title: "Bye", text: "Bye-bye, cruel world!" },
-			],
-		},
-		{
-			id: 2,
-			name: "Mary",
-			posts: [
-				{ id: 3, title: "Foo" },
-				{ id: 4, title: "Bar" },
-			],
-		},
+		{ id: 1, name: "John" },
+		{ id: 2, name: "Mary" },
 	])
+
+	await SectionModel.query().insertGraph([{ id: 1, slug: "test" }])
+
+	await PostModel.query().insertGraph(
+		[
+			{
+				id: 1,
+				author: { id: 1 },
+				section: { id: 1 },
+				title: "Hello",
+				text: "Hello, world!",
+			},
+			{ id: 2, author: { id: 1 }, title: "Bye", text: "Bye-bye, cruel world!" },
+			{ id: 3, author: { id: 2 }, title: "Foo" },
+			{ id: 4, author: { id: 2 }, section: { id: 1 }, title: "Bar" },
+		],
+		{ relate: true },
+	)
 
 	tap.matchSnapshot(
 		await client.request(
@@ -199,5 +237,25 @@ tap.test("Main", async (tap) => {
 			`,
 		),
 		"Posts where title is Hello or Foo",
+	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					posts(filter: { section_id: 1 }) {
+						id
+						title
+						author {
+							name
+						}
+						section {
+							slug
+						}
+					}
+				}
+			`,
+		),
+		"Posts with both author and section",
 	)
 })

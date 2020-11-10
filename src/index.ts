@@ -89,8 +89,8 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 	)) {
 		if (relations[field]) {
 			// Nested relation
-			query.withGraphFetched(`${field}(graphql)`).modifiers({
-				graphql: (subquery) =>
+			query.withGraphFetched(`${field}(${field})`).modifiers({
+				[field]: (subquery) =>
 					process_resolve_tree_node({
 						query: subquery,
 						resolve_tree: resolve_subtree,
