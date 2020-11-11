@@ -41,7 +41,7 @@ Object {
 }
 `
 
-exports[`src/tests/main.test.ts TAP Main > Posts with both author and section 1`] = `
+exports[`src/tests/main.test.ts TAP Main > Posts with both author and section (multiple relations) 1`] = `
 Object {
   "posts": Array [
     Object {
@@ -63,6 +63,52 @@ Object {
         "slug": "test",
       },
       "title": "Bar",
+    },
+  ],
+}
+`
+
+exports[`src/tests/main.test.ts TAP Main > Posts with url and section without slug (test nested fields dependency) 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "section": Object {
+        "name": "Test",
+      },
+      "url": "/test/Hello-1",
+    },
+    Object {
+      "section": null,
+      "url": "/Bye-2",
+    },
+    Object {
+      "section": null,
+      "url": "/Foo-3",
+    },
+    Object {
+      "section": Object {
+        "name": "Test",
+      },
+      "url": "/test/Bar-4",
+    },
+  ],
+}
+`
+
+exports[`src/tests/main.test.ts TAP Main > Posts with url only (test fields dependency) 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "url": "/test/Hello-1",
+    },
+    Object {
+      "url": "/Bye-2",
+    },
+    Object {
+      "url": "/Foo-3",
+    },
+    Object {
+      "url": "/test/Bar-4",
     },
   ],
 }

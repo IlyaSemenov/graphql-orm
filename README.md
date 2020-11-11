@@ -2,10 +2,11 @@
 
 A helper library to resolve GraphQL queries directly with objection.js models/relations.
 
-- Effective: selects only requested fields and relations
+- Effective: selects only requested fields and relations (using fine-tuned `withGraphFetched`)
 - Unlimited nested resolvers (traversing `relationMappings`)
+- Virtual attributes
 - Dynamic filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`
-- Per-model security modifiers
+- Hook into subqueries with query modifiers
 
 ## Install
 
@@ -199,9 +200,25 @@ Note that it only works reasonably for one-to-many relations, as in the example 
 
 For instance, filtering posts with `{ author: { name: "John" } }` will not work as expected.
 
-### Modifiers
+#### Filtering with model modifiers
 
-Nested models can be automatically filtered with:
+If you pass a filter like `{ public: true }`, and there is a corresponding modifier on the model, it will be applied.
+
+Example:
+
+```ts
+export class PostModel extends Model {
+	static modifiers = {
+		public: (query) => query.whereNull("delete_time"),
+	}
+}
+```
+
+Parametrized modifiers will work as well.
+
+### Query model modifiers
+
+All models can be filtered using query-level modifiers:
 
 ```ts
 PostModel.query().fetchGraphQL(info, {
@@ -209,4 +226,43 @@ PostModel.query().fetchGraphQL(info, {
 		User: (query) => query.where("active", true),
 	},
 })
+```
+
+### Virtual attributes
+
+Virtual attributes (getters on models) can be accessed as usual:
+
+```ts
+export class PostModel extends Model {
+	get url() {
+		return `/${this.id}.html`
+	}
+}
+```
+
+```graphql
+query get_all_posts {
+	posts {
+		id
+		title
+		url
+	}
+}
+```
+
+Note that if a getter relies on certain model fields (such as if `url` needs `title`), you will need to select all of them in the query.
+
+Alternatively, you can setup getter dependencies with `select.${field}` modifier, like this:
+
+```ts
+export class PostModel extends Model {
+	static modifiers = {
+		"graphql.select.url": (query) => query.select(ref("title")),
+	}
+
+	get url() {
+		assert(this.title !== undefined)
+		return `/${urlencode(this.title)}-${this.id}.html`
+	}
+}
 ```

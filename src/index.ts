@@ -107,6 +107,13 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 				has_selected_id = true
 			}
 		}
+
+		// Call field modifier
+		const modifier_name = `graphql.select.${field}`
+		if (Model.modifiers?.[modifier_name]) {
+			// Call modifier
+			query.modify(modifier_name)
+		}
 	}
 
 	if (!has_selected_id) {
