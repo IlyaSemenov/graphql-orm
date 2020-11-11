@@ -38,24 +38,6 @@ const schema = gql`
 	}
 `
 
-type Resolver<A> = (
-	parent: unknown,
-	args: A,
-	ctx: unknown,
-	info: GraphQLResolveInfo,
-) => any
-
-const resolvers: Record<string, Record<string, Resolver<any>>> = {
-	Query: {
-		user: (parent, { id }, ctx: unknown, info) => {
-			return UserModel.query().findById(id).fetchGraphQL(info)
-		},
-		posts: (parent, { filter }, ctx, info) => {
-			return PostModel.query().fetchGraphQL(info, { filter })
-		},
-	},
-}
-
 class UserModel extends Model {
 	static tableName = "users"
 	static get relationMappings() {
@@ -68,9 +50,9 @@ class UserModel extends Model {
 		}
 	}
 
-	declare id?: number
-	declare name?: string
-	declare posts?: PostModel[]
+	declare id: number
+	declare name: string
+	declare posts: PostModel[]
 }
 
 class SectionModel extends Model {
@@ -85,9 +67,9 @@ class SectionModel extends Model {
 		}
 	}
 
-	declare id?: number
-	declare slug?: string
-	declare posts?: PostModel[]
+	declare id: number
+	declare slug: string
+	declare posts: PostModel[]
 }
 
 class PostModel extends Model {
@@ -107,11 +89,29 @@ class PostModel extends Model {
 		}
 	}
 
-	declare id?: number
-	declare title?: string | null
-	declare text?: string | null
-	declare author?: UserModel
-	declare section?: SectionModel
+	declare id: number
+	declare title: string | null
+	declare text: string | null
+	declare author: UserModel
+	declare section: SectionModel
+}
+
+type Resolver<A> = (
+	parent: unknown,
+	args: A,
+	ctx: unknown,
+	info: GraphQLResolveInfo,
+) => any
+
+const resolvers: Record<string, Record<string, Resolver<any>>> = {
+	Query: {
+		user: (parent, { id }, ctx: unknown, info) => {
+			return UserModel.query().findById(id).fetchGraphQL(info)
+		},
+		posts: async (parent, { filter }, ctx, info) => {
+			return PostModel.query().fetchGraphQL(info, { filter })
+		},
+	},
 }
 
 async function use_db(tap: Test) {
