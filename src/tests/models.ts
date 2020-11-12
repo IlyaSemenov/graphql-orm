@@ -16,6 +16,7 @@ export class UserModel extends Model {
 
 	declare id: number
 	declare name: string
+	declare password: string
 	declare posts: PostModel[]
 }
 
@@ -87,6 +88,7 @@ export async function create_tables(knex: Knex) {
 	await knex.schema.createTable("users", function (table) {
 		table.integer("id").primary()
 		table.string("name")
+		table.string("password")
 	})
 	await knex.schema.createTable("sections", function (table) {
 		table.integer("id").primary()

@@ -9,7 +9,7 @@ tap.test("Main", async (tap) => {
 	const client = await use_client(tap)
 
 	await UserModel.query().insertGraph([
-		{ id: 1, name: "John" },
+		{ id: 1, name: "John", password: "secret" },
 		{ id: 2, name: "Mary" },
 	])
 
@@ -144,5 +144,19 @@ tap.test("Main", async (tap) => {
 			`,
 		),
 		"Posts with url and section without slug (test nested fields dependency)",
+	)
+
+	tap.rejects(
+		client.request(
+			gql`
+				{
+					user(id: 1) {
+						name
+						password
+					}
+				}
+			`,
+		),
+		"Reject retrieving user password (field not defined in schema)",
 	)
 })
