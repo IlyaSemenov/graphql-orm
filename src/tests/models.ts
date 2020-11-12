@@ -1,5 +1,5 @@
 import Knex from "knex"
-import { Model, QueryBuilder, ref } from "objection"
+import { Model, QueryBuilder } from "objection"
 import { assert } from "tap"
 
 export class UserModel extends Model {
@@ -32,9 +32,16 @@ export class SectionModel extends Model {
 		}
 	}
 
+	static modifiers = {
+		graphql: (query: QueryBuilder<UserModel>) =>
+			query.where("is_hidden", false),
+		"graphql.many": (query: QueryBuilder<UserModel>) => query.orderBy("name"),
+	}
+
 	declare id: number
 	declare slug: string
 	declare name: string
+	declare is_hidden: boolean
 	declare posts: PostModel[]
 }
 
@@ -62,7 +69,7 @@ export class PostModel extends Model {
 			query.where("title", "like", `%${term}%`),
 		"graphql.select.url": (query: QueryBuilder<PostModel>) =>
 			query
-				.select(ref("title"))
+				.select("title")
 				.withGraphFetched("section(section_slug)")
 				.modifiers({
 					section_slug: (query) => query.select("slug"),
@@ -98,6 +105,7 @@ export async function create_tables(knex: Knex) {
 		table.integer("id").primary()
 		table.string("slug").notNullable().unique()
 		table.string("name")
+		table.boolean("is_hidden").notNullable().defaultTo(false)
 	})
 	await knex.schema.createTable("posts", function (table) {
 		table.integer("id").primary()

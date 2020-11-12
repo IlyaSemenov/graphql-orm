@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from "graphql"
 
-import { PostModel, UserModel } from "./models"
+import { PostModel, SectionModel, UserModel } from "./models"
 
 type Resolver<A> = (
 	parent: unknown,
@@ -13,6 +13,9 @@ export const resolvers: Record<string, Record<string, Resolver<any>>> = {
 	Query: {
 		user: (parent, { id }, ctx: unknown, info) => {
 			return UserModel.query().findById(id).fetchGraphQL(info)
+		},
+		sections: async (parent, { filter }, ctx, info) => {
+			return SectionModel.query().fetchGraphQL(info, { filter })
 		},
 		posts: async (parent, { filter }, ctx, info) => {
 			return PostModel.query().fetchGraphQL(info, { filter })

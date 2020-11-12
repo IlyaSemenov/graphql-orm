@@ -276,3 +276,18 @@ export class PostModel extends Model {
 	}
 }
 ```
+
+### Global model modifiers
+
+The following model modifiers, when exist, are automatically applied on each query (including when resolving nested relations):
+
+```ts
+export class PostModel extends Model {
+	static modifiers = {
+		// Applied on each query
+		graphql: (query) => query.where("is_hidden", false),
+		// Applied on each query that is returning an array (not a single object)
+		"graphql.many": (query) => query.orderBy("publish_time", "desc"),
+	}
+}
+```

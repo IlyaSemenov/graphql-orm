@@ -49,13 +49,6 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 }) {
 	const Model = query.modelClass()
 
-	if (Model.modifiers?.graphQL) {
-		query.modify("graphQL")
-	}
-	if (Model.modifiers?.graphQLMany && !query.has("first")) {
-		query.modify("graphQLMany")
-	}
-
 	const type_name = Object.keys(resolve_tree.fieldsByTypeName)[0]
 
 	const type_query_modifier = modifiers?.[type_name]
@@ -176,6 +169,13 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 				}
 			}
 		}
+	}
+
+	if (Model.modifiers?.graphql) {
+		query.modify("graphql")
+	}
+	if (Model.modifiers?.["graphql.many"] && !query.has("first")) {
+		query.modify("graphql.many")
 	}
 
 	return query

@@ -26,6 +26,7 @@ export const schema = gql`
 
 	type Query {
 		user(id: ID!): User
+		sections(filter: Filter): [Section!]!
 		posts(filter: Filter): [Post!]!
 	}
 `

@@ -15,6 +15,8 @@ tap.test("Main", async (tap) => {
 
 	await SectionModel.query().insertGraph([
 		{ id: 1, slug: "test", name: "Test" },
+		{ id: 2, slug: "news", name: "News" },
+		{ id: 3, slug: "hidden", name: "Hidden", is_hidden: true },
 	])
 
 	await PostModel.query().insertGraph(
@@ -27,7 +29,7 @@ tap.test("Main", async (tap) => {
 				text: "Hello, world!",
 			},
 			{ id: 2, author: { id: 1 }, title: "Bye", text: "Bye-bye, cruel world!" },
-			{ id: 3, author: { id: 2 }, title: "Foo" },
+			{ id: 3, author: { id: 2 }, section: { id: 3 }, title: "Foo" },
 			{ id: 4, author: { id: 2 }, section: { id: 1 }, title: "Bar" },
 		],
 		{ relate: true },
@@ -202,5 +204,36 @@ tap.test("Main", async (tap) => {
 			`,
 		),
 		"Posts with 'Bye' in title (parameterized filter modifier)",
+	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					sections {
+						id
+						name
+					}
+				}
+			`,
+		),
+		"All sections, ordered, excluding hidden (test both global model modifiers)",
+	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					posts(filter: { section_id: 3 }) {
+						id
+						title
+						section {
+							name
+						}
+					}
+				}
+			`,
+		),
+		"Find post under Hidden section (test global model modifier)",
 	)
 })

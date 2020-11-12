@@ -5,6 +5,33 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
+exports[`src/tests/main.test.ts TAP Main > All sections, ordered, excluding hidden (test both global model modifiers) 1`] = `
+Object {
+  "sections": Array [
+    Object {
+      "id": "2",
+      "name": "News",
+    },
+    Object {
+      "id": "1",
+      "name": "Test",
+    },
+  ],
+}
+`
+
+exports[`src/tests/main.test.ts TAP Main > Find post under Hidden section (test global model modifier) 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "id": "3",
+      "section": null,
+      "title": "Foo",
+    },
+  ],
+}
+`
+
 exports[`src/tests/main.test.ts TAP Main > Posts where author_id=2 1`] = `
 Object {
   "posts": Array [
@@ -116,7 +143,7 @@ Object {
       "url": "/Bye-2",
     },
     Object {
-      "url": "/Foo-3",
+      "url": "/hidden/Foo-3",
     },
     Object {
       "url": "/test/Bar-4",
@@ -134,6 +161,11 @@ Object {
         "slug": "test",
       },
       "title": "Hello",
+    },
+    Object {
+      "id": "3",
+      "section": null,
+      "title": "Foo",
     },
     Object {
       "id": "4",
