@@ -172,4 +172,35 @@ tap.test("Main", async (tap) => {
 		),
 		"User with name->user_name (field alias)",
 	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					posts(filter: { published: true }) {
+						id
+						title
+						section {
+							slug
+						}
+					}
+				}
+			`,
+		),
+		"Published posts (filter modifier)",
+	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					posts(filter: { search: "Bye" }) {
+						id
+						title
+					}
+				}
+			`,
+		),
+		"Posts with 'Bye' in title (parameterized filter modifier)",
+	)
 })

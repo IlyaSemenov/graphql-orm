@@ -56,6 +56,10 @@ export class PostModel extends Model {
 	}
 
 	static modifiers = {
+		published: (query: QueryBuilder<PostModel>) =>
+			query.whereNotNull("section_id"),
+		search: (query: QueryBuilder<PostModel>, term: string) =>
+			query.where("title", "like", `%${term}%`),
 		"graphql.select.url": (query: QueryBuilder<PostModel>) =>
 			query
 				.select(ref("title"))

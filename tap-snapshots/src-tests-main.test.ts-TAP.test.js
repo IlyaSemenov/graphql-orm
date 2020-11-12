@@ -41,6 +41,17 @@ Object {
 }
 `
 
+exports[`src/tests/main.test.ts TAP Main > Posts with 'Bye' in title (parameterized filter modifier) 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "id": "2",
+      "title": "Bye",
+    },
+  ],
+}
+`
+
 exports[`src/tests/main.test.ts TAP Main > Posts with both author and section (multiple relations) 1`] = `
 Object {
   "posts": Array [
@@ -109,6 +120,27 @@ Object {
     },
     Object {
       "url": "/test/Bar-4",
+    },
+  ],
+}
+`
+
+exports[`src/tests/main.test.ts TAP Main > Published posts (filter modifier) 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "id": "1",
+      "section": Object {
+        "slug": "test",
+      },
+      "title": "Hello",
+    },
+    Object {
+      "id": "4",
+      "section": Object {
+        "slug": "test",
+      },
+      "title": "Bar",
     },
   ],
 }
