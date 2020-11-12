@@ -12,13 +12,13 @@ type Resolver<A> = (
 export const resolvers: Record<string, Record<string, Resolver<any>>> = {
 	Query: {
 		user: (parent, { id }, ctx: unknown, info) => {
-			return UserModel.query().findById(id).fetchGraphQL(info)
+			return UserModel.query().findById(id).withGraphQL(info)
 		},
 		sections: async (parent, { filter }, ctx, info) => {
-			return SectionModel.query().fetchGraphQL(info, { filter })
+			return SectionModel.query().withGraphQL(info, { filter })
 		},
 		posts: async (parent, { filter }, ctx, info) => {
-			return PostModel.query().fetchGraphQL(info, { filter })
+			return PostModel.query().withGraphQL(info, { filter })
 		},
 	},
 }

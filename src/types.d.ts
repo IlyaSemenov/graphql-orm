@@ -12,6 +12,6 @@ export * from "."
 declare module "objection" {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	export interface QueryBuilder<M extends Model, R = M[]> {
-		fetchGraphQL(info: GraphQLResolveInfo, options?: FetchOptions): this
+		withGraphQL(info: GraphQLResolveInfo, options?: FetchOptions): this
 	}
 }

@@ -53,7 +53,7 @@ Define resolver:
 export const resolvers = {
 	Query: {
 		posts: (parent, args, ctx, info) => {
-			return PostModel.query().fetchGraphQL(info)
+			return PostModel.query().withGraphQL(info)
 		},
 	},
 }
@@ -134,7 +134,7 @@ Resolver:
 
 ```ts
 // for the query above, will pull posts with related author object
-PostModel.query().fetchGraphQL(info)
+PostModel.query().withGraphQL(info)
 ```
 
 ### Filters
@@ -142,7 +142,7 @@ PostModel.query().fetchGraphQL(info)
 Queries can be filtered like this:
 
 ```ts
-PostModel.query().fetchGraphQL(info, {
+PostModel.query().withGraphQL(info, {
 	filter: {
 		date: "2020-10-01",
 		// Only pull posts where author_id is 123 or 456.
@@ -169,7 +169,7 @@ and then in resolver:
 export const resolvers = {
 	Query: {
 		posts: (parent, { filter }, ctx, info) => {
-			return PostModel.query().fetchGraphQL(info, { filter })
+			return PostModel.query().withGraphQL(info, { filter })
 		},
 	},
 }
@@ -186,7 +186,7 @@ Supported operators:
 You can filter nested relations with a nested filter:
 
 ```ts
-UserModel.query().fetchGraphQL(info, {
+UserModel.query().withGraphQL(info, {
 	filter: {
 		id: 123,
 		posts: {
@@ -216,7 +216,7 @@ export class PostModel extends Model {
 then you can filter results with:
 
 ```ts
-UserModel.query().fetchGraphQL(info, {
+UserModel.query().withGraphQL(info, {
 	filter: {
 		public: true, // even though the actual value is ignored, sending true is a reasonable convention
 		search: "hello",
@@ -231,7 +231,7 @@ Modifier filters take precedence over raw field filters.
 All models can be filtered using query-level modifiers:
 
 ```ts
-PostModel.query().fetchGraphQL(info, {
+PostModel.query().withGraphQL(info, {
 	modifiers: {
 		User: (query) => query.where("active", true),
 	},

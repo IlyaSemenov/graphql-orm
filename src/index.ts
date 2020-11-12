@@ -23,7 +23,7 @@ export interface FetchOptions {
 	modifiers?: Modifiers
 }
 
-QueryBuilder.prototype.fetchGraphQL = function <QB extends AnyQueryBuilder>(
+QueryBuilder.prototype.withGraphQL = function <QB extends AnyQueryBuilder>(
 	this: QB,
 	info: GraphQLResolveInfo,
 	options?: FetchOptions,
