@@ -202,19 +202,29 @@ For instance, filtering posts with `{ author: { name: "John" } }` will not work 
 
 #### Filtering with model modifiers
 
-If you pass a filter like `{ public: true }`, and there is a corresponding modifier on the model, it will be applied.
-
-Example:
+If you define modifiers on a model class:
 
 ```ts
 export class PostModel extends Model {
 	static modifiers = {
 		public: (query) => query.whereNull("delete_time"),
+		search: (query, term) => query.where("text", "ilike", `%${term}%`),
 	}
 }
 ```
 
-Parametrized modifiers will work as well.
+then you can filter results with:
+
+```ts
+UserModel.query().fetchGraphQL(info, {
+	filter: {
+		public: true, // even though the actual value is ignored, sending true is a reasonable convention
+		search: "hello",
+	},
+})
+```
+
+Modifier filters take precedence over raw field filters.
 
 ### Query model modifiers
 
