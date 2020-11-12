@@ -84,9 +84,10 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 
 	// Run select() and withGraphFetched() for fields requested in GraphQL query
 	let has_selected_id = false
-	for (const [field, resolve_subtree] of Object.entries(
+	for (const resolve_subtree of Object.values(
 		resolve_tree.fieldsByTypeName[type_name],
 	)) {
+		const field = resolve_subtree.name
 		if (relations[field]) {
 			// Nested relation
 			query.withGraphFetched(`${field}(${field})`).modifiers({

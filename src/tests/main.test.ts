@@ -159,4 +159,17 @@ tap.test("Main", async (tap) => {
 		),
 		"Reject retrieving user password (field not defined in schema)",
 	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					user(id: 1) {
+						user_name: name
+					}
+				}
+			`,
+		),
+		"User with name->user_name (field alias)",
+	)
 })

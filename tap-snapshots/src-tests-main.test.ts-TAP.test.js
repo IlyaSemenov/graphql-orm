@@ -134,3 +134,11 @@ Object {
   },
 }
 `
+
+exports[`src/tests/main.test.ts TAP Main > User with name->user_name (field alias) 1`] = `
+Object {
+  "user": Object {
+    "user_name": "John",
+  },
+}
+`
