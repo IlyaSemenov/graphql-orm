@@ -8,16 +8,19 @@ tap.test("Main", async (tap) => {
 	await use_db(tap)
 	const client = await use_client(tap)
 
-	await UserModel.query().insertGraph([
-		{ id: 1, name: "John", password: "secret" },
-		{ id: 2, name: "Mary" },
-	])
-
 	await SectionModel.query().insertGraph([
 		{ id: 1, slug: "test", name: "Test" },
 		{ id: 2, slug: "news", name: "News" },
 		{ id: 3, slug: "hidden", name: "Hidden", is_hidden: true },
 	])
+
+	await UserModel.query().insertGraph(
+		[
+			{ id: 1, name: "John", password: "secret", default_section: { id: 1 } },
+			{ id: 2, name: "Mary" },
+		],
+		{ relate: true },
+	)
 
 	await PostModel.query().insertGraph(
 		[
@@ -235,5 +238,23 @@ tap.test("Main", async (tap) => {
 			`,
 		),
 		"Find post under Hidden section (test global model modifier)",
+	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					posts(filter: { under_default_section: { user_id: 1 } }) {
+						id
+						title
+						section {
+							id
+							name
+						}
+					}
+				}
+			`,
+		),
+		"Find post under User ID=1's default section (test async model modifier)",
 	)
 })

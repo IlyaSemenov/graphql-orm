@@ -32,6 +32,29 @@ Object {
 }
 `
 
+exports[`src/tests/main.test.ts TAP Main > Find post under User ID=1's default section (test async model modifier) 1`] = `
+Object {
+  "posts": Array [
+    Object {
+      "id": "1",
+      "section": Object {
+        "id": "1",
+        "name": "Test",
+      },
+      "title": "Hello",
+    },
+    Object {
+      "id": "4",
+      "section": Object {
+        "id": "1",
+        "name": "Test",
+      },
+      "title": "Bar",
+    },
+  ],
+}
+`
+
 exports[`src/tests/main.test.ts TAP Main > Posts where author_id=2 1`] = `
 Object {
   "posts": Array [

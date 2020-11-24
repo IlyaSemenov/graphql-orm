@@ -11,6 +11,11 @@ export class UserModel extends Model {
 				modelClass: PostModel,
 				join: { from: "posts.author_id", to: "users.id" },
 			},
+			default_section: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: SectionModel,
+				join: { from: "users.default_section_id", to: "sections.id" },
+			},
 		}
 	}
 
@@ -18,6 +23,8 @@ export class UserModel extends Model {
 	declare name: string
 	declare password: string
 	declare posts: PostModel[]
+	declare default_section_id: number
+	declare default_section: SectionModel
 }
 
 export class SectionModel extends Model {
@@ -63,10 +70,23 @@ export class PostModel extends Model {
 	}
 
 	static modifiers = {
-		published: (query: QueryBuilder<PostModel>) =>
-			query.whereNotNull("section_id"),
-		search: (query: QueryBuilder<PostModel>, term: string) =>
-			query.where("title", "like", `%${term}%`),
+		published(query: QueryBuilder<PostModel>) {
+			query.whereNotNull("section_id")
+		},
+		search(query: QueryBuilder<PostModel>, term: string) {
+			query.where("title", "like", `%${term}%`)
+		},
+		under_default_section(
+			query: QueryBuilder<PostModel>,
+			{ user_id }: { user_id: string },
+		) {
+			query.runBefore(async function () {
+				const { default_section_id } = await UserModel.query(
+					this.context().transaction,
+				).findById(user_id)
+				this.where("section_id", default_section_id)
+			})
+		},
 		"graphql.select.url": (query: QueryBuilder<PostModel>) =>
 			query
 				.select("title")
@@ -106,6 +126,10 @@ export async function create_tables(knex: Knex) {
 		table.string("slug").notNullable().unique()
 		table.string("name")
 		table.boolean("is_hidden").notNullable().defaultTo(false)
+	})
+	await knex.schema.alterTable("users", function (table) {
+		table.integer("default_section_id")
+		table.foreign("default_section_id").references("id").inTable("sections")
 	})
 	await knex.schema.createTable("posts", function (table) {
 		table.integer("id").primary()
