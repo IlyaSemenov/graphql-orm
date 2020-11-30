@@ -183,6 +183,7 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 		query.modify("graphql")
 	}
 	if (Model.modifiers?.["graphql.many"] && !query.has("first")) {
+		// TODO: exclude XxxOne relations?
 		query.modify("graphql.many")
 	}
 	if (!relation && Model.modifiers?.["graphql.top"]) {

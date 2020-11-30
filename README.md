@@ -288,6 +288,8 @@ export class PostModel extends Model {
 		graphql: (query) => query.where("is_hidden", false),
 		// Applied on each query that is returning an array (not a single object)
 		"graphql.many": (query) => query.orderBy("publish_time", "desc"),
+		// Applied on each top-level query (not nested relation)
+		"graphql.top": (query) => query.where("is_top", true),
 	}
 }
 ```
