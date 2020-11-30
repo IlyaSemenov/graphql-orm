@@ -40,7 +40,7 @@ export class SectionModel extends Model {
 	}
 
 	static modifiers = {
-		graphql: (query: QueryBuilder<UserModel>) =>
+		"graphql.top": (query: QueryBuilder<UserModel>) =>
 			query.where("is_hidden", false),
 		"graphql.many": (query: QueryBuilder<UserModel>) => query.orderBy("name"),
 	}

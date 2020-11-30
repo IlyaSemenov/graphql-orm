@@ -1,6 +1,11 @@
 import { GraphQLResolveInfo } from "graphql"
 import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
-import { AnyQueryBuilder, QueryBuilder, RelationMappings } from "objection"
+import {
+	AnyQueryBuilder,
+	QueryBuilder,
+	RelationMappings,
+	RelationType,
+} from "objection"
 
 export type FilterNonNullScalarValue = string | number | boolean
 export type FilterScalarValue = null | FilterNonNullScalarValue
@@ -30,9 +35,9 @@ QueryBuilder.prototype.withGraphQL = function <QB extends AnyQueryBuilder>(
 ) {
 	const resolve_tree = parseResolveInfo(info) as ResolveTree
 	return process_resolve_tree_node({
+		...options,
 		query: this,
 		resolve_tree,
-		...options,
 	})
 }
 
@@ -41,11 +46,13 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 	resolve_tree,
 	filter,
 	modifiers,
+	relation,
 }: {
 	query: QB
 	resolve_tree: ResolveTree
 	filter?: Filter
 	modifiers?: Modifiers
+	relation?: RelationType
 }) {
 	const Model = query.modelClass()
 
@@ -90,6 +97,7 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 						resolve_tree: resolve_subtree,
 						filter: filter?.[field] as Filter,
 						modifiers,
+						relation: relations[field].relation,
 					}),
 			})
 		} else if (getters.has(field)) {
@@ -176,6 +184,9 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 	}
 	if (Model.modifiers?.["graphql.many"] && !query.has("first")) {
 		query.modify("graphql.many")
+	}
+	if (!relation && Model.modifiers?.["graphql.top"]) {
+		query.modify("graphql.top")
 	}
 
 	return query

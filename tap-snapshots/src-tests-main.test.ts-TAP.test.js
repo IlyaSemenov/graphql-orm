@@ -25,7 +25,9 @@ Object {
   "posts": Array [
     Object {
       "id": "3",
-      "section": null,
+      "section": Object {
+        "name": "Hidden",
+      },
       "title": "Foo",
     },
   ],
@@ -143,8 +145,10 @@ Object {
       "url": "/Bye-2",
     },
     Object {
-      "section": null,
-      "url": "/Foo-3",
+      "section": Object {
+        "name": "Hidden",
+      },
+      "url": "/hidden/Foo-3",
     },
     Object {
       "section": Object {
@@ -187,7 +191,9 @@ Object {
     },
     Object {
       "id": "3",
-      "section": null,
+      "section": Object {
+        "slug": "hidden",
+      },
       "title": "Foo",
     },
     Object {
