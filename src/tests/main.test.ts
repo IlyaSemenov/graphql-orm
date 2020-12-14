@@ -257,4 +257,19 @@ tap.test("Main", async (tap) => {
 		),
 		"Find post under User ID=1's default section (test async model modifier)",
 	)
+
+	tap.matchSnapshot(
+		await client.request(
+			gql`
+				{
+					user(id: 1) {
+						id
+						name
+						upper_name
+					}
+				}
+			`,
+		),
+		"User with id 1 with his upper_name",
+	)
 })

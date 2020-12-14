@@ -228,6 +228,16 @@ Object {
 }
 `
 
+exports[`src/tests/main.test.ts TAP Main > User with id 1 with his upper_name 1`] = `
+Object {
+  "user": Object {
+    "id": "1",
+    "name": "John",
+    "upper_name": "JOHN",
+  },
+}
+`
+
 exports[`src/tests/main.test.ts TAP Main > User with name->user_name (field alias) 1`] = `
 Object {
   "user": Object {

@@ -260,7 +260,9 @@ query get_all_posts {
 }
 ```
 
-Note that if a getter relies on certain model fields (such as if `url` needs `title`), you will need to select all of them in the query.
+#### Virtual attribute dependencies
+
+If a getter relies on certain model fields (such as if `url` needs `title`), you will need to select all of them in the query.
 
 Alternatively, you can setup getter dependencies with `select.${field}` modifier, like this:
 
@@ -274,6 +276,30 @@ export class PostModel extends Model {
 		assert(this.title !== undefined)
 		return `/${urlencode(this.title)}-${this.id}.html`
 	}
+}
+```
+
+#### Virtual attributes provided by the database
+
+`select.${field}` modifier can also be used to fill the virtual attribute with a raw subquery:
+
+```graphql
+type Post {
+	id: ID
+	title: String
+	upper_title: String
+}
+```
+
+```ts
+export class PostModel extends Model {
+	static modifiers = {
+		"graphql.select.upper_title": (query) =>
+			query.select(raw("upper(title) as upper_title")),
+	}
+
+	// Optionally for Typescript
+	declare readonly upper_title: string
 }
 ```
 

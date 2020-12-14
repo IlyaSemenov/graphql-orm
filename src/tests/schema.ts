@@ -4,6 +4,7 @@ export const schema = gql`
 	type User {
 		id: ID!
 		name: String
+		upper_name: String
 		posts: [Post!]!
 	}
 

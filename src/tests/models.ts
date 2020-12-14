@@ -1,5 +1,5 @@
 import Knex from "knex"
-import { Model, QueryBuilder } from "objection"
+import { Model, QueryBuilder, raw } from "objection"
 import { assert } from "tap"
 
 export class UserModel extends Model {
@@ -19,8 +19,14 @@ export class UserModel extends Model {
 		}
 	}
 
+	static modifiers = {
+		"graphql.select.upper_name": (query: QueryBuilder<UserModel>) =>
+			query.select(raw("upper(name) as upper_name")),
+	}
+
 	declare id: number
 	declare name: string
+	declare readonly upper_name: string
 	declare password: string
 	declare posts: PostModel[]
 	declare default_section_id: number

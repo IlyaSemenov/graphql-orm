@@ -88,6 +88,9 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 		resolve_tree.fieldsByTypeName[type_name],
 	)) {
 		const field = resolve_subtree.name
+		const modifier_name = `graphql.select.${field}`
+		const has_modifier = Model.modifiers?.[modifier_name]
+
 		if (relations[field]) {
 			// Nested relation
 			query.withGraphFetched(`${field}(${field})`).modifiers({
@@ -100,8 +103,9 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 						relation: relations[field].relation,
 					}),
 			})
-		} else if (getters.has(field)) {
+		} else if (getters.has(field) || has_modifier) {
 			// Getter - do nothing, it will be pulled by the external graphql resolver runner
+			// Modifier - do nothing, it's supposed to fill this.field
 		} else {
 			// Normal field - select() it
 			query.select(field)
@@ -111,9 +115,7 @@ function process_resolve_tree_node<QB extends AnyQueryBuilder>({
 		}
 
 		// Call field modifier
-		const modifier_name = `graphql.select.${field}`
-		if (Model.modifiers?.[modifier_name]) {
-			// Call modifier
+		if (has_modifier) {
 			query.modify(modifier_name)
 		}
 	}
