@@ -1,24 +1,44 @@
-import { GraphQLResolveInfo } from "graphql"
+import { CursorPaginator } from "objection-graphql-resolver"
 
-import { PostModel, SectionModel, UserModel } from "./models"
+import { resolve_graph } from "./graph"
+import { PostModel } from "./models/post"
+import { SectionModel } from "./models/section"
+import { UserModel } from "./models/user"
+import { Resolvers } from "./server"
 
-type Resolver<A> = (
-	parent: unknown,
-	args: A,
-	ctx: unknown,
-	info: GraphQLResolveInfo,
-) => any
-
-export const resolvers: Record<string, Record<string, Resolver<any>>> = {
+export const resolvers: Resolvers = {
 	Query: {
-		user: (parent, { id }, ctx: unknown, info) => {
-			return UserModel.query().findById(id).withGraphQL(info)
+		user: async (_parent, { id }, ctx, info) => {
+			const user = await resolve_graph(
+				ctx,
+				info,
+				UserModel.query().findById(id),
+			)
+			return user
 		},
-		sections: async (parent, { filter }, ctx, info) => {
-			return SectionModel.query().withGraphQL(info, { filter })
+		section: async (parent, { slug }, ctx, info) => {
+			const section = await resolve_graph(
+				ctx,
+				info,
+				SectionModel.query().findOne({ slug }),
+			)
+			return section
 		},
-		posts: async (parent, { filter }, ctx, info) => {
-			return PostModel.query().withGraphQL(info, { filter })
+		sections: async (parent, args, ctx, info) => {
+			const page = await resolve_graph(ctx, info, SectionModel.query(), {
+				paginate: CursorPaginator({
+					take: 2,
+					fields: ["name", "-id"],
+				}),
+			})
+			return page
+		},
+		posts: async (parent, args, ctx, info) => {
+			const page = await resolve_graph(ctx, info, PostModel.query(), {
+				paginate: CursorPaginator({ take: 2, fields: ["-id"] }),
+				filter: true,
+			})
+			return page
 		},
 	},
 }

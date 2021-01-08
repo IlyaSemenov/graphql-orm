@@ -1,15 +1,15 @@
 {
-  "name": "objection-fetch-graphql",
-  "description": "objection.js plugin: resolve GraphQL query using fetchGraph",
+  "name": "objection-graphql-resolver",
+  "description": "objection.js plugin: resolve GraphQL query using withGraphFetched",
   "version": "0.0.0-development",
   "repository": {
     "type": "git",
-    "url": "https://github.com/IlyaSemenov/objection-fetch-graphql.git"
+    "url": "https://github.com/IlyaSemenov/objection-graphql-resolver.git"
   },
   "author": "Ilya Semenov",
   "license": "MIT",
   "main": "dist/index.js",
-  "types": "dist/types.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -36,7 +36,10 @@
     ]
   },
   "dependencies": {
-    "graphql-parse-resolve-info": "^4.9.0"
+    "graphql-parse-resolve-info": "^4.10.0"
+  },
+  "peerDependencies": {
+    "objection": "^2"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
@@ -50,16 +53,15 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-simple-import-sort": "^5.0.3",
     "graphql": "^15.4.0",
-    "graphql-request": "^3.3.0",
+    "graphql-request": "^3.4.0",
     "graphql-tag": "^2.11.0",
     "husky": "^4.3.0",
-    "knex": "^0.21.12",
+    "knex": "^0.21.14",
     "lint-staged": "^10.5.1",
-    "objection": "^2.2.3",
+    "objection": "^2.2.5",
     "prettier": "^2.1.2",
     "rollup": "^2.33.1",
     "rollup-plugin-cleaner": "^1.0.0",
-    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-typescript2": "^0.29.0",
     "semantic-release": "^17.2.2",
     "sqlite3": "^5.0.0",

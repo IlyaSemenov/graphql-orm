@@ -8,7 +8,7 @@
 		"target": "ES2018",
 		"baseUrl": ".",
 		"paths": {
-			"objection-fetch-graphql": ["./src"]
+			"objection-graphql-resolver": ["./src"]
 		}
 	},
 	"include": ["src"]

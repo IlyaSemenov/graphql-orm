@@ -1,250 +1,249 @@
-# objection-fetch-graphql
+# objection-graphql-resolver
 
-A helper library to resolve GraphQL queries directly with objection.js models/relations.
+A helper library to resolve GraphQL queries directly with [Objection.js](https://vincit.github.io/objection.js/) models and relations.
 
-- Effective: selects only requested fields and relations (using fine-tuned `withGraphFetched`)
-- Unlimited nested resolvers (traversing `relationMappings`)
-- Virtual attributes
-- Dynamic filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`
+- Highly effective: selects only requested fields and relations (using fine-tuned `withGraphFetched`)
+- Support unlimited nested resolvers (traversing `relationMappings`)
+- Support pagination
+- Support virtual attributes
+- Support filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`
 - Hook into subqueries with query modifiers
+- Hook into field results to restrict access to sensitive information
+
+## History
+
+Before 3.0.0, this library used to be named `objection-fetch-graphql`.
 
 ## Install
 
 ```
-yarn add objection-fetch-graphql
+yarn add objection-graphql-resolver
 ```
 
-## Use
-
-Create GraphQL schema:
-
-```graphql
-type Post {
-	id: ID
-	title: String
-	text: String
-}
-
-type Query {
-	posts: [Post!]!
-}
-```
-
-Create objection.js model:
-
-```ts
-import { Model } from "objection"
-
-export class PostModel extends Model {
-	static tableName = "posts"
-}
-```
-
-Import `objection-fetch-graphql` somewhere in entry point:
-
-```ts
-// Somewhere in entry point: it monkey-patches objection.js
-import "objection-fetch-graphql"
-```
-
-Define resolver:
-
-```ts
-export const resolvers = {
-	Query: {
-		posts: (parent, args, ctx, info) => {
-			return PostModel.query().withGraphQL(info)
-		},
-	},
-}
-```
+## Minimal all-in-one example
 
 Run GraphQL server:
 
 ```ts
+// Everything is put into a single file for demonstration purposes.
+//
+// In real projects, you will want to separate models, typedefs,
+// model resolvers, and the server into their own modules.
+
+import { ApolloServer } from "apollo-server"
+import gql from "graphql-tag"
+import { Model } from "objection"
+import {
+	CursorPaginator,
+	GraphResolver,
+	ModelResolver,
+} from "objection-graphql-resolver"
+
+class PostModel extends Model {
+	static tableName = "posts"
+
+	declare id: number
+	declare text: string
+}
+
+const typeDefs = gql`
+	type Post {
+		id: ID!
+		text: String!
+	}
+
+	# Simplified paginator
+	# Relay-style pagination is also supported.
+	type PostPage {
+		nodes: [PostPage]!
+		cursor: String
+	}
+
+	type Query {
+		posts: PostPage!
+	}
+`
+
+const resolveGraph = GraphResolver({
+	// Map GraphQL types to model resolvers
+	Post: ModelResolver(PostModel, {
+		// List fields that can be accessed via GraphQL
+		fields: {
+			id: true,
+			text: true,
+		},
+	}),
+})
+
+const resolvers = {
+	Query: {
+		posts: async (parent, args, ctx, info) => {
+			const page = await resolveGraph(ctx, info, Post.query(), {
+				paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
+			})
+			return page
+		},
+	},
+}
+
 new ApolloServer({ typeDefs, resolvers }).listen({ port: 4000 })
 ```
 
-Define GraphQL query:
-
-```graphql
-query get_all_posts {
-	posts {
-		id
-		title
-		# text is not requested, and will not be selected from DB
-	}
-}
-```
-
-Execute it:
+Query it with GraphQL client:
 
 ```ts
-// Using @graphql-codegen/typescript-graphql-request
-const sdk = getSdk(new GraphQLClient("http://127.0.0.1:4000"))
-await sdk.get_all_posts()
-```
+import { GraphQLClient } from "graphql-request"
+import gql from "graphql-tag"
 
-### Relations
+const client = new GraphQLClient("http://127.0.0.1:4000")
 
-Relations will be fetched automatically using `withGraphFetched()` for the nested fields.
-
-Consider schema:
-
-```graphql
-type Post {
-	id: ID
-	text: String
-	author: User
-}
-```
-
-Model:
-
-```ts
-export class PostModel extends Model {
-	static tableName = "posts"
-	static get relationMappings() {
-		return {
-			author: {
-				relation: Model.BelongsToOneRelation,
-				modelClass: UserModel,
-				join: { from: "posts.author_id", to: "users.id" },
-			},
+await client.request(
+	gql`
+		query get_all_posts {
+			posts {
+				nodes {
+					id
+					text
+				}
+				cursor
+			}
 		}
-	}
-}
+	`,
+)
 ```
 
-Query:
+## Relations
+
+Relations will be fetched automatically using `withGraphFetched()` when resolving nested fields.
+
+Example:
+
+```ts
+const resolveGraph = GraphResolver({
+	User: ModelResolver(UserModel, {
+		fields: {
+			id: true,
+			name: true,
+			// will use withGraphFetched("posts")
+			// and process subquery with Post model resolver defined below
+			posts: true,
+		},
+	}),
+	// No resolver options = access to all fields
+	Post: ModelResolver(PostModel),
+})
+```
 
 ```graphql
 query posts_with_author {
-	posts {
-		id
-		text
-		author {
-			name
-		}
-	}
+  posts {
+    id
+    text
+    author {
+      name
+    }
+  }
+}
+
+query user_with_posts {
+  user(id: ID!) {
+    name
+    posts {
+      id
+      text
+    }
+  }
 }
 ```
 
-Resolver:
+[More details and examples for relations.](docs/relations.md)
+
+## Pagination
+
+Root queries and one-to-many nested relations can be paginated.
+
+Example:
 
 ```ts
-// for the query above, will pull posts with related author object
-PostModel.query().withGraphQL(info)
-```
-
-### Filters
-
-Queries can be filtered like this:
-
-```ts
-PostModel.query().withGraphQL(info, {
-	filter: {
-		date: "2020-10-01",
-		// Only pull posts where author_id is 123 or 456.
-		author_id__in: [123, 456],
-	},
+const resolveGraph = GraphResolver({
+	User: ModelResolver(UserModel, {
+		fields: {
+			id: true,
+			name: true,
+			posts: FieldResolver({
+				paginate: CursorPaginage({ take: 10, fields: ["-id"] }),
+			}),
+		},
+	}),
+	Post: ModelResolver(PostModel),
 })
 ```
 
-which adds `WHERE date='2020-10-01' AND author.id IN (123, 456)`.
+To paginate root query, use:
 
-The suggested workflow is using a dedicated untyped GraphQL query arg to pass filters:
+```ts
+const resolvers = {
+	Query: {
+		posts: async (parent, args, ctx, info) => {
+			const page = await resolveGraph(ctx, info, Post.query(), {
+				paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
+			})
+			return page
+		},
+	},
+}
+```
+
+[More details and examples for pagination.](docs/pagination.md)
+
+## Filters
+
+Both root and nested queries can be filtered with GraphQL arguments:
 
 ```graphql
-scalar Filter
-
-type Query {
-	posts(filter: Filter): [Post!]!
-}
-```
-
-and then in resolver:
-
-```ts
-export const resolvers = {
-	Query: {
-		posts: (parent, { filter }, ctx, info) => {
-			return PostModel.query().withGraphQL(info, { filter })
-		},
-	},
-}
-```
-
-Supported operators:
-
-- `exact`
-- `in`
-- TODO: `lt`, `gt`, `lte`, `gte`, `like`, `ilike`, `contains`, `icontains`
-
-#### Filtering nested relations
-
-You can filter nested relations with a nested filter:
-
-```ts
-UserModel.query().withGraphQL(info, {
-	filter: {
-		id: 123,
-		posts: {
-			date: "2020-10-01",
-		},
-	},
-})
-```
-
-Note that it only works reasonably for one-to-many relations, as in the example above.
-
-For instance, filtering posts with `{ author: { name: "John" } }` will not work as expected.
-
-#### Filtering with model modifiers
-
-If you define modifiers on a model class:
-
-```ts
-export class PostModel extends Model {
-	static modifiers = {
-		public: (query) => query.whereNull("delete_time"),
-		search: (query, term) => query.where("text", "ilike", `%${term}%`),
+query get_all_posts {
+	posts(filter: { date: "2020-10-01", author_id__in: [123, 456] }) {
+		nodes {
+			id
+			text
+		}
+		cursor
 	}
 }
 ```
 
-then you can filter results with:
+Filters will run against database fields, or call model modifiers.
+
+To enable filters, use:
 
 ```ts
-UserModel.query().withGraphQL(info, {
-	filter: {
-		public: true, // even though the actual value is ignored, sending true is a reasonable convention
-		search: "hello",
-	},
+const resolveGraph = GraphResolver({
+	Post: ModelResolver(PostModel, {
+		// enable all filters for all fields
+		filter: true,
+		// TODO: granular access
+		filter: {
+			date: true,
+			author_id: true,
+			published: true, // where published is a model modifier
+		},
+	}),
 })
 ```
 
-Modifier filters take precedence over raw field filters.
+[More details and examples for filters.](docs/filters.md)
 
-### Query model modifiers
+## Virtual attributes
 
-All models can be filtered using query-level modifiers:
-
-```ts
-PostModel.query().withGraphQL(info, {
-	modifiers: {
-		User: (query) => query.where("active", true),
-	},
-})
-```
-
-### Virtual attributes
-
-Virtual attributes (getters on models) can be accessed as usual:
+Virtual attributes (getters on models) can be accessed the same way as database fields:
 
 ```ts
 export class PostModel extends Model {
+	declare id: number
+	declare title: string
+
 	get url() {
+		assert(this.id)
 		return `/${this.id}.html`
 	}
 }
@@ -260,62 +259,129 @@ query get_all_posts {
 }
 ```
 
-#### Virtual attribute dependencies
+[More details and examples for virtual attributes.](docs/virtual-attributes.md)
 
-If a getter relies on certain model fields (such as if `url` needs `title`), you will need to select all of them in the query.
+## API
 
-Alternatively, you can setup getter dependencies with `select.${field}` modifier, like this:
-
-```ts
-export class PostModel extends Model {
-	static modifiers = {
-		"graphql.select.url": (query) => query.select(ref("title")),
-	}
-
-	get url() {
-		assert(this.title !== undefined)
-		return `/${urlencode(this.title)}-${this.id}.html`
-	}
-}
-```
-
-#### Virtual attributes provided by the database
-
-`select.${field}` modifier can also be used to fill the virtual attribute with a raw subquery:
-
-```graphql
-type Post {
-	id: ID
-	title: String
-	upper_title: String
-}
-```
+The following functions are exported:
 
 ```ts
-export class PostModel extends Model {
-	static modifiers = {
-		"graphql.select.upper_title": (query) =>
-			query.select(raw("upper(title) as upper_title")),
-	}
-
-	// Optionally for Typescript
-	declare readonly upper_title: string
-}
+import {
+	GraphResolver,
+	ModuleResolver,
+	FieldResolver,
+	CursorPaginator,
+} from "objection-graphql-resolver"
 ```
 
-### Global model modifiers
-
-The following model modifiers, when exist, are automatically applied on each query (including when resolving nested relations):
+### Arguments reference
 
 ```ts
-export class PostModel extends Model {
-	static modifiers = {
-		// Applied on each query
-		graphql: (query) => query.where("is_hidden", false),
-		// Applied on each query that is returning an array (not a single object)
-		"graphql.many": (query) => query.orderBy("publish_time", "desc"),
-		// Applied on each top-level query (not nested relation)
-		"graphql.top": (query) => query.where("is_top", true),
-	}
+const resolveGraph = GraphResolver(
+	// Map GraphQL types to model resolvers (required)
+	{
+		Post: ModelResolver(
+			// Required: Objection.js model class
+			PostModel,
+			// Default: { fields: true }
+			{
+				// List fields that can be accessed via GraphQL,
+				// or true = all fields can be accessed
+				fields: {
+					// Select field from database
+					id: true,
+					// Call model getter with this name
+					url: true,
+					// Descend into relation
+					// (related model must be also registered in this graph resolver)
+					author: true,
+					// Modify query when this field is resolved
+					preview: (query) =>
+						query.select(raw("substr(text,1,100) as preview")),
+					// Same as text: true
+					text: FieldResolver(),
+					// Custom field resolver
+					text2: FieldResolver({
+						// Source database field
+						modelField: "text",
+					}),
+					preview2: FieldResolver({
+						// Modify query
+						select: (query) =>
+							query.select(raw("substr(text,1,100) as preview2")),
+						// Post-process selected value
+						clean(
+							// Selected value
+							preview,
+							// Current instance
+							post,
+							// Query context
+							context,
+						) {
+							if (preview.length < 100) {
+								return preview
+							} else {
+								return preview + "..."
+							}
+						},
+					}),
+					// Select all objects in one-to-many relation
+					comments: true,
+					comments: FieldResolver({
+						// Paginate subquery in one-to-many relation
+						paginate: CursorPaginator(
+							// Pagination options
+							// Default: { take: 10, fields: ["id"] }
+							{
+								// How many object to take per page
+								take: 10,
+								// Which fields to use for ordering
+								// Prefix with - for descending sort
+								fields: ["name", "-id"],
+							},
+						),
+						// Enable filters on one-to-many relation
+						filters: true,
+					}),
+				},
+				// Modify all queries to this model
+				modifier: (query) => query.orderBy("id", "desc"),
+			},
+		),
+	},
+	// Options (default: empty)
+	{
+		// Callback: convert RequestContext into query context
+		// Default: merge RequestContext into query context as is
+		context(ctx) {
+			return { userId: ctx.passport.user.id }
+		},
+	},
+)
+
+const resolvers = {
+	Query: {
+		posts: async (parent, args, context, info) => {
+			const page = await resolveGraph(
+				// Resolver context (required)
+				// Will be merged into query context,
+				// possibly converted with GraphResolver's options.context callback
+				context,
+				// GraphQLResolveInfo object, as passed by GraphQL executor (required)
+				info,
+				// Root query (required)
+				Post.query(),
+				// Default: empty
+				{
+					// Paginator (only works for list queries)
+					// Default: resolve list query as is
+					paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
+					// Enable filters
+					filters: true,
+				},
+			)
+			return page
+		},
+	},
 }
 ```
