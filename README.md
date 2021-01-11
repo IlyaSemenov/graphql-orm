@@ -33,11 +33,7 @@ Run GraphQL server:
 import { ApolloServer } from "apollo-server"
 import gql from "graphql-tag"
 import { Model } from "objection"
-import {
-	CursorPaginator,
-	GraphResolver,
-	ModelResolver,
-} from "objection-graphql-resolver"
+import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
 
 class PostModel extends Model {
 	static tableName = "posts"
@@ -52,15 +48,8 @@ const typeDefs = gql`
 		text: String!
 	}
 
-	# Simplified paginator
-	# Relay-style pagination is also supported.
-	type PostPage {
-		nodes: [PostPage]!
-		cursor: String
-	}
-
 	type Query {
-		posts: PostPage!
+		posts: [Post!]!
 	}
 `
 
@@ -77,11 +66,8 @@ const resolveGraph = GraphResolver({
 
 const resolvers = {
 	Query: {
-		posts: async (parent, args, ctx, info) => {
-			const page = await resolveGraph(ctx, info, Post.query(), {
-				paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
-			})
-			return page
+		posts: (parent, args, ctx, info) => {
+			return resolveGraph(ctx, info, Post.query())
 		},
 	},
 }
@@ -99,13 +85,10 @@ const client = new GraphQLClient("http://127.0.0.1:4000")
 
 await client.request(
 	gql`
-		query get_all_posts {
+		query {
 			posts {
-				nodes {
-					id
-					text
-				}
-				cursor
+				id
+				text
 			}
 		}
 	`,
@@ -201,7 +184,7 @@ const resolvers = {
 Both root and nested queries can be filtered with GraphQL arguments:
 
 ```graphql
-query get_all_posts {
+query {
 	posts(filter: { date: "2020-10-01", author_id__in: [123, 456] }) {
 		nodes {
 			id
@@ -250,7 +233,7 @@ export class PostModel extends Model {
 ```
 
 ```graphql
-query get_all_posts {
+query {
 	posts {
 		id
 		title
