@@ -153,7 +153,7 @@ const resolveGraph = GraphResolver({
 		fields: {
 			id: true,
 			name: true,
-			posts: FieldResolver({
+			posts: RelationResolver({
 				paginate: CursorPaginage({ take: 10, fields: ["-id"] }),
 			}),
 		},
@@ -253,6 +253,7 @@ import {
 	GraphResolver,
 	ModuleResolver,
 	FieldResolver,
+	RelationResolver,
 	CursorPaginator,
 } from "objection-graphql-resolver"
 ```
@@ -285,7 +286,7 @@ const resolveGraph = GraphResolver(
 					text: FieldResolver(),
 					// Custom field resolver
 					text2: FieldResolver({
-						// Source database field
+						// Model (database) field, if different from GraphQL field
 						modelField: "text",
 					}),
 					preview2: FieldResolver({
@@ -310,7 +311,9 @@ const resolveGraph = GraphResolver(
 					}),
 					// Select all objects in one-to-many relation
 					comments: true,
-					comments: FieldResolver({
+					comments_page: RelationResolver({
+						// Model field, if different from GraphQL field
+						modelField: "comments",
 						// Paginate subquery in one-to-many relation
 						paginate: CursorPaginator(
 							// Pagination options
@@ -325,6 +328,10 @@ const resolveGraph = GraphResolver(
 						),
 						// Enable filters on one-to-many relation
 						filters: true,
+						// Modify subquery
+						modifier: (query) => query.orderBy("id", "desc"),
+						// Post-process selected value, see FIeldResolver
+						// clean: ...,
 					}),
 				},
 				// Modify all queries to this model

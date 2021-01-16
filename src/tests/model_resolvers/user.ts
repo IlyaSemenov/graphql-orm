@@ -2,6 +2,7 @@ import {
 	CursorPaginator,
 	FieldResolver,
 	ModelResolver,
+	RelationResolver,
 } from "objection-graphql-resolver"
 
 import { UserModel } from "../models/user"
@@ -19,16 +20,16 @@ export const User = ModelResolver(UserModel, {
 				}
 			},
 		}),
-		posts: FieldResolver({ paginate: CursorPaginator({ take: 2 }) }),
-		posts_page: FieldResolver({
+		posts: RelationResolver({ paginate: CursorPaginator({ take: 2 }) }),
+		posts_page: RelationResolver({
 			modelField: "posts",
 			paginate: CursorPaginator({ take: 2 }),
 		}),
-		posts_by_one: FieldResolver({
+		posts_by_one: RelationResolver({
 			modelField: "posts",
 			paginate: CursorPaginator({ take: 1 }),
 		}),
 		all_posts: "posts",
-		all_posts_verbose: FieldResolver({ modelField: "posts" }),
+		all_posts_verbose: RelationResolver({ modelField: "posts" }),
 	},
 })

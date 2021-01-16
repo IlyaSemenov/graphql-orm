@@ -4,27 +4,19 @@ import {
 	ModelClass,
 	ModelConstructor,
 	QueryBuilder,
-	ref,
 	RelationMappings,
 } from "objection"
 
-import { FiltersDef } from "../filter"
-import { run_after } from "../helpers/run_after"
-import { PaginatorFn } from "../paginators"
-import { FieldResolver, FieldResolverFn } from "./field"
+import { FieldResolver } from "./field"
 import { ResolveTreeFn } from "./graph"
+import { RelationResolver } from "./relation"
+
+export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
 
 export interface ModelResolverOptions<M extends Model> {
 	modifier?: Modifier<M>
 	fields?: Record<string, SimpleFieldResolver<M>> | true
 }
-
-export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
-
-export type SimpleFieldResolver<M extends Model> =
-	| true
-	| string
-	| FieldResolverFn<M>
 
 export type ModelResolverFn<M extends Model = Model> = (args: {
 	tree: ResolveTree
@@ -33,11 +25,21 @@ export type ModelResolverFn<M extends Model = Model> = (args: {
 	resolve_tree: ResolveTreeFn
 }) => void
 
-export type ModelFieldResolverFn<M extends Model> = (args: {
-	model_field: string
-	filter?: FiltersDef
-	paginate?: PaginatorFn<M>
-}) => void
+export type SimpleFieldResolver<M extends Model> =
+	| true
+	| string
+	| FieldResolverFn<M>
+
+export type FieldResolverFn<M extends Model> = (
+	query: QueryBuilder<M, any>,
+	options: {
+		// GraphQL field
+		field: string
+		// For drilling down
+		tree: ResolveTree
+		resolve_tree: ResolveTreeFn
+	},
+) => void
 
 export function ModelResolver<M extends Model = Model>(
 	model_class: ModelConstructor<M>,
@@ -64,7 +66,19 @@ export function ModelResolver<M extends Model = Model>(
 	const relations = ThisModel.relationMappings as RelationMappings
 
 	// Default field resolver
-	const resolve_field: FieldResolverFn<M> = FieldResolver()
+	const get_field_resolver = (
+		field: string,
+		modelField?: string,
+	): FieldResolverFn<M> => {
+		const model_field_lookup = modelField || field
+		if (getter_names.has(model_field_lookup)) {
+			return () => undefined
+		} else if (relations[model_field_lookup]) {
+			return RelationResolver<M, any>({ modelField })
+		} else {
+			return FieldResolver<M>({ modelField })
+		}
+	}
 
 	// Per-field resolvers
 	const field_resolvers: Record<string, FieldResolverFn<M>> | null =
@@ -77,9 +91,9 @@ export function ModelResolver<M extends Model = Model>(
 			if (typeof r0 === "function") {
 				r = r0
 			} else if (r0 === true) {
-				r = resolve_field
+				r = get_field_resolver(field)
 			} else if (typeof r0 === "string") {
-				r = FieldResolver({ modelField: r0 })
+				r = get_field_resolver(field, r0)
 			} else {
 				throw new Error(
 					`Field resolver must be a function, string, or true; found ${r0}`,
@@ -103,69 +117,13 @@ export function ModelResolver<M extends Model = Model>(
 
 		for (const subtree of Object.values(tree.fieldsByTypeName[type])) {
 			const field = subtree.name
-			const r = field_resolvers ? field_resolvers[field] : resolve_field
+			const r = field_resolvers
+				? field_resolvers[field]
+				: get_field_resolver(field)
 			if (!r) {
 				throw new Error(`No field resolver defined for field ${type}.${field}`)
 			}
-
-			// Base model field resolver
-			const resolve_model_field: ModelFieldResolverFn<M> = ({
-				model_field,
-				filter,
-				paginate,
-			}) => {
-				if (getter_names.has(field)) {
-					// Do nothing
-				} else if (relations[model_field]) {
-					// Nested relation
-					if (paginate) {
-						// withGraphFetched will disregard paginator's runAfter callback (which converts object list into cursor and nodes)
-						// Save it locally and then re-inject
-						let paginated_results: any
-						query
-							.withGraphFetched(`${model_field}(${field}) as ${field}`, {
-								joinOperation: "leftJoin", // Remove after https://github.com/Vincit/objection.js/issues/1954 is fixed
-								maxBatchSize: 1,
-							})
-							.modifiers({
-								[field]: (subquery) => {
-									resolve_tree({
-										tree: subtree,
-										query: subquery,
-										filter,
-										paginate,
-									})
-									subquery.runAfter((results) => {
-										// Save paginated results
-										paginated_results = results
-									})
-								},
-							})
-						query.runAfter(
-							// Re-inject paginated results
-							// They have been overwritten by objection.js by now
-							run_after((instance) => {
-								instance[field] = paginated_results
-								return instance
-							}),
-						)
-					} else {
-						query
-							.withGraphFetched(`${model_field}(${field}) as ${field}`)
-							.modifiers({
-								[field]: (subquery) =>
-									resolve_tree({ tree: subtree, query: subquery, filter }),
-							})
-					}
-				} else {
-					// Normal field - select() it
-					query.select(
-						field === model_field ? field : ref(model_field).as(field),
-					)
-				}
-			}
-
-			r(query, field, resolve_model_field)
+			r(query, { field, tree: subtree, resolve_tree })
 		}
 
 		if (

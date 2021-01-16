@@ -49,8 +49,10 @@ const resolveGraph = GraphResolver({
 		fields: {
 			id: true,
 			name: true,
-			// will use withGraphFetched("posts")
-			// and process subquery with Post model resolver defined below
+			// Use withGraphFetched("posts")
+			// and process subquery with Post model resolver defined below.
+			//
+			// See RelationResolver API for advanced options.
 			posts: true,
 		},
 	}),

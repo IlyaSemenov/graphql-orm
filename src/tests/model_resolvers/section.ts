@@ -1,8 +1,8 @@
 import { raw } from "objection"
 import {
 	CursorPaginator,
-	FieldResolver,
 	ModelResolver,
+	RelationResolver,
 } from "objection-graphql-resolver"
 
 import { SectionModel } from "../models/section"
@@ -17,7 +17,7 @@ export const Section = ModelResolver(SectionModel, {
 		slug: true,
 		url: (query) => query.select("slug"),
 		upper_slug: (query) => query.select(raw("upper(slug) as upper_slug")),
-		posts: FieldResolver({
+		posts: RelationResolver({
 			filter: true,
 			paginate: CursorPaginator({ take: 2 }),
 		}),

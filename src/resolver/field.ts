@@ -1,43 +1,30 @@
-import { Model, QueryBuilder } from "objection"
+import { Model, ref } from "objection"
 
-import { FiltersDef } from "../filter"
 import { async_run_after } from "../helpers/run_after"
-import { PaginatorFn } from "../paginators"
 import { AnyContext } from "./graph"
-import { ModelFieldResolverFn } from "./model"
+import { FieldResolverFn } from "./model"
 
 export interface FieldResolverOptions<M extends Model> {
 	modelField?: string
 	select?: FieldResolverFn<M>
-	filter?: FiltersDef
-	paginate?: PaginatorFn<M>
 	clean?(value: any, instance: M, context: AnyContext): any
 }
-
-export type FieldResolverFn<M extends Model> = (
-	query: QueryBuilder<M, any>,
-	field: string,
-	resolve_model_field: ModelFieldResolverFn<M>,
-) => void
 
 export function FieldResolver<M extends Model>(
 	options?: FieldResolverOptions<M>,
 ): FieldResolverFn<M> {
-	const field_options: FieldResolverOptions<M> = { ...options }
+	const select = options?.select
+	const clean = options?.clean
+	const model_field = options?.modelField
 
-	const clean_field = field_options.clean
-
-	return function resolve(query, field, resolve_model_field) {
-		if (field_options.select) {
-			field_options.select(query, field, resolve_model_field)
+	return function resolve(query, resolve_opts) {
+		const { field } = resolve_opts
+		if (select) {
+			select(query, resolve_opts)
 		} else {
-			resolve_model_field({
-				model_field: field_options.modelField || field,
-				filter: field_options.filter,
-				paginate: field_options.paginate,
-			})
+			query.select(model_field ? ref(model_field).as(field) : field)
 		}
-		if (clean_field) {
+		if (clean) {
 			const context = query.context()
 			query.runAfter(
 				async_run_after(async (instance: any) => {
@@ -45,11 +32,7 @@ export function FieldResolver<M extends Model>(
 						// Supposedly, single query builder returning NULL
 						return instance
 					}
-					instance[field] = await clean_field(
-						instance[field],
-						instance,
-						context,
-					)
+					instance[field] = await clean(instance[field], instance, context)
 					return instance
 				}),
 			)

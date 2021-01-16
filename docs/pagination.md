@@ -83,12 +83,12 @@ const resolveGraph = GraphResolver({
 			name: true,
 			// If it were posts: true, all posts will be returned.
 			// Instead, return a page of posts
-			posts: FieldResolver({
+			posts: RelationResolver({
 				paginate: CursorPaginage({ take: 10, fields: ["-id"] }),
 			}),
 			// Should you want this, it's still possible to pull all posts (non-paginated)
 			// under a different GraphQL field
-			all_posts: FieldResolver({ modelField: "posts" }),
+			all_posts: RelationResolver({ modelField: "posts" }),
 		},
 	}),
 	Post: ModelResolver(PostModel, {
