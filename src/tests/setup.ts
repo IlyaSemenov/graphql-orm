@@ -14,7 +14,7 @@ export async function use_db(tap: Test) {
 		connection: ":memory:",
 		useNullAsDefault: true,
 	})
-	tap.tearDown(async () => {
+	tap.teardown(async () => {
 		await knex.destroy()
 	})
 	Model.knex(knex)
@@ -23,7 +23,7 @@ export async function use_db(tap: Test) {
 
 export async function use_client(tap: Test) {
 	const server = create_server()
-	tap.tearDown(async () => {
+	tap.teardown(async () => {
 		await server.stop()
 	})
 	const { url } = await server.listen(0)

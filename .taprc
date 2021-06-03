@@ -1,4 +1,2 @@
 coverage: false
-node-arg: ["-r", "tsconfig-paths/register"]
-test-env:
-  - TS_NODE_TRANSPILE_ONLY=1
+node-arg: ["-r", "esbuild-runner/register"]
