@@ -260,25 +260,25 @@ tap.test("Main", async (tap) => {
 
 	tap.test("root filter", async (tap) => {
 		tap.test("by field", async (tap) => {
-			tap.matchSnapshot(
-				await client.request(
-					gql`
-						{
-							posts(filter: { author_id: 2 }, take: 10) {
-								nodes {
-									id
-									text
-									author {
-										id
-										name
-									}
-								}
+			const query = gql`
+				query($author_id: Int) {
+					posts(filter: { author_id: $author_id }, take: 10) {
+						nodes {
+							id
+							text
+							author {
+								id
+								name
 							}
 						}
-					`,
-				),
+					}
+				}
+			`
+			tap.matchSnapshot(
+				await client.request(query, { author_id: 2 }),
 				"author_id: 2",
 			)
+			tap.matchSnapshot(await client.request(query), "author_id not defined")
 		})
 		tap.test("__in", async (tap) => {
 			tap.matchSnapshot(

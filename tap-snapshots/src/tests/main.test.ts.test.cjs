@@ -231,6 +231,71 @@ Object {
 }
 `
 
+exports[`src/tests/main.test.ts TAP Main root filter by field > author_id not defined 1`] = `
+Object {
+  "posts": Object {
+    "nodes": Array [
+      Object {
+        "author": Object {
+          "id": "1",
+          "name": "John",
+        },
+        "id": "7",
+        "text": "This is a draft",
+      },
+      Object {
+        "author": Object {
+          "id": "1",
+          "name": "John",
+        },
+        "id": "6",
+        "text": "COVID vs Flu?",
+      },
+      Object {
+        "author": Object {
+          "id": "2",
+          "name": "Mary",
+        },
+        "id": "5",
+        "text": "More good news!",
+      },
+      Object {
+        "author": Object {
+          "id": "2",
+          "name": "Mary",
+        },
+        "id": "4",
+        "text": "Good news from China.",
+      },
+      Object {
+        "author": Object {
+          "id": "2",
+          "name": "Mary",
+        },
+        "id": "3",
+        "text": "Latest COVID figures.",
+      },
+      Object {
+        "author": Object {
+          "id": "1",
+          "name": "John",
+        },
+        "id": "2",
+        "text": "Is communism dead yet?",
+      },
+      Object {
+        "author": Object {
+          "id": "1",
+          "name": "John",
+        },
+        "id": "1",
+        "text": "Oil price rising.",
+      },
+    ],
+  },
+}
+`
+
 exports[`src/tests/main.test.ts TAP Main root filter by field > author_id: 2 1`] = `
 Object {
   "posts": Object {

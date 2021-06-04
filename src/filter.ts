@@ -31,6 +31,10 @@ export function apply_filter({
 	const ThisModel = query.modelClass()
 	const table_name = ThisModel.tableName
 	for (const [field, value] of Object.entries(filter_obj)) {
+		if (value === undefined) {
+			// Support optional GraphQL arguments in filter
+			continue
+		}
 		if (ThisModel.modifiers?.[field]) {
 			// Call modifier
 			query.modify(field, value)
