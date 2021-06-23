@@ -1,10 +1,10 @@
 import { CursorPaginator } from "objection-graphql-resolver"
 
+import { Resolvers } from "../setup"
 import { resolve_graph } from "./graph"
 import { PostModel } from "./models/post"
 import { SectionModel } from "./models/section"
 import { UserModel } from "./models/user"
-import { Resolvers } from "./server"
 
 export const resolvers: Resolvers = {
 	Query: {

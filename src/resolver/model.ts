@@ -73,7 +73,7 @@ export function ModelResolver<M extends Model = Model>(
 		const model_field_lookup = modelField || field
 		if (getter_names.has(model_field_lookup)) {
 			return () => undefined
-		} else if (relations[model_field_lookup]) {
+		} else if (relations?.[model_field_lookup]) {
 			return RelationResolver<M, any>({ modelField })
 		} else {
 			return FieldResolver<M>({ modelField })
