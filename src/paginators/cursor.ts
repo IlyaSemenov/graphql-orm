@@ -104,7 +104,7 @@ export function CursorPaginator<M extends Model>(
 			}
 			return { nodes, cursor }
 		})
-		return (query as unknown) as QueryBuilder<M, CursorPaginatorPage<M>>
+		return query as unknown as QueryBuilder<M, CursorPaginatorPage<M>>
 	}
 
 	paginate.path = ["nodes"]

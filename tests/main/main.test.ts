@@ -265,7 +265,7 @@ tap.test("Main", async (tap) => {
 	tap.test("root filter", async (tap) => {
 		tap.test("by field", async (tap) => {
 			const query = gql`
-				query($author_id: Int) {
+				query ($author_id: Int) {
 					posts(filter: { author_id: $author_id }, take: 10) {
 						nodes {
 							id
