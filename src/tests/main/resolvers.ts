@@ -12,7 +12,7 @@ export const resolvers: Resolvers = {
 			const user = await resolve_graph(
 				ctx,
 				info,
-				UserModel.query().findById(id),
+				UserModel.query().findById(id)
 			)
 			return user
 		},
@@ -20,7 +20,7 @@ export const resolvers: Resolvers = {
 			const section = await resolve_graph(
 				ctx,
 				info,
-				SectionModel.query().findOne({ slug }),
+				SectionModel.query().findOne({ slug })
 			)
 			return section
 		},

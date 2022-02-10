@@ -23,8 +23,8 @@ tap.test("Main", async (tap) => {
 							name
 						}
 					}
-				`,
-			),
+				`
+			)
 		)
 	})
 
@@ -38,9 +38,9 @@ tap.test("Main", async (tap) => {
 							name
 						}
 					}
-				`,
+				`
 			),
-			{ user: null },
+			{ user: null }
 		)
 	})
 
@@ -55,8 +55,8 @@ tap.test("Main", async (tap) => {
 							url
 						}
 					}
-				`,
-			),
+				`
+			)
 		)
 	})
 
@@ -71,8 +71,8 @@ tap.test("Main", async (tap) => {
 							upper_slug
 						}
 					}
-				`,
-			),
+				`
+			)
 		)
 	})
 
@@ -86,9 +86,9 @@ tap.test("Main", async (tap) => {
 							name
 						}
 					}
-				`,
+				`
 			),
-			"public fields",
+			"public fields"
 		)
 		tap.matchSnapshot(
 			await client.request(
@@ -100,25 +100,9 @@ tap.test("Main", async (tap) => {
 							password
 						}
 					}
-				`,
+				`
 			),
-			"reject password to public",
-		)
-		tap.matchSnapshot(
-			await client.request(
-				gql`
-					{
-						user(id: 1) {
-							id
-							name
-							password
-						}
-					}
-				`,
-				undefined,
-				{ user_id: "2" },
-			),
-			"reject password to other users",
+			"reject password to public"
 		)
 		tap.matchSnapshot(
 			await client.request(
@@ -132,9 +116,25 @@ tap.test("Main", async (tap) => {
 					}
 				`,
 				undefined,
-				{ user_id: "1" },
+				{ user_id: "2" }
 			),
-			"return own password to user",
+			"reject password to other users"
+		)
+		tap.matchSnapshot(
+			await client.request(
+				gql`
+					{
+						user(id: 1) {
+							id
+							name
+							password
+						}
+					}
+				`,
+				undefined,
+				{ user_id: "1" }
+			),
+			"return own password to user"
 		)
 	})
 
@@ -152,8 +152,8 @@ tap.test("Main", async (tap) => {
 							cursor
 						}
 					}
-				`,
-			),
+				`
+			)
 		)
 	})
 
@@ -170,7 +170,7 @@ tap.test("Main", async (tap) => {
 						cursor
 					}
 				}
-			`,
+			`
 		)
 		tap.matchSnapshot(sections, "take 1")
 		tap.matchSnapshot(
@@ -187,9 +187,9 @@ tap.test("Main", async (tap) => {
 						}
 					}
 				`,
-				{ cursor: sections.cursor },
+				{ cursor: sections.cursor }
 			),
-			"take 100 with cursor",
+			"take 100 with cursor"
 		)
 	})
 
@@ -214,8 +214,8 @@ tap.test("Main", async (tap) => {
 							}
 						}
 					}
-				`,
-			),
+				`
+			)
 		)
 	})
 
@@ -257,8 +257,8 @@ tap.test("Main", async (tap) => {
 							}
 						}
 					}
-				`,
-			),
+				`
+			)
 		)
 	})
 
@@ -280,7 +280,7 @@ tap.test("Main", async (tap) => {
 			`
 			tap.matchSnapshot(
 				await client.request(query, { author_id: 2 }),
-				"author_id: 2",
+				"author_id: 2"
 			)
 			tap.matchSnapshot(await client.request(query), "author_id not defined")
 		})
@@ -296,9 +296,9 @@ tap.test("Main", async (tap) => {
 								}
 							}
 						}
-					`,
+					`
 				),
-				"id__in: [3, 5]",
+				"id__in: [3, 5]"
 			)
 		})
 		tap.test("by modifier", async (tap) => {
@@ -313,9 +313,9 @@ tap.test("Main", async (tap) => {
 								}
 							}
 						}
-					`,
+					`
 				),
-				"is_draft",
+				"is_draft"
 			)
 		})
 		tap.test("filter by parametrized modifier", async (tap) => {
@@ -330,9 +330,9 @@ tap.test("Main", async (tap) => {
 								}
 							}
 						}
-					`,
+					`
 				),
-				'search: "news"',
+				'search: "news"'
 			)
 		})
 	})
@@ -349,9 +349,9 @@ tap.test("Main", async (tap) => {
 							}
 						}
 					}
-				`,
+				`
 			),
-			"all sections, not only news",
+			"all sections, not only news"
 		)
 	})
 
@@ -376,9 +376,9 @@ tap.test("Main", async (tap) => {
 							}
 						}
 					}
-				`,
+				`
 			),
-			"section slug, author_id: 2",
+			"section slug, author_id: 2"
 		)
 	})
 })

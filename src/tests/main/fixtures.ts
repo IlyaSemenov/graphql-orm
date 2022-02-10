@@ -30,6 +30,6 @@ export async function create_objects() {
 				is_published: false,
 			},
 		],
-		{ relate: true },
+		{ relate: true }
 	)
 }

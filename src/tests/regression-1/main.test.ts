@@ -50,11 +50,11 @@ tap.test("Main", async (tap) => {
 							id
 						}
 					}
-				`,
+				`
 			),
 			{
 				all_c: [{ id: "foo" }],
-			},
+			}
 		)
 	})
 })

@@ -18,7 +18,7 @@ export interface CursorPaginatorPage<M> {
 }
 
 export function CursorPaginator<M extends Model>(
-	options?: Partial<CursorPaginatorOptions>,
+	options?: Partial<CursorPaginatorOptions>
 ): PaginatorFn<M, CursorPaginatorPage<M>> {
 	const paginator_options: CursorPaginatorOptions = {
 		fields: ["id"],
@@ -43,11 +43,11 @@ export function CursorPaginator<M extends Model>(
 				const value = instance[field.name]
 				if (value === undefined) {
 					throw new Error(
-						`Unable to create cursor: undefined field ${field.name}`,
+						`Unable to create cursor: undefined field ${field.name}`
 					)
 				}
 				return String(value)
-			}),
+			})
 		)
 	}
 
@@ -67,17 +67,17 @@ export function CursorPaginator<M extends Model>(
 		const get_values = (pairs: P[]) => pairs.map(([, v]) => v)
 		const cond = raw(
 			`(${get_placeholders(left).join(",")}) > (${get_placeholders(right).join(
-				",",
+				","
 			)})`,
 			...get_values(left),
-			...get_values(right),
+			...get_values(right)
 		)
 		query.where(cond)
 	}
 
 	const paginate: PaginatorFn<M, CursorPaginatorPage<M>> = (
 		query: QueryBuilder<M, M[]>,
-		args?: CursorPaginatorArgs,
+		args?: CursorPaginatorArgs
 	): QueryBuilder<M, CursorPaginatorPage<M>> => {
 		const take = Number(args?.take) || paginator_options.take
 		const cursor = args?.cursor
@@ -85,7 +85,7 @@ export function CursorPaginator<M extends Model>(
 		// Set query order
 		query.clearOrder()
 		fields.forEach((field) =>
-			query.orderBy(field.name, field.desc ? "desc" : "asc"),
+			query.orderBy(field.name, field.desc ? "desc" : "asc")
 		)
 
 		if (cursor) {

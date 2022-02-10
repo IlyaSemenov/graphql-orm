@@ -1,5 +1,5 @@
+export { CursorPaginator } from "./paginators/cursor"
 export { FieldResolver } from "./resolver/field"
 export { GraphResolver } from "./resolver/graph"
 export { ModelResolver } from "./resolver/model"
 export { RelationResolver } from "./resolver/relation"
-export { CursorPaginator } from "./paginators/cursor"

@@ -30,11 +30,11 @@ export class PostModel extends Model {
 		},
 		under_default_section(
 			query: QueryBuilder<PostModel>,
-			{ user_id }: { user_id: string },
+			{ user_id }: { user_id: string }
 		) {
 			query.runBefore(async function () {
 				const { default_section_id } = await UserModel.query(
-					this.context().transaction,
+					this.context().transaction
 				).findById(user_id)
 				this.where("section_id", default_section_id)
 			})

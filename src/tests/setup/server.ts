@@ -13,7 +13,7 @@ export type Resolver<A> = (
 	parent: unknown,
 	args: A,
 	ctx: ResolverContext,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => any
 
 export type Resolvers = Record<"Query", Record<string, Resolver<any>>>

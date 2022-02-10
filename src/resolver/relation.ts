@@ -14,7 +14,7 @@ export interface RelationResolverOptions<M extends Model, R extends Model>
 }
 
 export function RelationResolver<M extends Model, R extends Model>(
-	options?: RelationResolverOptions<M, R>,
+	options?: RelationResolverOptions<M, R>
 ) {
 	const filter = options?.filter
 	const paginate = options?.paginate
@@ -34,7 +34,7 @@ export function RelationResolver<M extends Model, R extends Model>(
 								joinOperation: "leftJoin", // Remove after https://github.com/Vincit/objection.js/issues/1954 is fixed
 								maxBatchSize: 1,
 						  }
-						: undefined,
+						: undefined
 				)
 				.modifiers({
 					[field]: (subquery) => {
@@ -63,7 +63,7 @@ export function RelationResolver<M extends Model, R extends Model>(
 					run_after((instance) => {
 						instance[field] = paginated_results
 						return instance
-					}),
+					})
 				)
 			}
 		},

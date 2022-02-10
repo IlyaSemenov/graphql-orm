@@ -59,13 +59,13 @@ export function apply_filter({
 			} else if (op === "in") {
 				if (!Array.isArray(value)) {
 					throw new Error(
-						`Invalid filter value for ${table_name}.${field}: must be an array.`,
+						`Invalid filter value for ${table_name}.${field}: must be an array.`
 					)
 				}
 				query.whereIn(dbfield, value)
 			} else {
 				throw new Error(
-					`Invalid filter ${table_name}.${field}: unsupported operator ${op}.`,
+					`Invalid filter ${table_name}.${field}: unsupported operator ${op}.`
 				)
 			}
 		}

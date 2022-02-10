@@ -38,12 +38,12 @@ export type FieldResolverFn<M extends Model> = (
 		// For drilling down
 		tree: ResolveTree
 		resolve_tree: ResolveTreeFn
-	},
+	}
 ) => void
 
 export function ModelResolver<M extends Model = Model>(
 	model_class: ModelConstructor<M>,
-	options?: ModelResolverOptions<M>,
+	options?: ModelResolverOptions<M>
 ): ModelResolverFn<M> {
 	const model_options: ModelResolverOptions<M> = {
 		// inject defaults here
@@ -58,7 +58,7 @@ export function ModelResolver<M extends Model = Model>(
 	const getter_names = new Set(
 		Object.entries(Object.getOwnPropertyDescriptors(ThisModel.prototype))
 			.filter(([, descriptor]) => typeof descriptor.get === "function")
-			.map(([key]) => key),
+			.map(([key]) => key)
 	)
 
 	// List of model relations
@@ -68,7 +68,7 @@ export function ModelResolver<M extends Model = Model>(
 	// Default field resolver
 	const get_field_resolver = (
 		field: string,
-		modelField?: string,
+		modelField?: string
 	): FieldResolverFn<M> => {
 		const model_field_lookup = modelField || field
 		if (getter_names.has(model_field_lookup)) {
@@ -96,7 +96,7 @@ export function ModelResolver<M extends Model = Model>(
 				r = get_field_resolver(field, r0)
 			} else {
 				throw new Error(
-					`Field resolver must be a function, string, or true; found ${r0}`,
+					`Field resolver must be a function, string, or true; found ${r0}`
 				)
 			}
 			field_resolvers[field] = r
@@ -107,7 +107,7 @@ export function ModelResolver<M extends Model = Model>(
 		const ThisModel = query.modelClass()
 		if (model_class !== (ThisModel as ModelConstructor<Model>)) {
 			throw new Error(
-				`Mismatching query model for ${type} model resolver (expected ${model_class}, found ${ThisModel})`,
+				`Mismatching query model for ${type} model resolver (expected ${model_class}, found ${ThisModel})`
 			)
 		}
 
@@ -129,7 +129,7 @@ export function ModelResolver<M extends Model = Model>(
 		if (
 			!query.has(
 				((op: any) =>
-					op.name === "select" && op.args[0] === ThisModel.idColumn) as any,
+					op.name === "select" && op.args[0] === ThisModel.idColumn) as any
 			)
 		) {
 			// Always select ID:

@@ -7,7 +7,8 @@ module.exports = {
 	plugins: ["simple-import-sort"],
 	rules: {
 		"prettier/prettier": "warn",
-		"simple-import-sort/sort": "warn",
+		"simple-import-sort/imports": "warn",
+		"simple-import-sort/exports": "warn",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
 	},

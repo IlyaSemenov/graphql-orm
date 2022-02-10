@@ -26,7 +26,7 @@ export type ResolveTreeFn = <M extends Model>(args: {
 
 export function GraphResolver(
 	model_resolvers: Record<string, ModelResolverFn<any>>,
-	options?: GraphResolverOptions,
+	options?: GraphResolverOptions
 ) {
 	const graph_options: GraphResolverOptions = { ...options }
 
@@ -37,7 +37,7 @@ export function GraphResolver(
 		context: AnyContext,
 		info: GraphQLResolveInfo,
 		query: QB,
-		options?: O,
+		options?: O
 	): O extends {
 		paginate: PaginatorFn<any>
 	}
@@ -46,7 +46,7 @@ export function GraphResolver(
 		const query_options: QueryOptions<ModelType<QB>> = { ...options }
 		if (context) {
 			query.context(
-				graph_options.context ? graph_options.context(context) : context,
+				graph_options.context ? graph_options.context(context) : context
 			)
 		}
 

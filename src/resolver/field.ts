@@ -11,7 +11,7 @@ export interface FieldResolverOptions<M extends Model> {
 }
 
 export function FieldResolver<M extends Model>(
-	options?: FieldResolverOptions<M>,
+	options?: FieldResolverOptions<M>
 ): FieldResolverFn<M> {
 	const select = options?.select
 	const clean = options?.clean
@@ -34,7 +34,7 @@ export function FieldResolver<M extends Model>(
 					}
 					instance[field] = await clean(instance[field], instance, context)
 					return instance
-				}),
+				})
 			)
 		}
 	}
