@@ -45,34 +45,34 @@ query user_with_posts {
 
 ```ts
 const resolveGraph = GraphResolver({
-	User: ModelResolver(UserModel, {
-		fields: {
-			id: true,
-			name: true,
-			// Use withGraphFetched("posts")
-			// and process subquery with Post model resolver defined below.
-			//
-			// See RelationResolver API for advanced options.
-			posts: true,
-		},
-	}),
-	// No resolver options = access to all fields
-	Post: ModelResolver(PostModel),
+  User: ModelResolver(UserModel, {
+    fields: {
+      id: true,
+      name: true,
+      // Use withGraphFetched("posts")
+      // and process subquery with Post model resolver defined below.
+      //
+      // See RelationResolver API for advanced options.
+      posts: true,
+    },
+  }),
+  // No resolver options = access to all fields
+  Post: ModelResolver(PostModel),
 })
 
 const resolvers = {
-	Query: {
-		user: async (parent, args, ctx, info) => {
-			const user = await resolveGraph(ctx, info, User.query().findById(args.id))
-			return user
-		},
-		posts: async (parent, args, ctx, info) => {
-			const page = await resolveGraph(ctx, info, Post.query(), {
-				paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
-			})
-			return page
-		},
-	},
+  Query: {
+    user: async (parent, args, ctx, info) => {
+      const user = await resolveGraph(ctx, info, User.query().findById(args.id))
+      return user
+    },
+    posts: async (parent, args, ctx, info) => {
+      const page = await resolveGraph(ctx, info, Post.query(), {
+        paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
+      })
+      return page
+    },
+  },
 }
 ```
 
@@ -80,18 +80,18 @@ Internally, this traverses `Model.relationMappings` and can handle unlimited nes
 
 ```graphql
 query deep_nesting {
-	posts {
-		id
-		text
-		author {
-			name
-			posts {
-				id
-				author {
-					name
-				}
-			}
-		}
-	}
+  posts {
+    id
+    text
+    author {
+      name
+      posts {
+        id
+        author {
+          name
+        }
+      }
+    }
+  }
 }
 ```
