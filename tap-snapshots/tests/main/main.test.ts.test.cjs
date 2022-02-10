@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`src/tests/main/main.test.ts TAP Main double nested pagination > must match snapshot 1`] = `
+exports[`tests/main/main.test.ts TAP Main double nested pagination > must match snapshot 1`] = `
 Object {
   "user": Object {
     "id": "1",
@@ -83,7 +83,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main fetch existing object > must match snapshot 1`] = `
+exports[`tests/main/main.test.ts TAP Main fetch existing object > must match snapshot 1`] = `
 Object {
   "user": Object {
     "id": "1",
@@ -92,7 +92,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main field cleaner > public fields 1`] = `
+exports[`tests/main/main.test.ts TAP Main field cleaner > public fields 1`] = `
 Object {
   "user": Object {
     "id": "1",
@@ -101,17 +101,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main field cleaner > reject password to other users 1`] = `
-Object {
-  "user": Object {
-    "id": "1",
-    "name": "John",
-    "password": null,
-  },
-}
-`
-
-exports[`src/tests/main/main.test.ts TAP Main field cleaner > reject password to public 1`] = `
+exports[`tests/main/main.test.ts TAP Main field cleaner > reject password to other users 1`] = `
 Object {
   "user": Object {
     "id": "1",
@@ -121,7 +111,17 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main field cleaner > return own password to user 1`] = `
+exports[`tests/main/main.test.ts TAP Main field cleaner > reject password to public 1`] = `
+Object {
+  "user": Object {
+    "id": "1",
+    "name": "John",
+    "password": null,
+  },
+}
+`
+
+exports[`tests/main/main.test.ts TAP Main field cleaner > return own password to user 1`] = `
 Object {
   "user": Object {
     "id": "1",
@@ -131,7 +131,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main model getter > must match snapshot 1`] = `
+exports[`tests/main/main.test.ts TAP Main model getter > must match snapshot 1`] = `
 Object {
   "section": Object {
     "id": "1",
@@ -141,7 +141,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main nested filter > section slug, author_id: 2 1`] = `
+exports[`tests/main/main.test.ts TAP Main nested filter > section slug, author_id: 2 1`] = `
 Object {
   "section": Object {
     "posts": Object {
@@ -174,7 +174,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main nested pagination > must match snapshot 1`] = `
+exports[`tests/main/main.test.ts TAP Main nested pagination > must match snapshot 1`] = `
 Object {
   "user": Object {
     "id": "1",
@@ -204,7 +204,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main raw SQL selector > must match snapshot 1`] = `
+exports[`tests/main/main.test.ts TAP Main raw SQL selector > must match snapshot 1`] = `
 Object {
   "section": Object {
     "id": "1",
@@ -214,7 +214,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root filter __in > id__in: [3, 5] 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter __in > id__in: [3, 5] 1`] = `
 Object {
   "posts": Object {
     "nodes": Array [
@@ -231,7 +231,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root filter by field > author_id not defined 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter by field > author_id not defined 1`] = `
 Object {
   "posts": Object {
     "nodes": Array [
@@ -296,7 +296,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root filter by field > author_id: 2 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter by field > author_id: 2 1`] = `
 Object {
   "posts": Object {
     "nodes": Array [
@@ -329,7 +329,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root filter by modifier > is_draft 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter by modifier > is_draft 1`] = `
 Object {
   "posts": Object {
     "nodes": Array [
@@ -342,7 +342,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root filter filter by parametrized modifier > search: "news" 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter filter by parametrized modifier > search: "news" 1`] = `
 Object {
   "posts": Object {
     "nodes": Array [
@@ -359,7 +359,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root filter when filters not enabled > all sections, not only news 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter when filters not enabled > all sections, not only news 1`] = `
 Object {
   "sections": Object {
     "nodes": Array [
@@ -376,7 +376,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root pagination > must match snapshot 1`] = `
+exports[`tests/main/main.test.ts TAP Main root pagination > must match snapshot 1`] = `
 Object {
   "sections": Object {
     "cursor": "[\\"Editorial\\",\\"2\\"]",
@@ -396,7 +396,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root pagination with arguments > take 1 1`] = `
+exports[`tests/main/main.test.ts TAP Main root pagination with arguments > take 1 1`] = `
 Object {
   "cursor": "[\\"COVID-19\\",\\"3\\"]",
   "nodes": Array [
@@ -409,7 +409,7 @@ Object {
 }
 `
 
-exports[`src/tests/main/main.test.ts TAP Main root pagination with arguments > take 100 with cursor 1`] = `
+exports[`tests/main/main.test.ts TAP Main root pagination with arguments > take 100 with cursor 1`] = `
 Object {
   "sections": Object {
     "cursor": null,

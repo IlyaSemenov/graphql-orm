@@ -1,15 +1,9 @@
 {
+	"extends": "@tsconfig/node14/tsconfig.json",
+	"include": ["src", "tests"],
 	"compilerOptions": {
-		"declaration": true,
-		"esModuleInterop": true,
-		"moduleResolution": "node",
-		"strict": true,
-		// Target Node 10
-		"target": "ES2018",
-		"baseUrl": ".",
 		"paths": {
 			"objection-graphql-resolver": ["./src"]
 		}
-	},
-	"include": ["src"]
+	}
 }
