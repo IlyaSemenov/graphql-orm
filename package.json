@@ -33,7 +33,7 @@
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
     "@tsconfig/node14": "^1.0.1",
-    "@types/tap": "^15.0.2",
+    "@types/tap": "^15.0.5",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "apollo-server": "^2.19.0",
@@ -52,7 +52,7 @@
     "objection": "^2.2.5",
     "prettier": "^2.1.2",
     "sqlite3": "^5.0.0",
-    "tap": "^15.0.9",
+    "tap": "^15.1.6",
     "tsup": "^5.11.13",
     "typescript": "^4.0.5"
   }
