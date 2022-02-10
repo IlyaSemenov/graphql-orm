@@ -17,7 +17,8 @@
     "test": "tap 'src/**/*.test.ts'",
     "build": "rollup -c",
     "prepublish": "yarn build",
-    "lint": "eslint --fix '**/*.{js,ts}'"
+    "lint": "eslint --fix '**/*.{js,ts}'",
+    "prepare": "husky install"
   },
   "dependencies": {
     "graphql-parse-resolve-info": "^4.10.0"
