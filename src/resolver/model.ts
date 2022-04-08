@@ -8,7 +8,7 @@ import {
 } from "objection"
 
 import { FieldResolver } from "./field"
-import { AnyContext, ResolveTreeFn } from "./graph"
+import { ResolverContext, ResolveTreeFn } from "./graph"
 import { RelationResolver } from "./relation"
 
 export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
@@ -16,7 +16,7 @@ export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
 export interface ModelResolverOptions<M extends Model> {
 	modifier?: Modifier<M>
 	fields?: Record<string, SimpleFieldResolver<M>> | true
-	clean?(instance: M, context: AnyContext): void | PromiseLike<void>
+	clean?(instance: M, context: ResolverContext): void | PromiseLike<void>
 }
 
 export type ModelResolverFn<M extends Model = Model> = (args: {

@@ -1,13 +1,13 @@
 import { Model, ref } from "objection"
 
 import { async_run_after } from "../helpers/run_after"
-import { AnyContext } from "./graph"
+import { ResolverContext } from "./graph"
 import { FieldResolverFn } from "./model"
 
 export interface FieldResolverOptions<M extends Model> {
 	modelField?: string
 	select?: FieldResolverFn<M>
-	clean?(value: any, instance: M, context: AnyContext): any
+	clean?(value: any, instance: M, context: ResolverContext): any
 }
 
 export function FieldResolver<M extends Model>(

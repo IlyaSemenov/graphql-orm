@@ -49,3 +49,9 @@ export const resolvers: Resolvers = {
 		},
 	},
 }
+
+declare module "objection-graphql-resolver" {
+	interface ResolverContext {
+		hide_user_with_id?: number
+	}
+}

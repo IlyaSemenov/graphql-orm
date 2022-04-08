@@ -1,15 +1,17 @@
 import { GraphQLResolveInfo } from "graphql"
 import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
-import { Model, ModelType, QueryBuilder } from "objection"
+import { Model, ModelType, QueryBuilder, QueryContext } from "objection"
 
 import { apply_filter, FiltersDef } from "../filter"
 import { PaginatorFn } from "../paginators"
 import { ModelResolverFn } from "./model"
 
-export type AnyContext = Record<string, any>
+export interface ResolverContext extends QueryContext {
+	// You are welcome to augment this
+}
 
 export interface GraphResolverOptions {
-	context?: (context: AnyContext) => AnyContext
+	context?: (context: any) => ResolverContext
 }
 
 export interface QueryOptions<M extends Model> {
@@ -34,7 +36,7 @@ export function GraphResolver(
 		QB extends QueryBuilder<Model, any>,
 		O extends QueryOptions<ModelType<QB>>
 	>(
-		context: AnyContext,
+		context: any,
 		info: GraphQLResolveInfo,
 		query: QB,
 		options?: O
