@@ -27,7 +27,7 @@
     "graphql-parse-resolve-info": "^4.10.0"
   },
   "peerDependencies": {
-    "objection": "^2"
+    "objection": "^2 || ^3"
   },
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
@@ -36,6 +36,7 @@
     "@types/tap": "^15.0.5",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
+    "@vscode/sqlite3": "^5.0.8",
     "apollo-server": "^2.19.0",
     "esbuild": "^0.14.8",
     "esbuild-runner": "^2.2.1",
@@ -47,11 +48,10 @@
     "graphql-request": "^3.4.0",
     "graphql-tag": "^2.11.0",
     "husky": ">=6",
-    "knex": "^0.21.14",
+    "knex": "^1.0.5",
     "lint-staged": ">=10",
-    "objection": "^2.2.5",
+    "objection": "^3.0.1",
     "prettier": "^2.5.1",
-    "sqlite3": "^5.0.0",
     "tap": "^15.1.6",
     "tsup": "^5.11.13",
     "typescript": "^4.0.5"
