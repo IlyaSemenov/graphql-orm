@@ -20,10 +20,10 @@ export class UserModel extends Model {
 		}
 	}
 
-	declare id: number
-	declare name: string
-	declare password: string
-	declare posts: PostModel[]
-	declare default_section_id: number | null
-	declare default_section: SectionModel | null
+	declare id?: number
+	declare name?: string
+	declare password?: string
+	declare posts?: PostModel[]
+	declare default_section_id?: number | null
+	declare default_section?: SectionModel | null
 }

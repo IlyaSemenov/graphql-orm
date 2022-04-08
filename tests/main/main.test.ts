@@ -282,7 +282,10 @@ tap.test("Main", async (tap) => {
 				await client.request(query, { author_id: 2 }),
 				"author_id: 2"
 			)
-			tap.matchSnapshot(await client.request(query), "author_id not defined")
+			tap.matchSnapshot(
+				await client.request(query),
+				"author_id filter not defined"
+			)
 		})
 		tap.test("__in", async (tap) => {
 			tap.matchSnapshot(

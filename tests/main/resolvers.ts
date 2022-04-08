@@ -34,10 +34,17 @@ export const resolvers: Resolvers = {
 			return page
 		},
 		posts: async (parent, args, ctx, info) => {
-			const page = await resolve_graph(ctx, info, PostModel.query(), {
-				paginate: CursorPaginator({ take: 2, fields: ["-id"] }),
-				filter: true,
-			})
+			const page = await resolve_graph(
+				ctx,
+				info,
+				PostModel.query().context({
+					hide_user_with_id: 3,
+				}),
+				{
+					paginate: CursorPaginator({ take: 2, fields: ["-id"] }),
+					filter: true,
+				}
+			)
 			return page
 		},
 	},

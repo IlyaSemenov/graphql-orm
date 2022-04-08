@@ -5,7 +5,8 @@ export const schema = gql`
 
 	type User {
 		id: ID!
-		name: String!
+		# empty if hidden
+		name: String
 		# empty if not allowed
 		password: String
 		posts(filter: Filter, cursor: String, take: Int): PostPage!

@@ -8,7 +8,7 @@ import {
 } from "objection"
 
 import { FieldResolver } from "./field"
-import { ResolveTreeFn } from "./graph"
+import { AnyContext, ResolveTreeFn } from "./graph"
 import { RelationResolver } from "./relation"
 
 export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
@@ -16,6 +16,7 @@ export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
 export interface ModelResolverOptions<M extends Model> {
 	modifier?: Modifier<M>
 	fields?: Record<string, SimpleFieldResolver<M>> | true
+	clean?(instance: M, context: AnyContext): void | PromiseLike<void>
 }
 
 export type ModelResolverFn<M extends Model = Model> = (args: {
@@ -136,6 +137,23 @@ export function ModelResolver<M extends Model = Model>(
 			// 1. This is useful for potential $query()
 			// 2. This avoid automatic "select *" when not a single normal field was selected
 			query.select(ThisModel.idColumn)
+		}
+
+		const clean_instance = model_options.clean
+		if (clean_instance) {
+			query.runAfter(async (result, qb) => {
+				if (result) {
+					const context = qb.context()
+					if (Array.isArray(result)) {
+						await Promise.all(
+							result.map((instance) => clean_instance(instance, context))
+						)
+					} else {
+						await clean_instance(result, context)
+					}
+				}
+				return result
+			})
 		}
 	}
 }

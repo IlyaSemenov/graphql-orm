@@ -231,10 +231,18 @@ Object {
 }
 `
 
-exports[`tests/main/main.test.ts TAP Main root filter by field > author_id not defined 1`] = `
+exports[`tests/main/main.test.ts TAP Main root filter by field > author_id filter not defined 1`] = `
 Object {
   "posts": Object {
     "nodes": Array [
+      Object {
+        "author": Object {
+          "id": "3",
+          "name": null,
+        },
+        "id": "8",
+        "text": "Article from someone hidden!",
+      },
       Object {
         "author": Object {
           "id": "1",

@@ -32,4 +32,9 @@ export const User = ModelResolver(UserModel, {
 		all_posts: "posts",
 		all_posts_verbose: RelationResolver({ modelField: "posts" }),
 	},
+	clean(user, context) {
+		if (context.hide_user_with_id && user.id === context.hide_user_with_id) {
+			delete user.name
+		}
+	},
 })

@@ -12,6 +12,7 @@ export async function create_objects() {
 	await UserModel.query().insertGraph([
 		{ id: 1, name: "John", password: "secret", default_section_id: 1 },
 		{ id: 2, name: "Mary", password: "mary123" },
+		{ id: 3, name: "Pete", password: "pete111" },
 	])
 
 	await PostModel.query().insertGraph(
@@ -28,6 +29,12 @@ export async function create_objects() {
 				section_id: 1,
 				text: "This is a draft",
 				is_published: false,
+			},
+			{
+				id: 8,
+				author_id: 3,
+				section_id: 1,
+				text: "Article from someone hidden!",
 			},
 		],
 		{ relate: true }
