@@ -1,17 +1,16 @@
 import gql from "graphql-tag"
 import tap from "tap"
 
-import { use_db, use_server } from "../setup"
-import { create_objects } from "./fixtures"
-import { create_tables } from "./migrations"
-import { resolvers } from "./resolvers"
-import { schema } from "./schema"
+import { setup } from "../setup"
+import { create_objects } from "./setup/fixtures"
+import { create_tables } from "./setup/migrations"
+import { resolvers } from "./setup/resolvers"
+import { schema } from "./setup/schema"
 
 tap.test("Main", async (tap) => {
-	await use_db(tap)
+	const { client } = await setup(tap, { typeDefs: schema, resolvers })
 	await create_tables()
 	await create_objects()
-	const { client } = await use_server(tap, { typeDefs: schema, resolvers })
 
 	await tap.test("fetch existing object", async (tap) => {
 		tap.matchSnapshot(
