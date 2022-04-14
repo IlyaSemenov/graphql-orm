@@ -73,17 +73,17 @@ const schema = gql`
 	}
 `
 
+const resolve_graph = GraphResolver({
+	Author: ModelResolver(AuthorModel),
+	Book: ModelResolver(BookModel),
+})
+
 const resolvers: Resolvers = {
 	Query: {
 		library: (_parent, _args, ctx, info) =>
 			resolve_graph(ctx, info, BookModel.query().orderBy("id")),
 	},
 }
-
-const resolve_graph = GraphResolver({
-	Author: ModelResolver(AuthorModel),
-	Book: ModelResolver(BookModel),
-})
 
 tap.test("m2m", async (tap) => {
 	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })

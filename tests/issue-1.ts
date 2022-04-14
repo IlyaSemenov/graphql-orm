@@ -7,7 +7,7 @@ import { Resolvers, setup } from "./setup"
 
 class CModel extends Model {
 	static tableName = "c"
-	id!: string
+	id?: string
 }
 
 const schema = gql`
@@ -20,16 +20,16 @@ const schema = gql`
 	}
 `
 
+const resolve_graph = GraphResolver({
+	C: ModelResolver(CModel),
+})
+
 const resolvers: Resolvers = {
 	Query: {
 		all_c: (_parent, _args, ctx, info) =>
 			resolve_graph(ctx, info, CModel.query()),
 	},
 }
-
-const resolve_graph = GraphResolver({
-	C: ModelResolver(CModel),
-})
 
 tap.test("allow model without relationMappings", async (tap) => {
 	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
