@@ -2,17 +2,13 @@
 
 A helper library to resolve GraphQL queries directly with [Objection.js](https://vincit.github.io/objection.js/) models and relations.
 
-- Highly effective: selects only requested fields and relations (using fine-tuned `withGraphFetched`)
-- Support unlimited nested resolvers (traversing `relationMappings`)
-- Support pagination
-- Support virtual attributes
-- Support filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`
-- Hook into subqueries with query modifiers
-- Hook into field results to restrict access to sensitive information
-
-## History
-
-Before 3.0.0, this library used to be named `objection-fetch-graphql`.
+- Highly effective: selects only requested fields and relations (using fine-tuned `withGraphFetched`).
+- Supports unlimited nested resolvers (traversing `relationMappings`).
+- Supports pagination.
+- Supports virtual attributes.
+- Supports filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`.
+- Hooks into subqueries with query modifiers.
+- Hooks into field results to restrict access to sensitive information.
 
 ## Install
 
@@ -32,20 +28,29 @@ Run GraphQL server:
 
 import { ApolloServer } from "apollo-server"
 import gql from "graphql-tag"
+import Knex from "knex"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
 
-class PostModel extends Model {
-  static tableName = "posts"
+// Define Objection.js models
 
-  declare id: number
-  declare text: string
+class PostModel extends Model {
+  static tableName = "post"
+
+  id?: number
+  text?: string
 }
+
+// Define GraphQL schema
 
 const typeDefs = gql`
   type Post {
-    id: ID!
+    id: Int!
     text: String!
+  }
+
+  type Mutation {
+    create_post(text: String!): Post!
   }
 
   type Query {
@@ -53,26 +58,51 @@ const typeDefs = gql`
   }
 `
 
+// Map GraphQL types to model resolvers
+
 const resolveGraph = GraphResolver({
-  // Map GraphQL types to model resolvers
-  Post: ModelResolver(PostModel, {
-    // List fields that can be accessed via GraphQL
-    fields: {
-      id: true,
-      text: true,
-    },
-  }),
+  Post: ModelResolver(PostModel),
 })
 
+// Define resolvers
+
 const resolvers = {
+  Mutation: {
+    async create_post(_parent, args, ctx, info) {
+      const post = await PostModel.query().insert(args)
+      return resolveGraph(ctx, info, post.$query())
+    },
+  },
   Query: {
-    posts: (parent, args, ctx, info) => {
-      return resolveGraph(ctx, info, Post.query())
+    posts(_parent, _args, ctx, info) {
+      return resolveGraph(ctx, info, PostModel.query().orderBy("id"))
     },
   },
 }
 
-new ApolloServer({ typeDefs, resolvers }).listen({ port: 4000 })
+// Configure database backend
+
+const knex = Knex({ client: "sqlite3", connection: ":memory:" })
+Model.knex(knex)
+
+async function migrate() {
+  await knex.schema.createTable("post", (post) => {
+    post.increments("id")
+    post.text("text").notNullable()
+  })
+}
+
+migrate()
+
+// Start GraphQL server
+
+async function start() {
+  const server = new ApolloServer({ typeDefs, resolvers })
+  const { url } = await server.listen({ port: 4000 })
+  console.log(`Listening on ${url}`)
+}
+
+start()
 ```
 
 Query it with GraphQL client:
@@ -83,16 +113,33 @@ import gql from "graphql-tag"
 
 const client = new GraphQLClient("http://127.0.0.1:4000")
 
-await client.request(
-  gql`
-    query {
-      posts {
-        id
-        text
+async function main() {
+  await client.request(
+    gql`
+      mutation create_post($text: String!) {
+        new_post: create_post(text: $text) {
+          id
+        }
       }
-    }
-  `
-)
+    `,
+    { text: "Hello, world!" }
+  )
+
+  const { posts } = await client.request(
+    gql`
+      query {
+        posts {
+          id
+          text
+        }
+      }
+    `
+  )
+
+  console.log(posts)
+}
+
+main()
 ```
 
 ## Relations
