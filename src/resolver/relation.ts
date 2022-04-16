@@ -29,12 +29,7 @@ export function RelationResolver<M extends Model, R extends Model>(
 			query
 				.withGraphFetched(
 					`${options?.modelField || field}(${field}) as ${field}`,
-					paginate
-						? {
-								joinOperation: "leftJoin", // Remove after https://github.com/Vincit/objection.js/issues/1954 is fixed
-								maxBatchSize: 1,
-						  }
-						: undefined
+					paginate ? { maxBatchSize: 1 } : undefined
 				)
 				.modifiers({
 					[field]: (subquery) => {
