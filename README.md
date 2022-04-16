@@ -190,7 +190,7 @@ query user_with_posts {
 
 ## Pagination
 
-Root queries and one-to-many nested relations can be paginated.
+Root queries and -to-many nested relations can be paginated.
 
 Example:
 
@@ -356,12 +356,12 @@ const resolveGraph = GraphResolver(
               }
             },
           }),
-          // Select all objects in one-to-many relation
+          // Select all objects in -to-many relation
           comments: true,
           comments_page: RelationResolver({
             // Model field, if different from GraphQL field
             modelField: "comments",
-            // Paginate subquery in one-to-many relation
+            // Paginate subquery in -to-many relation
             paginate: CursorPaginator(
               // Pagination options
               // Default: { take: 10, fields: ["id"] }
@@ -373,7 +373,7 @@ const resolveGraph = GraphResolver(
                 fields: ["name", "-id"],
               }
             ),
-            // Enable filters on one-to-many relation
+            // Enable filters on -to-many relation
             filters: true,
             // Modify subquery
             modifier: (query, { args }) =>

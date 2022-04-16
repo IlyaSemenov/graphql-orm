@@ -1,6 +1,6 @@
 # Pagination
 
-Root queries and one-to-many nested relations can be paginated.
+Root queries and -to-many nested relations can be paginated.
 
 ## Paginators
 
