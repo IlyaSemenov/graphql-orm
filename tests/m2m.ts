@@ -89,11 +89,11 @@ tap.test("m2m", async (tap) => {
 	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
 
 	await knex.schema.createTable("author", (author) => {
-		author.integer("id").primary()
+		author.integer("id").notNullable().primary()
 		author.string("name").notNullable()
 	})
 	await knex.schema.createTable("book", (book) => {
-		book.integer("id").primary()
+		book.integer("id").notNullable().primary()
 		book.string("title").notNullable()
 	})
 	await knex.schema.createTable("author_book_rel", (rel) => {
@@ -102,11 +102,14 @@ tap.test("m2m", async (tap) => {
 			.notNullable()
 			.references("author.id")
 			.onDelete("cascade")
+			.index()
 		rel
 			.integer("book_id")
 			.notNullable()
 			.references("book.id")
 			.onDelete("cascade")
+			.index()
+		rel.primary(["author_id", "book_id"])
 	})
 
 	await BookModel.query().insertGraph(
