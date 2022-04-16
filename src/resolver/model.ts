@@ -12,7 +12,10 @@ import { FieldResolver } from "./field"
 import { ResolverContext, ResolveTreeFn } from "./graph"
 import { RelationResolver } from "./relation"
 
-export type Modifier<M extends Model> = (qb: QueryBuilder<M, any>) => void
+export type Modifier<M extends Model> = (
+	qb: QueryBuilder<M, any>,
+	tree: ResolveTree
+) => void
 
 export interface ModelResolverOptions<M extends Model> {
 	modifier?: Modifier<M>
@@ -114,7 +117,7 @@ export function ModelResolver<M extends Model = Model>(
 		}
 
 		if (model_options.modifier) {
-			model_options.modifier(query)
+			model_options.modifier(query, tree)
 		}
 
 		for (const subtree of Object.values(tree.fieldsByTypeName[type])) {

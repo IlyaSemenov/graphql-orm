@@ -376,13 +376,14 @@ const resolveGraph = GraphResolver(
             // Enable filters on one-to-many relation
             filters: true,
             // Modify subquery
-            modifier: (query) => query.orderBy("id", "desc"),
-            // Post-process selected value, see FIeldResolver
+            modifier: (query, { args }) =>
+              query.where(args).orderBy("id", "desc"),
+            // Post-process selected value, see FieldResolver
             // clean: ...,
           }),
         },
         // Modify all queries to this model
-        modifier: (query) => query.orderBy("id", "desc"),
+        modifier: (query, { args }) => query.where(args).orderBy("id", "desc"),
       }
     ),
   },

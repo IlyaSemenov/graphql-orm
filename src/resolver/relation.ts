@@ -46,7 +46,7 @@ export function RelationResolver<M extends Model, R extends Model>(
 							})
 						}
 						if (modifier) {
-							modifier(subquery)
+							modifier(subquery, tree)
 						}
 					},
 				})
