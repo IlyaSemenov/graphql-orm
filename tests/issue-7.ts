@@ -1,3 +1,5 @@
+// Regression test for https://github.com/IlyaSemenov/objection-graphql-resolver/issues/7
+
 import gql from "graphql-tag"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
@@ -85,7 +87,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.todo("m2m with extra columns in relation table", async (tap) => {
+tap.test("m2m: naming clash with column in relation table", async (tap) => {
 	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
 
 	await knex.schema.createTable("author", (author) => {

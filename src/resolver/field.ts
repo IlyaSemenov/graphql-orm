@@ -22,7 +22,11 @@ export function FieldResolver<M extends Model>(
 		if (select) {
 			select(query, resolve_opts)
 		} else {
-			query.select(model_field ? ref(model_field).as(field) : field)
+			query.select(
+				ref(model_field || field)
+					.from(query.tableRef())
+					.as(field)
+			)
 		}
 		if (clean) {
 			const context = query.context()

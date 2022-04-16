@@ -1,3 +1,5 @@
+// Regression test for https://github.com/IlyaSemenov/objection-graphql-resolver/issues/1
+
 import gql from "graphql-tag"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
