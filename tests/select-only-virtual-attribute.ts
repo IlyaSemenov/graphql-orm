@@ -22,7 +22,7 @@ const schema = gql`
 	}
 
 	type Query {
-		library: [Book!]!
+		books: [Book!]!
 	}
 `
 
@@ -32,7 +32,7 @@ const resolve_graph = GraphResolver({
 
 const resolvers: Resolvers = {
 	Query: {
-		library: (_parent, _args, ctx, info) =>
+		books: (_parent, _args, ctx, info) =>
 			resolve_graph(ctx, info, BookModel.query()),
 	},
 }
@@ -50,14 +50,14 @@ tap.test("select virtual attribute only", async (tap) => {
 		await client.request(
 			gql`
 				{
-					library {
+					books {
 						foo
 					}
 				}
 			`
 		),
 		{
-			library: [{ foo: "whatever" }],
+			books: [{ foo: "whatever" }],
 		}
 	)
 })

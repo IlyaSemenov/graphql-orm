@@ -30,7 +30,7 @@ const schema = gql`
 	}
 
 	type Query {
-		library: BookPage!
+		books: BookPage!
 	}
 `
 
@@ -40,7 +40,7 @@ const resolve_graph = GraphResolver({
 
 const resolvers: Resolvers = {
 	Query: {
-		library: (_parent, _args, ctx, info) =>
+		books: (_parent, _args, ctx, info) =>
 			resolve_graph(ctx, info, BookModel.query(), {
 				paginate: CursorPaginator({ take: 1, fields: ["author", "id"] }),
 			}),
@@ -65,7 +65,7 @@ tap.test("auto select pagination key", async (tap) => {
 		await client.request(
 			gql`
 				{
-					library {
+					books {
 						nodes {
 							title
 						}
@@ -74,7 +74,7 @@ tap.test("auto select pagination key", async (tap) => {
 			`
 		),
 		{
-			library: {
+			books: {
 				nodes: [{ title: "1984" }],
 			},
 		},

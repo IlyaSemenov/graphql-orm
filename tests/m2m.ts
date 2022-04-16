@@ -69,7 +69,7 @@ const schema = gql`
 	}
 
 	type Query {
-		library: [Book!]!
+		books: [Book!]!
 	}
 `
 
@@ -80,7 +80,7 @@ const resolve_graph = GraphResolver({
 
 const resolvers: Resolvers = {
 	Query: {
-		library: (_parent, _args, ctx, info) =>
+		books: (_parent, _args, ctx, info) =>
 			resolve_graph(ctx, info, BookModel.query().orderBy("id")),
 	},
 }
@@ -133,7 +133,7 @@ tap.test("m2m", async (tap) => {
 		await client.request(
 			gql`
 				{
-					library {
+					books {
 						id
 						title
 						authors {
@@ -145,7 +145,7 @@ tap.test("m2m", async (tap) => {
 			`
 		),
 		{
-			library: [
+			books: [
 				{ id: 1, title: "1984", authors: [{ id: 1, name: "George Orwell" }] },
 				{
 					id: 2,
