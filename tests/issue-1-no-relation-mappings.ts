@@ -10,6 +10,8 @@ import { Resolvers, setup } from "./setup"
 class CModel extends Model {
 	static tableName = "c"
 	id?: string
+
+	// no relationMappings defined on purpose
 }
 
 const schema = gql`
