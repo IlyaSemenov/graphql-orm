@@ -46,7 +46,8 @@ export function apply_filter({
 					!(
 						value === null ||
 						typeof value === "string" ||
-						typeof value === "number"
+						typeof value === "number" ||
+						typeof value === "boolean"
 					)
 				) {
 					throw new Error(`Unsupported filter value for ${table_name}.${field}`)
