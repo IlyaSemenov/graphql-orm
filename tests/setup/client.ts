@@ -20,7 +20,7 @@ export type ServerConfig = Required<Pick<Config, "typeDefs" | "resolvers">>
 export async function setup_client(tap: Tap.Test, config: ServerConfig) {
 	const server = new ApolloServer({
 		...config,
-		context: ({ req }): ResolverContext => {
+		context({ req }): ResolverContext {
 			const user_id = Number(req.headers.user_id) || null
 			return { user_id }
 		},
