@@ -12,8 +12,8 @@ A helper library to resolve GraphQL queries directly with [Objection.js](https:/
 
 ## Install
 
-```
-yarn add objection-graphql-resolver
+```sh
+npm i objection-graphql-resolver
 ```
 
 ## Minimal all-in-one example
