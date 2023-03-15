@@ -65,9 +65,10 @@ const resolvers = {
 
 Supported operators:
 
-- `exact`
-- `in`
-- TODO: `lt`, `gt`, `lte`, `gte`, `like`, `ilike`, `contains`, `icontains`
+- no operator / exact comparison (also works for `null` values)
+- `lt`, `lte`, `gt`, `gte`
+- `like`, `ilike`
+- `in` (expects an array of scalars)
 
 ## Filtering with model modifiers
 

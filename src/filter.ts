@@ -9,6 +9,15 @@ export type FilterScalarValue = null | string | number | boolean
 export type FilterValue = FilterScalarValue | Exclude<FilterScalarValue, null>[]
 export type Filter = { [property: string]: FilterValue }
 
+function is_scalar(value: any) {
+	return (
+		value === null ||
+		typeof value === "string" ||
+		typeof value === "number" ||
+		typeof value === "boolean"
+	)
+}
+
 export function apply_filter({
 	query,
 	filter,
@@ -40,27 +49,25 @@ export function apply_filter({
 			query.modify(field, value)
 		} else {
 			// Normal filter
-			const [dbfield, op] = field.split("__")
-			if (!op || op === "exact") {
-				if (
-					!(
-						value === null ||
-						typeof value === "string" ||
-						typeof value === "number" ||
-						typeof value === "boolean"
+			const [dbfield, op0] = field.split("__")
+			const op = op0?.toLowerCase() || "exact"
+			if (["exact", "lt", "lte", "gt", "gte", "like", "ilike"].includes(op)) {
+				if (!is_scalar(value)) {
+					throw new Error(
+						`Unsupported filter value for ${table_name}.${field}: must be scalar.`
 					)
-				) {
-					throw new Error(`Unsupported filter value for ${table_name}.${field}`)
 				}
-				if (value !== null) {
-					query.where(dbfield, value)
-				} else {
+				if (op === "exact" && value === null) {
 					query.whereNull(dbfield)
+				} else {
+					const objection_op =
+						{ exact: "=", lt: "<", lte: "<=", gt: ">", gte: ">=" }[op] || op
+					query.where(dbfield, objection_op, value)
 				}
 			} else if (op === "in") {
-				if (!Array.isArray(value)) {
+				if (!(Array.isArray(value) && value.every(is_scalar))) {
 					throw new Error(
-						`Invalid filter value for ${table_name}.${field}: must be an array.`
+						`Invalid filter value for ${table_name}.${field}: must be an array of scalars.`
 					)
 				}
 				query.whereIn(dbfield, value)

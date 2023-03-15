@@ -171,6 +171,76 @@ tap.test("filters", async (tap) => {
 	)
 
 	tap.strictSame(
+		await client.request(
+			gql`
+				{
+					posts(filter: { id__lt: 3 }) {
+						id
+					}
+				}
+			`
+		),
+		{ posts: [{ id: 1 }, { id: 2 }] },
+		"filter by id__lt"
+	)
+
+	tap.strictSame(
+		await client.request(
+			gql`
+				{
+					posts(filter: { id__lte: 3 }) {
+						id
+					}
+				}
+			`
+		),
+		{ posts: [{ id: 1 }, { id: 2 }, { id: 3 }] },
+		"filter by id__lte"
+	)
+
+	tap.strictSame(
+		await client.request(
+			gql`
+				{
+					posts(filter: { id__gt: 4 }) {
+						id
+					}
+				}
+			`
+		),
+		{ posts: [{ id: 5 }, { id: 6 }] },
+		"filter by id__gt"
+	)
+
+	tap.strictSame(
+		await client.request(
+			gql`
+				{
+					posts(filter: { id__gte: 4 }) {
+						id
+					}
+				}
+			`
+		),
+		{ posts: [{ id: 4 }, { id: 5 }, { id: 6 }] },
+		"filter by id__gte"
+	)
+
+	tap.strictSame(
+		await client.request(
+			gql`
+				{
+					posts(filter: { text__like: "%COVID%" }) {
+						text
+					}
+				}
+			`
+		),
+		{ posts: [{ text: "Latest COVID news." }, { text: "COVID vs Flu?" }] },
+		"filter by text__like"
+	)
+
+	tap.strictSame(
 		(
 			await client.request(
 				gql`
