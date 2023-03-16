@@ -16,6 +16,9 @@
     "dist",
     "src"
   ],
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
     "build": "tsup",
     "lint": "eslint --fix '**/*.{js,ts}'",
@@ -37,7 +40,7 @@
     "@types/tap": "^15.0.6",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
-    "esbuild": "^0.14.8",
+    "esbuild": "~0.17.11",
     "esbuild-runner": "^2.2.1",
     "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
@@ -54,7 +57,7 @@
     "sqlite3": "~5.1.6",
     "tap": "^16.0.1",
     "tar": "~6.1.13",
-    "tsup": "^5.11.13",
+    "tsup": "~6.6.3",
     "typescript": "^4.0.5"
   }
 }
