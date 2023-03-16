@@ -13,7 +13,9 @@ export type Resolver<A> = (
 	info: GraphQLResolveInfo
 ) => any
 
-export type Resolvers = Record<"Query", Record<string, Resolver<any>>>
+export type Resolvers = Partial<
+	Record<"Query" | "Mutation", Record<string, Resolver<any>>>
+>
 
 export type ServerConfig = Required<Pick<Config, "typeDefs" | "resolvers">>
 
