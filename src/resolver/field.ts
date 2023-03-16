@@ -1,12 +1,28 @@
-import { Model, ref } from "objection"
+import { ResolveTree } from "graphql-parse-resolve-info"
+import { Model, QueryBuilder, ref } from "objection"
 
 import { async_run_after } from "../helpers/run_after"
-import { ResolverContext } from "./graph"
-import { FieldResolverFn } from "./model"
+import { ResolverContext, ResolveTreeFn } from "./graph"
+
+/* A function that modifies a query to return a field. */
+export type FieldResolverFn<M extends Model> = (
+	query: QueryBuilder<M, any>,
+	options: {
+		/** GraphQL field */
+		field: string
+		/** GraphQL resolve tree */
+		tree: ResolveTree
+		/** Current graph resolver */
+		resolve_tree: ResolveTreeFn
+	}
+) => void
 
 export interface FieldResolverOptions<M extends Model> {
+	/** Model field (if different from GraphQL field) */
 	modelField?: string
+	/** Custom query modifier (if different than simply selecting a field). */
 	select?: FieldResolverFn<M>
+	/** Post-process selected value. Return a new value or a promise. */
 	clean?(value: any, instance: M, context: ResolverContext): any
 }
 

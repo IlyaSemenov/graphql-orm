@@ -8,7 +8,7 @@ import {
 	RelationMappings,
 } from "objection"
 
-import { FieldResolver } from "./field"
+import { FieldResolver, FieldResolverFn } from "./field"
 import { ResolverContext, ResolveTreeFn } from "./graph"
 import { RelationResolver } from "./relation"
 
@@ -34,17 +34,6 @@ export type SimpleFieldResolver<M extends Model> =
 	| true
 	| string
 	| FieldResolverFn<M>
-
-export type FieldResolverFn<M extends Model> = (
-	query: QueryBuilder<M, any>,
-	options: {
-		// GraphQL field
-		field: string
-		// For drilling down
-		tree: ResolveTree
-		resolve_tree: ResolveTreeFn
-	}
-) => void
 
 export function ModelResolver<M extends Model = Model>(
 	model_class: ModelConstructor<M>,
