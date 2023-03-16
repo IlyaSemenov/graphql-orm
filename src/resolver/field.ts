@@ -1,6 +1,7 @@
 import { ResolveTree } from "graphql-parse-resolve-info"
-import { Model, QueryBuilder, ref } from "objection"
+import { Model, QueryBuilder } from "objection"
 
+import { field_ref } from "../helpers/field_ref"
 import { async_run_after } from "../helpers/run_after"
 import { ResolverContext, ResolveTreeFn } from "./graph"
 
@@ -38,11 +39,7 @@ export function FieldResolver<M extends Model>(
 		if (select) {
 			select(query, resolve_opts)
 		} else {
-			query.select(
-				ref(model_field || field)
-					.from(query.tableRef())
-					.as(field)
-			)
+			query.select(field_ref(query, model_field || field).as(field))
 		}
 		if (clean) {
 			const context = query.context()

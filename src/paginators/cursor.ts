@@ -1,5 +1,6 @@
-import { Model, QueryBuilder, raw, ref } from "objection"
+import { Model, QueryBuilder, raw } from "objection"
 
+import { field_ref } from "../helpers/field_ref"
 import { PaginatorFn } from "."
 
 export interface CursorPaginatorOptions {
@@ -85,7 +86,7 @@ export function CursorPaginator<M extends Model>(
 		// Set query order
 		query.clearOrder()
 		fields.forEach((field) => {
-			const f = ref(field.name).from(query.tableRef())
+			const f = field_ref(query, field.name)
 			// TODO: prevent potential name clash with aliases like .as(`_${table_ref}_order_key_0`)
 			query.select(f).orderBy(f, field.desc ? "desc" : "asc")
 		})
