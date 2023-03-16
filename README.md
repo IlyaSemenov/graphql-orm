@@ -26,7 +26,8 @@ Run GraphQL server:
 // In real projects, you will want to separate models, typedefs,
 // model resolvers, and the server into their own modules.
 
-import { ApolloServer } from "apollo-server"
+import { ApolloServer, ApolloServerOptions } from "@apollo/server"
+import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
 import Knex from "knex"
 import { Model } from "objection"
@@ -66,7 +67,7 @@ const resolveGraph = GraphResolver({
 
 // Define resolvers
 
-const resolvers = {
+const resolvers: ApolloServerOptions<any>["resolvers"] = {
   Mutation: {
     async create_post(_parent, args, ctx, info) {
       const post = await PostModel.query().insert(args)
@@ -98,7 +99,9 @@ migrate()
 
 async function start() {
   const server = new ApolloServer({ typeDefs, resolvers })
-  const { url } = await server.listen({ port: 4000 })
+  const { url } = await startStandaloneServer(server, {
+    listen: { port: 4000 },
+  })
   console.log(`Listening on ${url}`)
 }
 
