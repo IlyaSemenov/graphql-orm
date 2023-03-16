@@ -47,7 +47,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "~10.0.0",
     "graphql": "~16.6.0",
-    "graphql-request": "^3.4.0",
+    "graphql-request": "~5.2.0",
     "graphql-tag": "^2.11.0",
     "husky": ">=6",
     "knex": "~2.4.2",

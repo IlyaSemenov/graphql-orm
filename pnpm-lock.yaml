@@ -16,7 +16,7 @@ specifiers:
   eslint-plugin-simple-import-sort: ~10.0.0
   graphql: ~16.6.0
   graphql-parse-resolve-info: ^4.12.0
-  graphql-request: ^3.4.0
+  graphql-request: ~5.2.0
   graphql-tag: ^2.11.0
   husky: '>=6'
   knex: ~2.4.2
@@ -47,7 +47,7 @@ devDependencies:
   eslint-plugin-prettier: 4.2.1_eqzx3hpkgx5nnvxls3azrcc7dm
   eslint-plugin-simple-import-sort: 10.0.0_eslint@8.36.0
   graphql: 16.6.0
-  graphql-request: 3.7.0_graphql@16.6.0
+  graphql-request: 5.2.0_graphql@16.6.0
   graphql-tag: 2.12.6_graphql@16.6.0
   husky: 8.0.3
   knex: 2.4.2_sqlite3@5.1.6
@@ -2782,11 +2782,12 @@ packages:
       - supports-color
     dev: false
 
-  /graphql-request/3.7.0_graphql@16.6.0:
-    resolution: {integrity: sha512-dw5PxHCgBneN2DDNqpWu8QkbbJ07oOziy8z+bK/TAXufsOLaETuVO4GkXrbs0WjhdKhBMN3BkpN/RIvUHkmNUQ==}
+  /graphql-request/5.2.0_graphql@16.6.0:
+    resolution: {integrity: sha512-pLhKIvnMyBERL0dtFI3medKqWOz/RhHdcgbZ+hMMIb32mEPa5MJSzS4AuXxfI4sRAu6JVVk5tvXuGfCWl9JYWQ==}
     peerDependencies:
       graphql: 14 - 16
     dependencies:
+      '@graphql-typed-document-node/core': 3.1.2_graphql@16.6.0
       cross-fetch: 3.1.5
       extract-files: 9.0.0
       form-data: 3.0.1
