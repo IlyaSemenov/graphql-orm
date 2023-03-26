@@ -1,4 +1,3 @@
-import assert from "assert"
 import gql from "graphql-tag"
 import { Model, ref } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
