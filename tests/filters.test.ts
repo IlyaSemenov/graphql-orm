@@ -242,7 +242,7 @@ test("filters", async () => {
 
 	assert.deepEqual(
 		(
-			await client.request(
+			await client.request<any>(
 				gql`
 					{
 						posts(filter: { published: true }) {
@@ -277,7 +277,7 @@ test("filters", async () => {
 
 	assert.deepEqual(
 		(
-			await client.request(
+			await client.request<any>(
 				gql`
 					{
 						posts: non_filterable_posts(filter: { search: "news" }) {
@@ -313,7 +313,7 @@ test("filters", async () => {
 
 	assert.deepEqual(
 		(
-			await client.request(
+			await client.request<any>(
 				gql`
 					{
 						user(id: 1) {
