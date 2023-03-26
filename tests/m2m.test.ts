@@ -114,16 +114,20 @@ test("m2m", async () => {
 
 	await BookModel.query().insertGraph(
 		[
-			{ id: 1, title: "1984", authors: [{ "#id": 1, name: "George Orwell" }] },
+			{
+				id: 1,
+				title: "1984",
+				authors: [{ "#id": "George Orwell", name: "George Orwell" }],
+			},
 			{
 				id: 2,
 				title: "Tom Sawyer",
-				authors: [{ "#id": 2, name: "Mark Twain" }],
+				authors: [{ "#id": "Mark Twain", name: "Mark Twain" }],
 			},
 			{
 				id: 3,
 				title: "Imaginary Book",
-				authors: [{ "#ref": 1 }, { "#ref": 2 }],
+				authors: [{ "#ref": "George Orwell" }, { "#ref": "Mark Twain" }],
 			},
 		],
 		{ allowRefs: true }
