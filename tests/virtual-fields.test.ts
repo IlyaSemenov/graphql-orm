@@ -2,7 +2,7 @@ import assert from "assert"
 import gql from "graphql-tag"
 import { Model, ref } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, expect, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -57,9 +57,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("virtual fields", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("virtual fields", async () => {
 	await knex.schema.createTable("user", function (table) {
 		table.increments("id").notNullable().primary()
 		table.string("name").notNullable()
@@ -67,7 +67,7 @@ tap.test("virtual fields", async (tap) => {
 
 	await UserModel.query().insert({ name: "Alice" })
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -83,7 +83,7 @@ tap.test("virtual fields", async (tap) => {
 		"fetch guarded virtual field"
 	)
 
-	await tap.rejects(
+	await expect(
 		client.request(
 			gql`
 				{
@@ -94,9 +94,9 @@ tap.test("virtual fields", async (tap) => {
 			`
 		),
 		"break on fetching naive virtual field"
-	)
+	).rejects.toThrow()
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

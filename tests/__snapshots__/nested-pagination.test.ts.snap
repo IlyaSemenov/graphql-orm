@@ -1,42 +1,37 @@
-/* IMPORTANT
- * This snapshot file is auto-generated, but designed for humans.
- * It should be checked into source control and tracked carefully.
- * Re-generate by setting TAP_SNAPSHOT=1 and running tests.
- * Make sure to inspect the output below.  Do not ignore changes!
- */
-'use strict'
-exports[`tests/nested-pagination.ts TAP nested pagination > double nested pagination 1`] = `
-Object {
-  "user": Object {
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`nested pagination > double nested pagination 1`] = `
+{
+  "user": {
     "id": 1,
     "name": "Alice",
-    "posts": Object {
+    "posts": {
       "cursor": "[\\"2\\"]",
-      "nodes": Array [
-        Object {
-          "author": Object {
+      "nodes": [
+        {
+          "author": {
             "name": "Alice",
           },
           "id": 1,
-          "section": Object {
+          "section": {
             "name": "News",
-            "posts": Object {
+            "posts": {
               "cursor": "[\\"4\\"]",
-              "nodes": Array [
-                Object {
-                  "author": Object {
+              "nodes": [
+                {
+                  "author": {
                     "name": "Alice",
                   },
-                  "section": Object {
+                  "section": {
                     "name": "News",
                   },
                   "text": "Oil price rising.",
                 },
-                Object {
-                  "author": Object {
+                {
+                  "author": {
                     "name": "Bob",
                   },
-                  "section": Object {
+                  "section": {
                     "name": "News",
                   },
                   "text": "Good news from China.",
@@ -46,21 +41,21 @@ Object {
           },
           "text": "Oil price rising.",
         },
-        Object {
-          "author": Object {
+        {
+          "author": {
             "name": "Alice",
           },
           "id": 2,
-          "section": Object {
+          "section": {
             "name": "Editorial",
-            "posts": Object {
+            "posts": {
               "cursor": null,
-              "nodes": Array [
-                Object {
-                  "author": Object {
+              "nodes": [
+                {
+                  "author": {
                     "name": "Alice",
                   },
-                  "section": Object {
+                  "section": {
                     "name": "Editorial",
                   },
                   "text": "Is communism dead yet?",
@@ -74,25 +69,25 @@ Object {
     },
   },
 }
-`
+`;
 
-exports[`tests/nested-pagination.ts TAP nested pagination > nested pagination 1`] = `
-Object {
-  "user": Object {
+exports[`nested pagination > nested pagination 1`] = `
+{
+  "user": {
     "name": "Alice",
-    "posts": Object {
+    "posts": {
       "cursor": "[\\"2\\"]",
-      "nodes": Array [
-        Object {
+      "nodes": [
+        {
           "id": 1,
-          "section": Object {
+          "section": {
             "name": "News",
           },
           "text": "Oil price rising.",
         },
-        Object {
+        {
           "id": 2,
-          "section": Object {
+          "section": {
             "name": "Editorial",
           },
           "text": "Is communism dead yet?",
@@ -101,28 +96,28 @@ Object {
     },
   },
 }
-`
+`;
 
-exports[`tests/nested-pagination.ts TAP nested pagination > triple nested pagination 1`] = `
-Object {
-  "user": Object {
+exports[`nested pagination > triple nested pagination 1`] = `
+{
+  "user": {
     "name": "Bob",
-    "posts": Object {
+    "posts": {
       "cursor": "[\\"4\\"]",
-      "nodes": Array [
-        Object {
-          "author": Object {
+      "nodes": [
+        {
+          "author": {
             "name": "Bob",
-            "posts": Object {
-              "nodes": Array [
-                Object {
-                  "author": Object {
+            "posts": {
+              "nodes": [
+                {
+                  "author": {
                     "name": "Bob",
                   },
                   "text": "Latest COVID figures.",
                 },
-                Object {
-                  "author": Object {
+                {
+                  "author": {
                     "name": "Bob",
                   },
                   "text": "Good news from China.",
@@ -132,19 +127,19 @@ Object {
           },
           "text": "Latest COVID figures.",
         },
-        Object {
-          "author": Object {
+        {
+          "author": {
             "name": "Bob",
-            "posts": Object {
-              "nodes": Array [
-                Object {
-                  "author": Object {
+            "posts": {
+              "nodes": [
+                {
+                  "author": {
                     "name": "Bob",
                   },
                   "text": "Latest COVID figures.",
                 },
-                Object {
-                  "author": Object {
+                {
+                  "author": {
                     "name": "Bob",
                   },
                   "text": "Good news from China.",
@@ -158,4 +153,4 @@ Object {
     },
   },
 }
-`
+`;

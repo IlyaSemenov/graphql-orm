@@ -5,7 +5,7 @@ import {
 	ModelResolver,
 	RelationResolver,
 } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -107,9 +107,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("filters", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("filters", async () => {
 	await knex.schema.createTable("user", (user) => {
 		user.increments("id").notNullable().primary()
 		user.string("name").notNullable()
@@ -140,7 +140,7 @@ tap.test("filters", async (tap) => {
 		{ relate: true }
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -156,7 +156,7 @@ tap.test("filters", async (tap) => {
 		"filter by field value"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -170,7 +170,7 @@ tap.test("filters", async (tap) => {
 		"filter by id__in"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -184,7 +184,7 @@ tap.test("filters", async (tap) => {
 		"filter by id__lt"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -198,7 +198,7 @@ tap.test("filters", async (tap) => {
 		"filter by id__lte"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -212,7 +212,7 @@ tap.test("filters", async (tap) => {
 		"filter by id__gt"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -226,7 +226,7 @@ tap.test("filters", async (tap) => {
 		"filter by id__gte"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -240,7 +240,7 @@ tap.test("filters", async (tap) => {
 		"filter by text__like"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		(
 			await client.request(
 				gql`
@@ -256,7 +256,7 @@ tap.test("filters", async (tap) => {
 		"filter by modifier"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -275,7 +275,7 @@ tap.test("filters", async (tap) => {
 		"filter by parametrized modifier"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		(
 			await client.request(
 				gql`
@@ -291,7 +291,7 @@ tap.test("filters", async (tap) => {
 		"ignore filter in non-filterable root query"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -311,7 +311,7 @@ tap.test("filters", async (tap) => {
 		"nested filter"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		(
 			await client.request(
 				gql`

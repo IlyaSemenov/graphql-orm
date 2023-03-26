@@ -1,7 +1,11 @@
 import gql from "graphql-tag"
 import { Model } from "objection"
-import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
-import tap from "tap"
+import {
+	GraphResolver,
+	ModelResolver,
+	RelationResolver,
+} from "objection-graphql-resolver"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -27,6 +31,7 @@ class AuthorModel extends Model {
 
 	id?: number
 	name?: string
+	country?: string
 	books?: BookModel[]
 }
 
@@ -59,13 +64,14 @@ const schema = gql`
 	type Author {
 		id: Int!
 		name: String!
+		country: String
 		books: [Book!]!
 	}
 
 	type Book {
 		id: Int!
 		title: String!
-		authors: [Author!]!
+		authors(country: String): [Author!]!
 	}
 
 	type Query {
@@ -75,7 +81,20 @@ const schema = gql`
 
 const resolve_graph = GraphResolver({
 	Author: ModelResolver(AuthorModel),
-	Book: ModelResolver(BookModel),
+	Book: ModelResolver(BookModel, {
+		fields: {
+			id: true,
+			title: true,
+			authors: RelationResolver({
+				modifier(authors, { args }) {
+					authors.orderBy("name")
+					if (typeof args.country === "string" || args.country === null) {
+						authors.where("country", args.country)
+					}
+				},
+			}),
+		},
+	}),
 })
 
 const resolvers: Resolvers = {
@@ -85,12 +104,13 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("m2m", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("filter relation", async () => {
 	await knex.schema.createTable("author", (author) => {
 		author.integer("id").notNullable().primary()
 		author.string("name").notNullable()
+		author.string("country")
 	})
 	await knex.schema.createTable("book", (book) => {
 		book.integer("id").notNullable().primary()
@@ -112,32 +132,40 @@ tap.test("m2m", async (tap) => {
 		rel.primary(["author_id", "book_id"])
 	})
 
+	await AuthorModel.query().insertGraph([
+		{ id: 1, name: "George Orwell", country: "UK" },
+		{ id: 2, name: "Mark Twain", country: "USA" },
+		{ id: 3, name: "Bill Gates", country: "USA" },
+	])
+
 	await BookModel.query().insertGraph(
 		[
-			{ id: 1, title: "1984", authors: [{ "#id": 1, name: "George Orwell" }] },
+			{
+				id: 1,
+				title: "1984",
+				authors: [{ id: 1 }],
+			},
 			{
 				id: 2,
 				title: "Tom Sawyer",
-				authors: [{ "#id": 2, name: "Mark Twain" }],
+				authors: [{ id: 2 }],
 			},
 			{
 				id: 3,
 				title: "Imaginary Book",
-				authors: [{ "#ref": 1 }, { "#ref": 2 }],
+				authors: [{ id: 1 }, { id: 2 }, { id: 3 }],
 			},
 		],
-		{ allowRefs: true }
+		{ relate: true }
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
 					books {
-						id
 						title
-						authors {
-							id
+						authors(country: "USA") {
 							name
 						}
 					}
@@ -146,19 +174,11 @@ tap.test("m2m", async (tap) => {
 		),
 		{
 			books: [
-				{ id: 1, title: "1984", authors: [{ id: 1, name: "George Orwell" }] },
+				{ title: "1984", authors: [] },
+				{ title: "Tom Sawyer", authors: [{ name: "Mark Twain" }] },
 				{
-					id: 2,
-					title: "Tom Sawyer",
-					authors: [{ id: 2, name: "Mark Twain" }],
-				},
-				{
-					id: 3,
 					title: "Imaginary Book",
-					authors: [
-						{ id: 1, name: "George Orwell" },
-						{ id: 2, name: "Mark Twain" },
-					],
+					authors: [{ name: "Bill Gates" }, { name: "Mark Twain" }],
 				},
 			],
 		}

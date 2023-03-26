@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -39,9 +39,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("access fields", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("access fields", async () => {
 	await knex.schema.createTable("user", function (table) {
 		table.increments("id").notNullable().primary()
 		table.string("name").notNullable()
@@ -53,7 +53,7 @@ tap.test("access fields", async (tap) => {
 		{ name: "Charlie" },
 	])
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -70,7 +70,7 @@ tap.test("access fields", async (tap) => {
 		"fetch object"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -86,7 +86,7 @@ tap.test("access fields", async (tap) => {
 		"fetch object"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -101,7 +101,7 @@ tap.test("access fields", async (tap) => {
 		"fetch missing object"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

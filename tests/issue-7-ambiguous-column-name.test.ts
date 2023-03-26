@@ -1,11 +1,9 @@
+// Regression test for https://github.com/IlyaSemenov/objection-graphql-resolver/issues/7
+
 import gql from "graphql-tag"
 import { Model } from "objection"
-import {
-	GraphResolver,
-	ModelResolver,
-	RelationResolver,
-} from "objection-graphql-resolver"
-import tap from "tap"
+import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -31,7 +29,6 @@ class AuthorModel extends Model {
 
 	id?: number
 	name?: string
-	country?: string
 	books?: BookModel[]
 }
 
@@ -64,14 +61,13 @@ const schema = gql`
 	type Author {
 		id: Int!
 		name: String!
-		country: String
 		books: [Book!]!
 	}
 
 	type Book {
 		id: Int!
 		title: String!
-		authors(country: String): [Author!]!
+		authors: [Author!]!
 	}
 
 	type Query {
@@ -81,20 +77,7 @@ const schema = gql`
 
 const resolve_graph = GraphResolver({
 	Author: ModelResolver(AuthorModel),
-	Book: ModelResolver(BookModel, {
-		fields: {
-			id: true,
-			title: true,
-			authors: RelationResolver({
-				modifier(authors, { args }) {
-					authors.orderBy("name")
-					if (typeof args.country === "string" || args.country === null) {
-						authors.where("country", args.country)
-					}
-				},
-			}),
-		},
-	}),
+	Book: ModelResolver(BookModel),
 })
 
 const resolvers: Resolvers = {
@@ -104,19 +87,19 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("filter relation", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("m2m: naming clash with column in relation table", async () => {
 	await knex.schema.createTable("author", (author) => {
-		author.integer("id").notNullable().primary()
+		author.integer("id").primary()
 		author.string("name").notNullable()
-		author.string("country")
 	})
 	await knex.schema.createTable("book", (book) => {
-		book.integer("id").notNullable().primary()
+		book.integer("id").primary()
 		book.string("title").notNullable()
 	})
 	await knex.schema.createTable("author_book_rel", (rel) => {
+		rel.increments("id").notNullable().primary()
 		rel
 			.integer("author_id")
 			.notNullable()
@@ -129,43 +112,34 @@ tap.test("filter relation", async (tap) => {
 			.references("book.id")
 			.onDelete("cascade")
 			.index()
-		rel.primary(["author_id", "book_id"])
 	})
-
-	await AuthorModel.query().insertGraph([
-		{ id: 1, name: "George Orwell", country: "UK" },
-		{ id: 2, name: "Mark Twain", country: "USA" },
-		{ id: 3, name: "Bill Gates", country: "USA" },
-	])
 
 	await BookModel.query().insertGraph(
 		[
-			{
-				id: 1,
-				title: "1984",
-				authors: [{ id: 1 }],
-			},
+			{ id: 1, title: "1984", authors: [{ "#id": 1, name: "George Orwell" }] },
 			{
 				id: 2,
 				title: "Tom Sawyer",
-				authors: [{ id: 2 }],
+				authors: [{ "#id": 2, name: "Mark Twain" }],
 			},
 			{
 				id: 3,
 				title: "Imaginary Book",
-				authors: [{ id: 1 }, { id: 2 }, { id: 3 }],
+				authors: [{ "#ref": 1 }, { "#ref": 2 }],
 			},
 		],
-		{ relate: true }
+		{ allowRefs: true }
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
 					books {
+						id
 						title
-						authors(country: "USA") {
+						authors {
+							id
 							name
 						}
 					}
@@ -174,11 +148,19 @@ tap.test("filter relation", async (tap) => {
 		),
 		{
 			books: [
-				{ title: "1984", authors: [] },
-				{ title: "Tom Sawyer", authors: [{ name: "Mark Twain" }] },
+				{ id: 1, title: "1984", authors: [{ id: 1, name: "George Orwell" }] },
 				{
+					id: 2,
+					title: "Tom Sawyer",
+					authors: [{ id: 2, name: "Mark Twain" }],
+				},
+				{
+					id: 3,
 					title: "Imaginary Book",
-					authors: [{ name: "Bill Gates" }, { name: "Mark Twain" }],
+					authors: [
+						{ id: 1, name: "George Orwell" },
+						{ id: 2, name: "Mark Twain" },
+					],
 				},
 			],
 		}

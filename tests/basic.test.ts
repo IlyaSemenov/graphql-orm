@@ -3,7 +3,7 @@
 import gql from "graphql-tag"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -55,9 +55,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("basic demo", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs, resolvers })
+const { client, knex } = await setup({ typeDefs, resolvers })
 
+test("basic demo", async () => {
 	await knex.schema.createTable("post", (post) => {
 		post.increments("id")
 		post.text("text").notNullable()
@@ -85,5 +85,5 @@ tap.test("basic demo", async (tap) => {
 		`
 	)
 
-	tap.same(posts, [{ id: 1, text: "Hello, world!" }])
+	assert.deepEqual(posts, [{ id: 1, text: "Hello, world!" }])
 })

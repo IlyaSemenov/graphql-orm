@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 import { Model, raw } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -43,9 +43,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("raw sql", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("raw sql", async () => {
 	await knex.schema.createTable("user", function (table) {
 		table.increments("id").notNullable().primary()
 		table.string("name").notNullable()
@@ -53,7 +53,7 @@ tap.test("raw sql", async (tap) => {
 
 	await UserModel.query().insert({ name: "Alice" })
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

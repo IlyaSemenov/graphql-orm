@@ -1,11 +1,7 @@
 import gql from "graphql-tag"
-import { Model, QueryBuilder, ref } from "objection"
-import {
-	GraphResolver,
-	ModelResolver,
-	RelationResolver,
-} from "objection-graphql-resolver"
-import tap from "tap"
+import { Model, QueryBuilder } from "objection"
+import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -66,9 +62,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("filter with async modifier", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("filter with async modifier", async () => {
 	await knex.schema.createTable("user", (user) => {
 		user.increments("id").notNullable().primary()
 		user.string("name").notNullable()
@@ -92,7 +88,7 @@ tap.test("filter with async modifier", async (tap) => {
 		{ text: "Elon Musk marries again.", tag: "celebrities" },
 	])
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

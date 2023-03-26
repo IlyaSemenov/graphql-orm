@@ -5,7 +5,7 @@ import {
 	GraphResolver,
 	ModelResolver,
 } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -47,9 +47,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("auto select pagination key", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("auto select pagination key", async () => {
 	await knex.schema.createTable("book", (book) => {
 		book.increments("id").notNullable().primary()
 		book.string("title").notNullable()
@@ -61,7 +61,7 @@ tap.test("auto select pagination key", async (tap) => {
 		{ title: "Tom Sawyer", author: "Mark Twain" },
 	])
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

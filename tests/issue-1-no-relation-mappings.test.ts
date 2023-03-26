@@ -3,7 +3,7 @@
 import gql from "graphql-tag"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -35,16 +35,16 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("allow model without relationMappings", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("allow model without relationMappings", async () => {
 	await knex.schema.createTable("c", (c) => {
 		c.string("id").primary()
 	})
 
 	await CModel.query().insert({ id: "foo" })
 
-	tap.same(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

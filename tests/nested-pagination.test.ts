@@ -6,7 +6,7 @@ import {
 	ModelResolver,
 	RelationResolver,
 } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, expect, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -151,9 +151,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("nested pagination", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("nested pagination", async () => {
 	await knex.schema.createTable("user", (user) => {
 		user.increments("id").notNullable().primary()
 		user.string("name").notNullable()
@@ -195,7 +195,7 @@ tap.test("nested pagination", async (tap) => {
 		{ relate: true }
 	)
 
-	tap.matchSnapshot(
+	expect(
 		await client.request(
 			gql`
 				{
@@ -214,11 +214,10 @@ tap.test("nested pagination", async (tap) => {
 					}
 				}
 			`
-		),
-		"nested pagination"
-	)
+		)
+	).toMatchSnapshot("nested pagination")
 
-	tap.matchSnapshot(
+	expect(
 		await client.request(
 			gql`
 				{
@@ -253,11 +252,10 @@ tap.test("nested pagination", async (tap) => {
 					}
 				}
 			`
-		),
-		"double nested pagination"
-	)
+		)
+	).toMatchSnapshot("double nested pagination")
 
-	tap.matchSnapshot(
+	expect(
 		await client.request(
 			gql`
 				{
@@ -283,7 +281,6 @@ tap.test("nested pagination", async (tap) => {
 					}
 				}
 			`
-		),
-		"triple nested pagination"
-	)
+		)
+	).toMatchSnapshot("triple nested pagination")
 })

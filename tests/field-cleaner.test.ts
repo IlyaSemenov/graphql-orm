@@ -5,7 +5,7 @@ import {
 	GraphResolver,
 	ModelResolver,
 } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -56,9 +56,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("field cleaner", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("field cleaner", async () => {
 	await knex.schema.createTable("user", function (table) {
 		table.increments("id").notNullable().primary()
 		table.string("name").notNullable()
@@ -67,7 +67,7 @@ tap.test("field cleaner", async (tap) => {
 
 	await UserModel.query().insert({ name: "Alice", password: "secret" })
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -85,7 +85,7 @@ tap.test("field cleaner", async (tap) => {
 		"reject password to public"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{
@@ -105,7 +105,7 @@ tap.test("field cleaner", async (tap) => {
 		"reject password to other users"
 	)
 
-	tap.strictSame(
+	assert.deepEqual(
 		await client.request(
 			gql`
 				{

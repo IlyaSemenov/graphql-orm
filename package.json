@@ -24,7 +24,7 @@
     "lint": "eslint --fix '**/*.{js,ts}'",
     "prepack": "npm run build",
     "prepare": "husky install",
-    "test": "tap"
+    "test": "vitest run"
   },
   "dependencies": {
     "graphql-parse-resolve-info": "^4.12.0"
@@ -37,11 +37,8 @@
     "@commitlint/cli": "~17.4.4",
     "@commitlint/config-conventional": "~17.4.4",
     "@tsconfig/node14": "^1.0.1",
-    "@types/tap": "^15.0.6",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
-    "esbuild": "~0.17.11",
-    "esbuild-runner": "^2.2.1",
     "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -55,9 +52,10 @@
     "objection": "^3.0.1",
     "prettier": "^2.5.1",
     "sqlite3": "~5.1.6",
-    "tap": "^16.0.1",
     "tar": "~6.1.13",
     "tsup": "~6.6.3",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "vite-tsconfig-paths": "~4.0.7",
+    "vitest": "~0.29.7"
   }
 }

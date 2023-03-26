@@ -5,7 +5,7 @@ import {
 	GraphResolver,
 	ModelResolver,
 } from "objection-graphql-resolver"
-import tap from "tap"
+import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "./setup"
 
@@ -58,9 +58,9 @@ const resolvers: Resolvers = {
 	},
 }
 
-tap.test("root pagination", async (tap) => {
-	const { client, knex } = await setup(tap, { typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
+test("root pagination", async () => {
 	await knex.schema.createTable("user", function (table) {
 		table.increments("id").notNullable().primary()
 		table.string("name").notNullable()
@@ -81,11 +81,11 @@ tap.test("root pagination", async (tap) => {
 	) {
 		const { cursor, nodes } = response.users
 		if (must_have_cursor) {
-			tap.ok(cursor, `${name}: has cursor`)
+			assert.ok(cursor, `${name}: has cursor`)
 		} else {
-			tap.notOk(cursor, `${name}: has no cursor`)
+			assert.notOk(cursor, `${name}: has no cursor`)
 		}
-		tap.strictSame(nodes, users, name)
+		assert.deepEqual(nodes, users, name)
 		return cursor
 	}
 
