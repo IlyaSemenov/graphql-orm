@@ -2,14 +2,10 @@
 
 import gql from "graphql-tag"
 import { Model } from "objection"
-import {
-	GraphResolver,
-	ModelResolver,
-	RelationResolver,
-} from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class CompanyModel extends Model {
 	static tableName = "company"
@@ -114,22 +110,22 @@ const schema = gql`
 	scalar Filter
 `
 
-const resolve_graph = GraphResolver({
-	Company: ModelResolver(CompanyModel),
-	Office: ModelResolver(OfficeModel),
-	Staff: ModelResolver(StaffModel, {
+const graph = r.graph({
+	Company: r.model(CompanyModel),
+	Office: r.model(OfficeModel),
+	Staff: r.model(StaffModel, {
 		fields: {
 			name: true,
-			expenses: RelationResolver({ filter: true }),
+			expenses: r.relation({ filters: true }),
 		},
 	}),
-	Expense: ModelResolver(ExpenseModel),
+	Expense: r.model(ExpenseModel),
 })
 
 const resolvers: Resolvers = {
 	Query: {
 		companies: (_parent, _args, ctx, info) =>
-			resolve_graph(ctx, info, CompanyModel.query().orderBy("id")),
+			graph.resolve(ctx, info, CompanyModel.query().orderBy("id")),
 	},
 }
 

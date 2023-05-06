@@ -1,9 +1,11 @@
+// Regression test for https://github.com/IlyaSemenov/objection-graphql-resolver/issues/7
+
 import gql from "graphql-tag"
 import { Model } from "objection"
-import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class AuthorModel extends Model {
 	static tableName = "author"
@@ -73,30 +75,31 @@ const schema = gql`
 	}
 `
 
-const resolve_graph = GraphResolver({
-	Author: ModelResolver(AuthorModel),
-	Book: ModelResolver(BookModel),
+const graph = r.graph({
+	Author: r.model(AuthorModel),
+	Book: r.model(BookModel),
 })
 
 const resolvers: Resolvers = {
 	Query: {
 		books: (_parent, _args, ctx, info) =>
-			resolve_graph(ctx, info, BookModel.query().orderBy("id")),
+			graph.resolve(ctx, info, BookModel.query().orderBy("id")),
 	},
 }
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-test("m2m", async () => {
+test("m2m: naming clash with column in relation table", async () => {
 	await knex.schema.createTable("author", (author) => {
-		author.integer("id").notNullable().primary()
+		author.integer("id").primary()
 		author.string("name").notNullable()
 	})
 	await knex.schema.createTable("book", (book) => {
-		book.integer("id").notNullable().primary()
+		book.integer("id").primary()
 		book.string("title").notNullable()
 	})
 	await knex.schema.createTable("author_book_rel", (rel) => {
+		rel.increments("id").notNullable().primary()
 		rel
 			.integer("author_id")
 			.notNullable()
@@ -109,7 +112,6 @@ test("m2m", async () => {
 			.references("book.id")
 			.onDelete("cascade")
 			.index()
-		rel.primary(["author_id", "book_id"])
 	})
 
 	await BookModel.query().insertGraph(

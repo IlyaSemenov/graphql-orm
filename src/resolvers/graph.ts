@@ -1,87 +1,121 @@
 import { GraphQLResolveInfo } from "graphql"
 import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
-import { Model, ModelType, QueryBuilder, QueryContext } from "objection"
+import { AnyQueryBuilder, ModelType, QueryContext } from "objection"
 
-import { apply_filter, FiltersDef } from "../filter"
-import { PaginatorFn } from "../paginators"
-import { ModelResolverFn } from "./model"
+import { FiltersDef } from "../filters"
+import type { Paginator } from "../paginators/base"
+import type { ModelResolverFn, ModelResolverOptions } from "./model"
 
 export interface ResolverContext extends QueryContext {
 	// You are welcome to augment this
 }
 
-export interface GraphResolverOptions {
+export interface GraphResolverOptions
+	extends Pick<ModelResolverOptions, "allowAllFields" | "allowAllFilters"> {
+	/** convert Apollo ResolverContext into QueryResolverContext */
 	context?: (context: any) => ResolverContext
 }
 
-export interface QueryOptions<M extends Model> {
-	filter?: FiltersDef
-	paginate?: PaginatorFn<M>
-}
-
-export type ResolveTreeFn = <M extends Model>(args: {
-	tree: ResolveTree
-	query: QueryBuilder<M, any>
-	filter?: FiltersDef
-	paginate?: PaginatorFn<M>
-}) => void
-
-export function GraphResolver(
-	model_resolvers: Record<string, ModelResolverFn<any>>,
+export function create_graph_resolver(
+	models: Record<string, ModelResolverFn<any>>,
 	options?: GraphResolverOptions
 ) {
-	const graph_options: GraphResolverOptions = { ...options }
+	return new GraphResolver(models, options)
+}
 
-	return function resolve<
-		QB extends QueryBuilder<Model, any>,
-		O extends QueryOptions<ModelType<QB>>
+export interface ResolveGraphOptions {
+	filters?: FiltersDef
+}
+
+export class GraphResolver {
+	constructor(
+		public readonly modelResolvers: Record<string, ModelResolverFn<any>>,
+		public readonly options: GraphResolverOptions = {}
+	) {}
+
+	resolve<QB extends AnyQueryBuilder>(
+		context: any,
+		info: GraphQLResolveInfo,
+		query: QB,
+		options: ResolveGraphOptions = {}
+	): QB {
+		this._set_context(query, context)
+		const tree = this._get_resolve_tree(info)
+		return this._resolve_model({ query, tree, filters: options.filters })
+	}
+
+	resolvePage<
+		QB extends AnyQueryBuilder,
+		P extends Paginator<ModelType<QB>, any>
 	>(
 		context: any,
 		info: GraphQLResolveInfo,
 		query: QB,
-		options?: O
-	): O extends {
-		paginate: PaginatorFn<any>
+		paginator: P,
+		options: ResolveGraphOptions = {}
+	) {
+		this._set_context(query, context)
+		const tree = this._get_resolve_tree(info)
+		return this._resolve_page({
+			query,
+			tree,
+			paginator,
+			filters: options.filters,
+		})
 	}
-		? ReturnType<O["paginate"]>
-		: QB {
-		const query_options: QueryOptions<ModelType<QB>> = { ...options }
+
+	_set_context(query: AnyQueryBuilder, context: any) {
 		if (context) {
 			query.context(
-				graph_options.context ? graph_options.context(context) : context
+				this.options.context ? this.options.context(context) : context
 			)
 		}
+	}
 
-		const resolve_tree: ResolveTreeFn = ({ tree, query, filter, paginate }) => {
-			const { args } = tree
-			let type = Object.keys(tree.fieldsByTypeName)[0]
-			if (paginate) {
-				// Skip page subtree(s)
-				for (const field of paginate.path) {
-					tree = tree.fieldsByTypeName[type][field]
-					type = Object.keys(tree.fieldsByTypeName)[0]
-				}
-			}
-			const resolve_model = model_resolvers[type]
-			if (!resolve_model) {
-				throw new Error(`Model resolver not found for type ${type}`)
-			}
-			resolve_model({ tree, type, query, resolve_tree })
-			if (filter) {
-				apply_filter({ query, filter, args })
-			}
-			if (paginate) {
-				paginate(query, args)
-			}
+	_get_resolve_tree(info: GraphQLResolveInfo) {
+		return parseResolveInfo(info) as ResolveTree
+	}
+
+	_resolve_model<QB extends AnyQueryBuilder>({
+		tree,
+		query,
+		filters,
+	}: {
+		query: QB
+		tree: ResolveTree
+		filters?: FiltersDef
+	}) {
+		const type = Object.keys(tree.fieldsByTypeName)[0]
+		const model_resolver = this.modelResolvers[type]
+		if (!model_resolver) {
+			throw new Error(`Model resolver not found for type ${type}`)
 		}
+		model_resolver({ tree, type, query, filters, graph: this })
+		return query
+	}
 
-		resolve_tree({
-			tree: parseResolveInfo(info) as ResolveTree,
-			query,
-			filter: query_options.filter,
-			paginate: query_options.paginate,
-		})
-
-		return query as any // I have no idea how to cast this properly.
+	_resolve_page<
+		QB extends AnyQueryBuilder,
+		P extends Paginator<ModelType<QB>, any>
+	>({
+		tree,
+		query,
+		paginator,
+		filters,
+	}: {
+		query: QB
+		tree: ResolveTree
+		paginator: P
+		filters?: FiltersDef
+	}) {
+		const { args } = tree
+		// Skip page subtree(s)
+		for (const field of paginator.path) {
+			const type = Object.keys(tree.fieldsByTypeName)[0]
+			tree = tree.fieldsByTypeName[type][field]
+			// TODO: raise exception if not found
+		}
+		this._resolve_model({ query, tree, filters })
+		return paginator.paginate(query, args)
 	}
 }

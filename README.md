@@ -31,7 +31,7 @@ import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
 import Knex from "knex"
 import { Model } from "objection"
-import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 
 // Define Objection.js models
 
@@ -61,8 +61,8 @@ const typeDefs = gql`
 
 // Map GraphQL types to model resolvers
 
-const resolveGraph = GraphResolver({
-  Post: ModelResolver(PostModel),
+const graph = r.graph({
+  Post: r.model(PostModel),
 })
 
 // Define resolvers
@@ -71,12 +71,12 @@ const resolvers: ApolloServerOptions<any>["resolvers"] = {
   Mutation: {
     async create_post(_parent, args, ctx, info) {
       const post = await PostModel.query().insert(args)
-      return resolveGraph(ctx, info, post.$query())
+      return graph.resolve(ctx, info, post.$query())
     },
   },
   Query: {
     posts(_parent, _args, ctx, info) {
-      return resolveGraph(ctx, info, PostModel.query().orderBy("id"))
+      return graph.resolve(ctx, info, PostModel.query().orderBy("id"))
     },
   },
 }
@@ -152,26 +152,18 @@ Relations will be fetched automatically using `withGraphFetched()` when resolvin
 Example:
 
 ```ts
-const resolveGraph = GraphResolver({
-  User: ModelResolver(UserModel, {
-    fields: {
-      id: true,
-      name: true,
-      // will use withGraphFetched("posts")
-      // and process subquery with Post model resolver defined below
-      posts: true,
-    },
-  }),
-  // No resolver options = access to all fields
-  Post: ModelResolver(PostModel),
+const graph = r.graph({
+  User: r.model(UserModel),
+  Post: r.model(PostModel),
 })
 ```
 
-```graphql
+```gql
 query posts_with_author {
   posts {
     id
     text
+    # will use withGraphFetched("author") if requested
     author {
       name
     }
@@ -181,6 +173,7 @@ query posts_with_author {
 query user_with_posts {
   user(id: ID!) {
     name
+    # will use withGraphFetched("posts") if requested
     posts {
       id
       text
@@ -191,24 +184,40 @@ query user_with_posts {
 
 [More details and examples for relations.](docs/relations.md)
 
+## Fields access
+
+Access to individual fields can be limited:
+
+```ts
+const graph = r.graph({
+  User: r.model(UserModel, {
+    fields: {
+      id: true,
+      name: true,
+      // other fields not specified here, such as user password,
+      // will not be accessible
+    },
+  }),
+})
+```
+
+This API also allows to fine-tune field selectors, see [API](#api) section below.
+
 ## Pagination
 
 Root queries and -to-many nested relations can be paginated.
 
-Example:
-
 ```ts
-const resolveGraph = GraphResolver({
-  User: ModelResolver(UserModel, {
+const graph = r.graph({
+  User: r.model(UserModel, {
     fields: {
       id: true,
       name: true,
-      posts: RelationResolver({
-        paginate: CursorPaginage({ take: 10, fields: ["-id"] }),
-      }),
+      // user.posts will be a page with nodes and continuation cursor
+      posts: r.page(r.cursor({ fields: ["-id"], take: 10 })),
     },
   }),
-  Post: ModelResolver(PostModel),
+  Post: r.model(PostModel),
 })
 ```
 
@@ -218,10 +227,12 @@ To paginate root query, use:
 const resolvers = {
   Query: {
     posts: async (parent, args, ctx, info) => {
-      const page = await resolveGraph(ctx, info, Post.query(), {
-        paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
-      })
-      return page
+      return graph.resolvePage(
+        ctx,
+        info,
+        Post.query(),
+        r.cursor({ take: 10, fields: ["-id"] })
+      )
     },
   },
 }
@@ -233,36 +244,21 @@ const resolvers = {
 
 Both root and nested queries can be filtered with GraphQL arguments:
 
-```graphql
+```gql
 query {
   posts(filter: { date: "2020-10-01", author_id__in: [123, 456] }) {
-    nodes {
+    id
+    date
+    text
+    author {
       id
-      text
+      name
     }
-    cursor
   }
 }
 ```
 
 Filters will run against database fields, or call model modifiers.
-
-To enable filters, use:
-
-```ts
-const resolveGraph = GraphResolver({
-  Post: ModelResolver(PostModel, {
-    // enable all filters for all fields
-    filter: true,
-    // TODO: granular access
-    filter: {
-      date: true,
-      author_id: true,
-      published: true, // where published is a model modifier
-    },
-  }),
-})
-```
 
 [More details and examples for filters.](docs/filters.md)
 
@@ -271,9 +267,9 @@ const resolveGraph = GraphResolver({
 Virtual attributes (getters on models) can be accessed the same way as database fields:
 
 ```ts
-export class PostModel extends Model {
-  declare id: number
-  declare title: string
+class PostModel extends Model {
+  declare id?: number
+  declare title?: string
 
   get url() {
     assert(this.id)
@@ -282,7 +278,7 @@ export class PostModel extends Model {
 }
 ```
 
-```graphql
+```gql
 query {
   posts {
     id
@@ -296,31 +292,19 @@ query {
 
 ## API
 
-The following functions are exported:
-
 ```ts
-import {
-  GraphResolver,
-  ModuleResolver,
-  FieldResolver,
-  RelationResolver,
-  CursorPaginator,
-} from "objection-graphql-resolver"
-```
+import * as r from "objection-graphql-resolver"
 
-### Arguments reference
-
-```ts
-const resolveGraph = GraphResolver(
+const graph = r.graph(
   // Map GraphQL types to model resolvers (required)
   {
-    Post: ModelResolver(
-      // Required: Objection.js model class
+    Post: r.model(
+      // Objection.js model class (required)
       PostModel,
-      // Default: { fields: true }
+      // Model options
       {
-        // List fields that can be accessed via GraphQL,
-        // or true = all fields can be accessed
+        // List fields that can be accessed via GraphQL
+        // if not provided, all fields can be accessed
         fields: {
           // Select field from database
           id: true,
@@ -333,18 +317,18 @@ const resolveGraph = GraphResolver(
           preview: (query) =>
             query.select(raw("substr(text,1,100) as preview")),
           // Same as text: true
-          text: FieldResolver(),
+          text: r.field(),
           // Custom field resolver
-          text2: FieldResolver({
+          text2: r.field({
             // Model (database) field, if different from GraphQL field
             modelField: "text",
           }),
-          preview2: FieldResolver({
+          preview2: r.field({
             // Modify query
-            select: (query) =>
+            modify: (query) =>
               query.select(raw("substr(text,1,100) as preview2")),
             // Post-process selected value
-            clean(
+            transform(
               // Selected value
               preview,
               // Current instance
@@ -361,67 +345,93 @@ const resolveGraph = GraphResolver(
           }),
           // Select all objects in -to-many relation
           comments: true,
-          comments_page: RelationResolver({
+          // Select all objects in -to-many relation
+          all_comments: r.relation({
             // Model field, if different from GraphQL field
             modelField: "comments",
-            // Paginate subquery in -to-many relation
-            paginate: CursorPaginator(
-              // Pagination options
-              // Default: { take: 10, fields: ["id"] }
-              {
-                // How many object to take per page
-                take: 10,
-                // Which fields to use for ordering
-                // Prefix with - for descending sort
-                fields: ["name", "-id"],
-              }
-            ),
             // Enable filters on -to-many relation
             filters: true,
             // Modify subquery
-            modifier: (query, { args }) =>
-              query.where(args).orderBy("id", "desc"),
-            // Post-process selected value, see FieldResolver
-            // clean: ...,
+            modify: (query, { liked }) =>
+              query.where({ liked }).orderBy("id", "desc"),
+            // Post-process selected values, see r.field()
+            // transform: ...,
           }),
+          // Paginate subquery in -to-many relation
+          comments_page: r.page(
+            // Paginator
+            r.cursor(
+              // Pagination options
+              // Default: { fields: ["id"], take: 10 }
+              {
+                // Which fields to use for ordering
+                // Prefix with - for descending sort
+                fields: ["name", "-id"],
+                // How many object to take per page
+                take: 10,
+              }
+            ),
+            {
+              // All r.relation() options, such as:
+              modelField: "comments",
+            }
+          ),
         },
         // Modify all queries to this model
-        modifier: (query, { args }) => query.where(args).orderBy("id", "desc"),
+        modify: (query, { args }) => query.where(args).orderBy("id", "desc"),
+        // Allow all fields (`fields` will be used for overrides)
+        allowAllFields: true,
+        // Allow filters in all relations
+        allowAllFilters: true,
       }
     ),
   },
-  // Options (default: empty)
+  // Graph options
   {
-    // Callback: convert RequestContext into query context
-    // Default: merge RequestContext into query context as is
+    // Callback: transform RequestContext before merging with query context
     context(ctx) {
       return { userId: ctx.passport.user.id }
     },
+    // Allow all fields in all models (`fields` will be used for overrides)
+    allowAllFields: true,
+    // Allow filters in all models' relations
+    allowAllFilters: true,
   }
 )
 
 const resolvers = {
   Query: {
-    posts: async (parent, args, context, info) => {
-      const page = await resolveGraph(
+    posts: (parent, args, ctx, info) => {
+      return graph.resolve(
         // Resolver context (required)
         // Will be merged into query context,
-        // possibly converted with GraphResolver's options.context callback
-        context,
+        // possibly converted with graph resolver's options.context callback
+        ctx,
         // GraphQLResolveInfo object, as passed by GraphQL executor (required)
         info,
         // Root query (required)
         Post.query(),
-        // Default: empty
+        // Options
         {
-          // Paginator (only works for list queries)
-          // Default: resolve list query as is
-          paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
           // Enable filters
           filters: true,
         }
       )
-      return page
+    },
+    posts_page: (parent, args, ctx, info) => {
+      return graph.resolvePage(
+        // See graph.resolve
+        ctx,
+        info,
+        // Root query (required)
+        Post.query(),
+        // Paginator (required)
+        r.cursor({ fields: ["-id"], take: 10 })
+        // Options - see graph.resolve
+        {
+          filters: true,
+        }
+      )
     },
   },
 }

@@ -1,13 +1,9 @@
 import gql from "graphql-tag"
 import { Model } from "objection"
-import {
-	GraphResolver,
-	ModelResolver,
-	RelationResolver,
-} from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class AuthorModel extends Model {
 	static tableName = "author"
@@ -79,14 +75,14 @@ const schema = gql`
 	}
 `
 
-const resolve_graph = GraphResolver({
-	Author: ModelResolver(AuthorModel),
-	Book: ModelResolver(BookModel, {
+const graph = r.graph({
+	Author: r.model(AuthorModel),
+	Book: r.model(BookModel, {
 		fields: {
 			id: true,
 			title: true,
-			authors: RelationResolver({
-				modifier(authors, { args }) {
+			authors: r.relation({
+				modify(authors, { args }) {
 					authors.orderBy("name")
 					if (typeof args.country === "string" || args.country === null) {
 						authors.where("country", args.country)
@@ -100,7 +96,7 @@ const resolve_graph = GraphResolver({
 const resolvers: Resolvers = {
 	Query: {
 		books: (_parent, _args, ctx, info) =>
-			resolve_graph(ctx, info, BookModel.query().orderBy("id")),
+			graph.resolve(ctx, info, BookModel.query().orderBy("id")),
 	},
 }
 

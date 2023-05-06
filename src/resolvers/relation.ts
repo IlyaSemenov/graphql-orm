@@ -1,64 +1,29 @@
-import { Model } from "objection"
+import { Model, QueryBuilder } from "objection"
 
-import { FiltersDef } from "../filter"
-import { run_after_query } from "../helpers/run-after"
-import { PaginatorFn } from "../paginators"
-import { FieldResolver, FieldResolverOptions } from "./field"
-import { Modifier } from "./model"
+import { FiltersDef } from "../filters"
+import { create_field_resolver, FieldResolverOptions } from "./field"
+import { QueryTreeModifier } from "./model"
 
 export interface RelationResolverOptions<M extends Model, R extends Model>
-	extends Exclude<FieldResolverOptions<M>, "select"> {
-	filter?: FiltersDef
-	paginate?: PaginatorFn<R>
-	modifier?: Modifier<R>
+	extends Omit<FieldResolverOptions<M>, "modify"> {
+	filters?: FiltersDef
+	modify?: QueryTreeModifier<R>
 }
 
-export function RelationResolver<M extends Model, R extends Model>(
-	options?: RelationResolverOptions<M, R>
+export function create_relation_resolver<M extends Model, R extends Model>(
+	options: RelationResolverOptions<M, R> = {}
 ) {
-	const filter = options?.filter
-	const paginate = options?.paginate
-	const modifier = options?.modifier
+	const { modelField, filters, modify } = options
 
-	return FieldResolver<M>({
-		select(query, { field, tree, resolve_tree }) {
-			// withGraphFetched will disregard paginator's runAfter callback (which converts object list into cursor and nodes)
-			// Save it locally and then re-inject
-			let paginated_results: any
-
+	return create_field_resolver<M>({
+		modify(query, { field, tree, graph }) {
 			query
-				.withGraphFetched(
-					`${options?.modelField || field}(${field}) as ${field}`,
-					paginate ? { maxBatchSize: 1 } : undefined
-				)
-				.modifiers({
-					[field]: (subquery) => {
-						resolve_tree({
-							tree,
-							query: subquery,
-							filter,
-							paginate,
-						})
-						if (paginate) {
-							subquery.runAfter((results) => {
-								// Save paginated results
-								paginated_results = results
-							})
-						}
-						if (modifier) {
-							modifier(subquery, tree)
-						}
-					},
+				.withGraphFetched(`${modelField || field} as ${field}`)
+				.modifyGraph<R>(field, (_query) => {
+					const query = _query as QueryBuilder<R, any>
+					graph._resolve_model({ tree, query, filters })
+					modify?.(query, tree)
 				})
-
-			if (paginate) {
-				// Re-inject paginated results
-				// They have been overwritten by objection.js by now
-				run_after_query(query, (instance) => {
-					instance[field] = paginated_results
-					return instance
-				})
-			}
 		},
 	})
 }

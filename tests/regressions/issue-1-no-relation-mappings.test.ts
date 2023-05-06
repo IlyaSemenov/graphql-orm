@@ -2,10 +2,10 @@
 
 import gql from "graphql-tag"
 import { Model } from "objection"
-import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class CModel extends Model {
 	static tableName = "c"
@@ -24,14 +24,14 @@ const schema = gql`
 	}
 `
 
-const resolve_graph = GraphResolver({
-	C: ModelResolver(CModel),
+const graph = r.graph({
+	C: r.model(CModel),
 })
 
 const resolvers: Resolvers = {
 	Query: {
 		all_c: (_parent, _args, ctx, info) =>
-			resolve_graph(ctx, info, CModel.query()),
+			graph.resolve(ctx, info, CModel.query()),
 	},
 }
 

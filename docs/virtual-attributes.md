@@ -6,25 +6,28 @@ Getters on objection.js instances can be pulled the same way as database fields:
 
 ```ts
 class PostModel extends Model {
+  declare id?: number
+  declare title?: string
+
   get url() {
     assert(this.id)
     return `/${this.id}.html`
   }
 }
 
-const resolveGraph = GraphResolver({
-  Post: ModelResolver(PostModel, {
+const graph = r.graph({
+  Post: r.model(PostModel, {
     fields: {
       id: true,
       title: true,
       url: true,
     },
-    // or simply `fields: true` to allow all fields and getters
+    // or simply omit `fields` to allow all fields and getters
   }),
 })
 ```
 
-```graphql
+```gql
 query get_all_posts {
   posts {
     # Pull from database
@@ -44,18 +47,21 @@ You can automate this with:
 
 ```ts
 class PostModel extends Model {
+  declare id?: number
+  declare slug?: string
+  declare title?: string
+
   get url() {
     assert(this.slug)
     return `/${this.slug}.html`
   }
 }
 
-const resolveGraph = GraphResolver({
-  Post: ModelResolver(PostModel, {
+const graph = r.graph({
+  Post: r.model(PostModel, {
     fields: {
       id: true,
-      slug: true,
-      text: true,
+      title: true,
       url: (query) => query.select("slug"),
     },
   }),
@@ -66,7 +72,7 @@ const resolveGraph = GraphResolver({
 
 Similarly, you can pull virtual attributes directly from the database:
 
-```graphql
+```gql
 type Post {
   id: ID
   title: String
@@ -75,8 +81,8 @@ type Post {
 ```
 
 ```ts
-const resolveGraph = GraphResolver({
-  Post: ModelResolver(PostModel, {
+const graph = r.graph({
+  Post: r.model(PostModel, {
     fields: {
       id: true,
       title: true,

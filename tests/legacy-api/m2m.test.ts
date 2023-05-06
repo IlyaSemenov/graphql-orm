@@ -1,11 +1,9 @@
-// Regression test for https://github.com/IlyaSemenov/objection-graphql-resolver/issues/7
-
 import gql from "graphql-tag"
 import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class AuthorModel extends Model {
 	static tableName = "author"
@@ -89,17 +87,16 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-test("m2m: naming clash with column in relation table", async () => {
+test("m2m", async () => {
 	await knex.schema.createTable("author", (author) => {
-		author.integer("id").primary()
+		author.integer("id").notNullable().primary()
 		author.string("name").notNullable()
 	})
 	await knex.schema.createTable("book", (book) => {
-		book.integer("id").primary()
+		book.integer("id").notNullable().primary()
 		book.string("title").notNullable()
 	})
 	await knex.schema.createTable("author_book_rel", (rel) => {
-		rel.increments("id").notNullable().primary()
 		rel
 			.integer("author_id")
 			.notNullable()
@@ -112,6 +109,7 @@ test("m2m: naming clash with column in relation table", async () => {
 			.references("book.id")
 			.onDelete("cascade")
 			.index()
+		rel.primary(["author_id", "book_id"])
 	})
 
 	await BookModel.query().insertGraph(

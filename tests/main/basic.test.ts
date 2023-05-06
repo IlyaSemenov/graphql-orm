@@ -2,10 +2,10 @@
 
 import gql from "graphql-tag"
 import { Model } from "objection"
-import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 // Define Objection.js models
 
@@ -35,8 +35,8 @@ const typeDefs = gql`
 
 // Map GraphQL types to model resolvers
 
-const resolveGraph = GraphResolver({
-	Post: ModelResolver(PostModel),
+const graph = r.graph({
+	Post: r.model(PostModel),
 })
 
 // Define resolvers
@@ -45,12 +45,12 @@ const resolvers: Resolvers = {
 	Mutation: {
 		async create_post(_parent, args, ctx, info) {
 			const post = await PostModel.query().insert(args)
-			return resolveGraph(ctx, info, post.$query())
+			return graph.resolve(ctx, info, post.$query())
 		},
 	},
 	Query: {
 		posts(_parent, _args, ctx, info) {
-			return resolveGraph(ctx, info, PostModel.query().orderBy("id"))
+			return graph.resolve(ctx, info, PostModel.query().orderBy("id"))
 		},
 	},
 }
@@ -74,7 +74,7 @@ test("basic demo", async () => {
 		{ text: "Hello, world!" }
 	)
 
-	const { posts } = await client.request(
+	const { posts } = await client.request<any>(
 		gql`
 			query {
 				posts {

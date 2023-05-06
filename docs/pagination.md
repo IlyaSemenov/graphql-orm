@@ -4,7 +4,7 @@ Root queries and -to-many nested relations can be paginated.
 
 ## Paginators
 
-The specific shape of the page object and the pagination logic is decoupled and is fully defined by a _paginator_.
+The specific shape of the page object and the pagination logic is decoupled and is defined by a _paginator_.
 
 The library includes simple `CursorPaginator` implementation which traverses ordered rows with the following shape of the page object:
 
@@ -24,11 +24,16 @@ Different paginators such as providing Relay-style pagination can be implemented
 
 This example demonstrates both root query and relation pagination.
 
-```graphql
+```gql
 type Post {
   id: ID!
   text: String!
   author: User
+}
+
+type PostPage {
+  nodes: [Post!]!
+  cursor: String
 }
 
 type User {
@@ -36,11 +41,6 @@ type User {
   name: String!
   posts: PostPage!
   all_posts: [Post!]!
-}
-
-type PostPage {
-  nodes: [Post!]!
-  cursor: String
 }
 
 type Query {
@@ -76,41 +76,34 @@ class UserModel extends Model {
   }
 }
 
-const resolveGraph = GraphResolver({
-  User: ModelResolver(UserModel, {
+const graph = r.graph({
+  User: r.model(UserModel, {
     fields: {
       id: true,
       name: true,
       // If it were posts: true, all posts will be returned.
-      // Instead, return a page of posts
-      posts: RelationResolver({
-        paginate: CursorPaginage({ take: 10, fields: ["-id"] }),
-      }),
+      // Instead, return a page of posts sorted by newest first.
+      posts: r.page(r.cursor({ fields: ["-id"], take: 10 })),
       // Should you want this, it's still possible to pull all posts (non-paginated)
       // under a different GraphQL field
-      all_posts: RelationResolver({ modelField: "posts" }),
+      all_posts: r.relation({ modelField: "posts" }),
     },
   }),
-  Post: ModelResolver(PostModel, {
-    fields: {
-      id: true,
-      text: true,
-      author: true,
-    },
-  }),
+  Post: r.model(PostModel),
 })
 
 const resolvers = {
   Query: {
-    user: async (parent, args, ctx, info) => {
-      const user = await resolveGraph(ctx, info, User.query().findById(args.id))
-      return user
+    user: (parent, args, ctx, info) => {
+      return graph.resolve(ctx, info, User.query().findById(args.id))
     },
-    posts: async (parent, args, ctx, info) => {
-      const page = await resolveGraph(ctx, info, Post.query(), {
-        paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
-      })
-      return page
+    posts: (parent, args, ctx, info) => {
+      return graph.resolvePage(
+        ctx,
+        info,
+        Post.query(),
+        r.cursor({ fields: ["-id"], take: 10 })
+      )
     },
   },
 }

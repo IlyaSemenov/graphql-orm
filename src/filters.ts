@@ -18,16 +18,16 @@ function is_scalar(value: any) {
 	)
 }
 
-export function apply_filter({
+export function apply_filters({
 	query,
-	filter,
+	filters,
 	args,
 }: {
 	query: AnyQueryBuilder
-	filter: FiltersDef
+	filters: FiltersDef
 	args?: Record<string, any>
 }) {
-	if (!filter) {
+	if (!filters) {
 		return
 	}
 	const filter_obj = args?.filter
@@ -35,7 +35,7 @@ export function apply_filter({
 		return
 	}
 	if (!is_plain_object(filter_obj)) {
-		throw new Error(`Invalid filter: ${filter}, must be object.`)
+		throw new Error(`Invalid filter: ${filter_obj}, must be object.`)
 	}
 	const ThisModel = query.modelClass()
 	const table_name = ThisModel.tableName

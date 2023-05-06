@@ -3,9 +3,9 @@ import { Model, QueryBuilder } from "objection"
 
 import { field_ref } from "../helpers/field-ref"
 import { run_after_query } from "../helpers/run-after"
-import { ResolverContext, ResolveTreeFn } from "./graph"
+import type { GraphResolver, ResolverContext } from "./graph"
 
-/* A function that modifies a query to return a field. */
+/* A function that modifies the query to select a field. */
 export type FieldResolverFn<M extends Model> = (
 	query: QueryBuilder<M, any>,
 	options: {
@@ -14,7 +14,7 @@ export type FieldResolverFn<M extends Model> = (
 		/** GraphQL resolve tree */
 		tree: ResolveTree
 		/** Current graph resolver */
-		resolve_tree: ResolveTreeFn
+		graph: GraphResolver
 	}
 ) => void
 
@@ -22,29 +22,27 @@ export interface FieldResolverOptions<M extends Model> {
 	/** Model field (if different from GraphQL field) */
 	modelField?: string
 	/** Custom query modifier (if different than simply selecting a field). */
-	select?: FieldResolverFn<M>
+	modify?: FieldResolverFn<M>
 	/** Post-process selected value. Return a new value or a promise. */
-	clean?(value: any, instance: M, context: ResolverContext): any
+	transform?(value: any, instance: M, context: ResolverContext): any
 }
 
-export function FieldResolver<M extends Model>(
-	options?: FieldResolverOptions<M>
+export function create_field_resolver<M extends Model = Model>(
+	options: FieldResolverOptions<M> = {}
 ): FieldResolverFn<M> {
-	const select = options?.select
-	const clean = options?.clean
-	const model_field = options?.modelField
+	const { modelField, modify, transform } = options
 
-	return function resolve(query, resolve_opts) {
-		const { field } = resolve_opts
-		if (select) {
-			select(query, resolve_opts)
+	return function resolve(query, options) {
+		const { field } = options
+		if (modify) {
+			modify(query, options)
 		} else {
-			query.select(field_ref(query, model_field || field).as(field))
+			query.select(field_ref(query, modelField || field).as(field))
 		}
-		if (clean) {
+		if (transform) {
 			const context = query.context()
 			run_after_query(query, async (instance) => {
-				instance[field] = await clean(instance[field], instance, context)
+				instance[field] = await transform(instance[field], instance, context)
 				return instance
 			})
 		}

@@ -6,9 +6,9 @@ import {
 	ModelResolver,
 	RelationResolver,
 } from "objection-graphql-resolver"
-import { assert, expect, test } from "vitest"
+import { expect, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class UserModel extends Model {
 	static tableName = "user"

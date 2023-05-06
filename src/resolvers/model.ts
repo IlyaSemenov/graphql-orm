@@ -7,117 +7,136 @@ import {
 	RelationMappings,
 } from "objection"
 
+import { apply_filters, FiltersDef } from "../filters"
 import { field_ref } from "../helpers/field-ref"
-import { FieldResolver, FieldResolverFn } from "./field"
-import { ResolverContext, ResolveTreeFn } from "./graph"
-import { RelationResolver } from "./relation"
+import { run_after_query } from "../helpers/run-after"
+import { create_field_resolver, FieldResolverFn } from "./field"
+import type { GraphResolver, ResolverContext } from "./graph"
+import { create_relation_resolver } from "./relation"
 
-export type Modifier<M extends Model> = (
-	qb: QueryBuilder<M, any>,
-	tree: ResolveTree
-) => void
-
-export interface ModelResolverOptions<M extends Model> {
-	modifier?: Modifier<M>
-	fields?: Record<string, SimpleFieldResolver<M>> | true
-	clean?(instance: M, context: ResolverContext): void | PromiseLike<void>
-}
-
+/** A function that modifies the query to select fields/relations and filter the result set. */
 export type ModelResolverFn<M extends Model = Model> = (args: {
 	tree: ResolveTree
 	type: string
 	query: QueryBuilder<M, any>
-	resolve_tree: ResolveTreeFn
+	filters?: FiltersDef
+	graph: GraphResolver
 }) => void
+
+export interface ModelResolverOptions<M extends Model = Model> {
+	/** allow to resolve all model fields without explicitly listing them */
+	allowAllFields?: boolean
+	/** allow to filter all model fields without explicitly listing them */
+	allowAllFilters?: boolean
+	fields?: Record<string, SimpleFieldResolver<M>>
+	modify?: QueryTreeModifier<M>
+	transform?(instance: M, context: ResolverContext): void | PromiseLike<void>
+}
 
 export type SimpleFieldResolver<M extends Model> =
 	| true
 	| string
 	| FieldResolverFn<M>
 
-export function ModelResolver<M extends Model = Model>(
-	model_class: ModelConstructor<M>,
-	options?: ModelResolverOptions<M>
-): ModelResolverFn<M> {
-	const model_options: ModelResolverOptions<M> = {
-		// inject defaults here
-		fields: true,
-		...options,
-	}
+export type QueryTreeModifier<M extends Model> = (
+	query: QueryBuilder<M, any>,
+	tree: ResolveTree
+) => void
 
-	const ThisModel = model_class as ModelClass<M>
+export function create_model_resolver<M extends Model>(
+	model: ModelConstructor<M>,
+	options: ModelResolverOptions<M> = {}
+): ModelResolverFn<M> {
+	const ThisModel = model as ModelClass<M>
 
 	// Pull the list of getter names from Model
-	// see https://stackoverflow.com/a/39310917/189806
-	const getter_names = new Set(
-		Object.entries(Object.getOwnPropertyDescriptors(ThisModel.prototype))
+	// See https://stackoverflow.com/a/39310917/189806
+	const model_getter_names = new Set(
+		Object.entries(Object.getOwnPropertyDescriptors(model.prototype))
 			.filter(([, descriptor]) => typeof descriptor.get === "function")
 			.map(([key]) => key)
 	)
 
-	// List of model relations
-	// Static-cast the value to RelationMappings, because if it was a thunk, it has been already resolved by now.
-	const relations = ThisModel.relationMappings as RelationMappings
+	// Static-cast the value to RelationMappings, because if it was a thunk, it would have been already resolved by now.
+	const model_relations = ThisModel.relationMappings as RelationMappings
 
-	// Default field resolver
-	const get_field_resolver = (
+	/**
+	 * Create a field resolver which will modify the query to resolve a GraphQL field.
+	 */
+	const get_default_field_resolver = (
 		field: string,
 		modelField?: string
-	): FieldResolverFn<M> => {
+	): FieldResolverFn<M> | undefined => {
 		const model_field_lookup = modelField || field
-		if (getter_names.has(model_field_lookup)) {
+		if (model_getter_names.has(model_field_lookup)) {
 			return () => undefined
-		} else if (relations?.[model_field_lookup]) {
-			return RelationResolver<M, any>({ modelField })
+		} else if (model_relations?.[model_field_lookup]) {
+			return create_relation_resolver<M, any>({ modelField })
 		} else {
-			return FieldResolver<M>({ modelField })
+			return create_field_resolver<M>({ modelField })
 		}
 	}
 
-	// Per-field resolvers
-	const field_resolvers: Record<string, FieldResolverFn<M>> | null =
-		model_options.fields === true ? null : {}
-	if (field_resolvers) {
-		const fields = model_options.fields as Record<string, FieldResolverFn<M>>
-		for (const field of Object.keys(fields)) {
-			const r0 = fields[field]
-			let r: FieldResolverFn<M>
-			if (typeof r0 === "function") {
-				r = r0
-			} else if (r0 === true) {
-				r = get_field_resolver(field)
-			} else if (typeof r0 === "string") {
-				r = get_field_resolver(field, r0)
-			} else {
-				throw new Error(
-					`Field resolver must be a function, string, or true; found ${r0}`
-				)
-			}
-			field_resolvers[field] = r
-		}
-	}
+	// Pre-create field resolvers
+	const { fields } = options
+	const model_field_resolvers = fields
+		? Object.keys(fields).reduce<Record<string, FieldResolverFn<M>>>(
+				(resolvers, field) => {
+					const r0 = fields[field]
+					const r: FieldResolverFn<M> | undefined =
+						typeof r0 === "function"
+							? r0
+							: r0 === true
+							? get_default_field_resolver(field)
+							: typeof r0 === "string"
+							? get_default_field_resolver(field, r0)
+							: undefined
+					if (r === undefined) {
+						throw new Error(
+							`Field resolver must be a function, string, or true; found ${r0}`
+						)
+					}
+					resolvers[field] = r
+					return resolvers
+				},
+				{}
+		  )
+		: undefined
 
-	return function resolve({ tree, type, query, resolve_tree }) {
-		const ThisModel = query.modelClass()
-		if (model_class !== (ThisModel as ModelConstructor<Model>)) {
+	const { modify, transform } = options
+
+	return function resolve({ tree, type, query, filters, graph }) {
+		const query_model = query.modelClass()
+		if (query_model !== ThisModel) {
 			throw new Error(
-				`Mismatching query model for ${type} model resolver (expected ${model_class}, found ${ThisModel})`
+				`Mismatching query model for ${type} model resolver (expected ${ThisModel}, found ${query_model})`
 			)
 		}
 
-		if (model_options.modifier) {
-			model_options.modifier(query, tree)
+		const allow_all_fields =
+			options.allowAllFields ??
+			graph.options.allowAllFields ??
+			model_field_resolvers === undefined
+
+		const field_resolvers = allow_all_fields ? undefined : model_field_resolvers
+
+		if (!allow_all_fields && !field_resolvers) {
+			throw new Error(
+				`Model resolver for ${type} must either allow all fields or specify options.fields`
+			)
 		}
+
+		modify?.(query, tree)
 
 		for (const subtree of Object.values(tree.fieldsByTypeName[type])) {
 			const field = subtree.name
 			const r = field_resolvers
 				? field_resolvers[field]
-				: get_field_resolver(field)
-			if (!r) {
+				: get_default_field_resolver(field)
+			if (field_resolvers && !r) {
 				throw new Error(`No field resolver defined for field ${type}.${field}`)
 			}
-			r(query, { field, tree: subtree, resolve_tree })
+			r?.(query, { field, tree: subtree, graph })
 		}
 
 		// Performance: select ID if nothing was selected.
@@ -133,20 +152,19 @@ export function ModelResolver<M extends Model = Model>(
 			)
 		}
 
-		const clean_instance = model_options.clean
-		if (clean_instance) {
-			query.runAfter(async (result, qb) => {
-				if (result) {
-					const context = qb.context()
-					if (Array.isArray(result)) {
-						await Promise.all(
-							result.map((instance) => clean_instance(instance, context))
-						)
-					} else {
-						await clean_instance(result, context)
-					}
-				}
-				return result
+		const allow_all_filters =
+			options.allowAllFilters ?? graph.options.allowAllFilters
+
+		const effective_filters = allow_all_filters ? true : filters
+
+		if (effective_filters) {
+			apply_filters({ query, filters: effective_filters, args: tree.args })
+		}
+
+		if (transform) {
+			const context = query.context()
+			run_after_query(query, (instance) => {
+				return transform(instance, context)
 			})
 		}
 	}

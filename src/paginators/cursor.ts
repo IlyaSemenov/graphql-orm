@@ -1,7 +1,13 @@
 import { Model, QueryBuilder, raw } from "objection"
 
 import { field_ref } from "../helpers/field-ref"
-import { PaginatorFn } from "."
+import { Paginator } from "./base"
+
+export function create_cursor_paginator<M extends Model>(
+	options: Partial<CursorPaginatorOptions> = {}
+) {
+	return new CursorPaginator<M>(options)
+}
 
 export interface CursorPaginatorOptions {
 	fields: string[]
@@ -18,29 +24,68 @@ export interface CursorPaginatorPage<M> {
 	cursor?: string
 }
 
-export function CursorPaginator<M extends Model>(
-	options?: Partial<CursorPaginatorOptions>
-): PaginatorFn<M, CursorPaginatorPage<M>> {
-	const paginator_options: CursorPaginatorOptions = {
-		fields: ["id"],
-		take: 10,
-		...options,
-	}
+class CursorPaginator<M extends Model> extends Paginator<
+	M,
+	CursorPaginatorPage<M>
+> {
+	readonly path = ["nodes"]
+	readonly options: CursorPaginatorOptions
 
-	const fields: Array<{
+	readonly fields: Array<{
 		name: string
 		desc: boolean
-	}> = paginator_options.fields.map((field) => {
-		if (field.startsWith("-")) {
-			return { name: field.slice(1), desc: true }
-		} else {
-			return { name: field, desc: false }
-		}
-	})
+	}>
 
-	const create_cursor = (instance: any) => {
+	constructor(options: Partial<CursorPaginatorOptions> = {}) {
+		super()
+		this.options = {
+			fields: ["id"],
+			take: 10,
+			...options,
+		}
+		this.fields = this.options.fields.map((field) => {
+			if (field.startsWith("-")) {
+				return { name: field.slice(1), desc: true }
+			} else {
+				return { name: field, desc: false }
+			}
+		})
+	}
+
+	paginate(query: QueryBuilder<M, M[]>, args: CursorPaginatorArgs = {}) {
+		const take = args.take ?? this.options.take
+		const { cursor } = args
+
+		// Set query order
+		query.clearOrder()
+		for (const field of this.fields) {
+			const f = field_ref(query, field.name)
+			// TODO: prevent potential name clash with aliases like .as(`_${table_ref}_order_key_0`)
+			query.select(f).orderBy(f, field.desc ? "desc" : "asc")
+		}
+
+		if (cursor) {
+			this._set_query_cursor(query, cursor)
+		}
+		query.limit(take + 1)
+
+		query.runAfter((nodes) => {
+			if (!Array.isArray(nodes)) {
+				throw new Error(`Paginator called for single result query.`)
+			}
+			let cursor: string | undefined
+			if (nodes.length > take) {
+				cursor = this._create_cursor(nodes[take - 1])
+				nodes = nodes.slice(0, take)
+			}
+			return { nodes, cursor }
+		})
+		return query as unknown as QueryBuilder<M, CursorPaginatorPage<M>>
+	}
+
+	_create_cursor(instance: any) {
 		return JSON.stringify(
-			fields.map((field) => {
+			this.fields.map((field) => {
 				const value = instance[field.name]
 				if (value === undefined) {
 					throw new Error(
@@ -52,13 +97,14 @@ export function CursorPaginator<M extends Model>(
 		)
 	}
 
-	const set_query_cursor = (query: QueryBuilder<M, M[]>, cursor: string) => {
+	_set_query_cursor(query: QueryBuilder<M, M[]>, cursor: string) {
 		const values = JSON.parse(cursor)
 		type P = [string, any]
 		const left: P[] = []
 		const right: P[] = []
-		for (let i = 0; i < fields.length; ++i) {
-			const field = fields[i]
+		// TODO: refactor
+		for (let i = 0; i < this.fields.length; ++i) {
+			const field = this.fields[i]
 			const field_part = field.desc ? right : left
 			const value_part = field.desc ? left : right
 			field_part.push(["??", field.name])
@@ -75,41 +121,4 @@ export function CursorPaginator<M extends Model>(
 		)
 		query.where(cond)
 	}
-
-	const paginate: PaginatorFn<M, CursorPaginatorPage<M>> = (
-		query: QueryBuilder<M, M[]>,
-		args?: CursorPaginatorArgs
-	): QueryBuilder<M, CursorPaginatorPage<M>> => {
-		const take = Number(args?.take) || paginator_options.take
-		const cursor = args?.cursor
-
-		// Set query order
-		query.clearOrder()
-		fields.forEach((field) => {
-			const f = field_ref(query, field.name)
-			// TODO: prevent potential name clash with aliases like .as(`_${table_ref}_order_key_0`)
-			query.select(f).orderBy(f, field.desc ? "desc" : "asc")
-		})
-
-		if (cursor) {
-			set_query_cursor(query, cursor)
-		}
-		query.limit(take + 1)
-
-		query.runAfter((nodes) => {
-			if (!Array.isArray(nodes)) {
-				throw new Error(`Paginator called for single result query.`)
-			}
-			let cursor: string | undefined
-			if (nodes.length > take) {
-				cursor = create_cursor(nodes[take - 1])
-				nodes = nodes.slice(0, take)
-			}
-			return { nodes, cursor }
-		})
-		return query as unknown as QueryBuilder<M, CursorPaginatorPage<M>>
-	}
-
-	paginate.path = ["nodes"]
-	return paginate
 }

@@ -2,7 +2,7 @@
 
 Both root and nested queries can be filtered with GraphQL arguments:
 
-```graphql
+```gql
 scalar Filter
 
 type Query {
@@ -23,32 +23,63 @@ The above generates:
 SELECT id, text FROM posts WHERE date='2020-10-01' AND author_id IN (123, 456)
 ```
 
-For security purposes, filters are disabled by default. To enable filters, use:
+## Enabling filters
+
+For security purposes, filters are disabled by default.
+
+Filters can be enabled for individual relations:
 
 ```ts
-const resolveGraph = GraphResolver({
-  Post: ModelResolver(PostModel, {
-    // enable all filters for all fields
-    filter: true,
-    // TODO: granular access
-    filter: {
-      date: true,
-      author_id: true,
+const graph = r.graph({
+  User: r.model(UserModel, {
+    fields: {
+      id: true,
+      name: true,
+      posts: r.relation({ filters: true }),
     },
   }),
+  Post: r.model(PostModel),
 })
 ```
 
-To filter root query, use:
+or on model level:
+
+```ts
+const graph = r.graph({
+  User: r.model(UserModel, {
+    // enable filters on all user relations
+    allowAllFilters: true,
+  }),
+  Post: r.model(PostModel),
+})
+```
+
+or on graph level:
+
+```ts
+const graph = r.graph(
+  {
+    User: r.model(UserModel),
+    Post: r.model(PostModel),
+  },
+  {
+    // enable filters on all relations
+    allowAllFilters: true,
+  }
+)
+```
+
+## Filters on root query
+
+To filter root query (if not enabled for model or graph), use:
 
 ```ts
 const resolvers = {
   Query: {
     posts: async (parent, args, ctx, info) => {
-      const posts = await resolveGraph(ctx, info, Post.query(), {
-        filter: true,
+      return graph.resolve(ctx, info, Post.query(), {
+        filters: true,
       })
-      return posts
     },
   },
 }
@@ -75,7 +106,7 @@ Supported operators:
 Define modifiers on a model class:
 
 ```ts
-export class PostModel extends Model {
+class PostModel extends Model {
   static modifiers = {
     public: (query) => query.whereNull("delete_time"),
     search: (query, term) => query.where("text", "ilike", `%${term}%`),
@@ -85,7 +116,7 @@ export class PostModel extends Model {
 
 Then you can filter results with:
 
-```graphql
+```gql
 query get_all_posts {
   posts(filter: { public: true, search: "hello" }) {
     id

@@ -1,9 +1,9 @@
 import gql from "graphql-tag"
 import { Model } from "objection"
-import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class UserModel extends Model {
 	static tableName = "user"
@@ -24,17 +24,17 @@ const schema = gql`
 	}
 `
 
-const resolve_graph = GraphResolver({
-	User: ModelResolver(UserModel),
+const graph = r.graph({
+	User: r.model(UserModel),
 })
 
 const resolvers: Resolvers = {
 	Query: {
 		user(_parent, { id }, ctx, info) {
-			return resolve_graph(ctx, info, UserModel.query().findById(id))
+			return graph.resolve(ctx, info, UserModel.query().findById(id))
 		},
 		users(_parent, _args, ctx, info) {
-			return resolve_graph(ctx, info, UserModel.query())
+			return graph.resolve(ctx, info, UserModel.query())
 		},
 	},
 }

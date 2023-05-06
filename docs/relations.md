@@ -4,7 +4,7 @@ Relations will be fetched automatically using `withGraphFetched()` when resolvin
 
 Example:
 
-```graphql
+```gql
 type User {
 	id: ID!
 	name: String!
@@ -44,33 +44,29 @@ query user_with_posts {
 ```
 
 ```ts
-const resolveGraph = GraphResolver({
-  User: ModelResolver(UserModel, {
+const graph = r.graph({
+  User: r.model(UserModel, {
     fields: {
       id: true,
       name: true,
       // Use withGraphFetched("posts")
       // and process subquery with Post model resolver defined below.
       //
-      // See RelationResolver API for advanced options.
+      // See r.relation() API for advanced options.
       posts: true,
     },
   }),
-  // No resolver options = access to all fields
-  Post: ModelResolver(PostModel),
+  // No resolver options = access to all fields (including relations)
+  Post: r.model(PostModel),
 })
 
 const resolvers = {
   Query: {
-    user: async (parent, args, ctx, info) => {
-      const user = await resolveGraph(ctx, info, User.query().findById(args.id))
-      return user
+    user: (parent, args, ctx, info) => {
+      return graph.resolve(ctx, info, User.query().findById(args.id))
     },
-    posts: async (parent, args, ctx, info) => {
-      const page = await resolveGraph(ctx, info, Post.query(), {
-        paginate: CursorPaginator({ take: 10, fields: ["-id"] }),
-      })
-      return page
+    posts: (parent, args, ctx, info) => {
+      return graph.resolve(ctx, info, Post.query())
     },
   },
 }
@@ -78,7 +74,7 @@ const resolvers = {
 
 Internally, this traverses `Model.relationMappings` and can handle unlimited nesting levels. Using the graph above, one could run a request like:
 
-```graphql
+```gql
 query deep_nesting {
   posts {
     id

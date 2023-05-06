@@ -3,7 +3,7 @@ import { Model } from "objection"
 import { GraphResolver, ModelResolver } from "objection-graphql-resolver"
 import { assert, beforeAll, expect, test } from "vitest"
 
-import { Resolvers, setup } from "./setup"
+import { Resolvers, setup } from "../setup"
 
 class UserModel extends Model {
 	static tableName = "user"
@@ -107,6 +107,23 @@ test("model resolver fields access", async () => {
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
 		"fields: true"
+	)
+
+	assert.deepEqual(
+		await client.request(
+			gql`
+				{
+					user: secure_user(id: 1) {
+						id
+						name
+					}
+				}
+			`
+		),
+		{
+			user: { id: 1, name: "Alice" },
+		},
+		"secure user without password"
 	)
 
 	await expect(
