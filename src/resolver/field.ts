@@ -2,7 +2,7 @@ import { ResolveTree } from "graphql-parse-resolve-info"
 import { Model, QueryBuilder } from "objection"
 
 import { field_ref } from "../helpers/field-ref"
-import { async_run_after } from "../helpers/run-after"
+import { run_after_query } from "../helpers/run-after"
 import { ResolverContext, ResolveTreeFn } from "./graph"
 
 /* A function that modifies a query to return a field. */
@@ -43,16 +43,10 @@ export function FieldResolver<M extends Model>(
 		}
 		if (clean) {
 			const context = query.context()
-			query.runAfter(
-				async_run_after(async (instance: any) => {
-					if (!instance) {
-						// Supposedly, single query builder returning NULL
-						return instance
-					}
-					instance[field] = await clean(instance[field], instance, context)
-					return instance
-				})
-			)
+			run_after_query(query, async (instance) => {
+				instance[field] = await clean(instance[field], instance, context)
+				return instance
+			})
 		}
 	}
 }

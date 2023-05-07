@@ -1,19 +1,18 @@
-export function run_after(callback: (instance: any) => void) {
-	return (result: any) => {
-		if (Array.isArray(result)) {
-			return result.map(callback)
-		} else {
-			return callback(result)
-		}
-	}
-}
+import { AnyQueryBuilder } from "objection"
 
-export function async_run_after(callback: (instance: any) => Promise<void>) {
-	return (result: any) => {
+export function run_after_query(
+	query: AnyQueryBuilder,
+	transform: (instance: any) => any
+) {
+	query.runAfter(async (result) => {
 		if (Array.isArray(result)) {
-			return Promise.all(result.map(callback))
+			const result1 = await Promise.all(result.map(transform))
+			return result1.filter(Boolean) // Skip empty objects
+		} else if (result) {
+			return transform(result)
 		} else {
-			return callback(result)
+			// Supposedly, single query builder returning NULL
+			return result
 		}
-	}
+	})
 }

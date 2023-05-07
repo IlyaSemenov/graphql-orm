@@ -1,7 +1,7 @@
 import { Model } from "objection"
 
 import { FiltersDef } from "../filter"
-import { run_after } from "../helpers/run-after"
+import { run_after_query } from "../helpers/run-after"
 import { PaginatorFn } from "../paginators"
 import { FieldResolver, FieldResolverOptions } from "./field"
 import { Modifier } from "./model"
@@ -52,14 +52,12 @@ export function RelationResolver<M extends Model, R extends Model>(
 				})
 
 			if (paginate) {
-				query.runAfter(
-					// Re-inject paginated results
-					// They have been overwritten by objection.js by now
-					run_after((instance) => {
-						instance[field] = paginated_results
-						return instance
-					})
-				)
+				// Re-inject paginated results
+				// They have been overwritten by objection.js by now
+				run_after_query(query, (instance) => {
+					instance[field] = paginated_results
+					return instance
+				})
 			}
 		},
 	})
