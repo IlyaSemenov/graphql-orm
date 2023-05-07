@@ -1,7 +1,7 @@
 import { Model } from "objection"
 
 import { FiltersDef } from "../filter"
-import { run_after } from "../helpers/run_after"
+import { run_after } from "../helpers/run-after"
 import { PaginatorFn } from "../paginators"
 import { FieldResolver, FieldResolverOptions } from "./field"
 import { Modifier } from "./model"

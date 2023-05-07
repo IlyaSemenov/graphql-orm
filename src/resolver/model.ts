@@ -7,7 +7,7 @@ import {
 	RelationMappings,
 } from "objection"
 
-import { field_ref } from "../helpers/field_ref"
+import { field_ref } from "../helpers/field-ref"
 import { FieldResolver, FieldResolverFn } from "./field"
 import { ResolverContext, ResolveTreeFn } from "./graph"
 import { RelationResolver } from "./relation"

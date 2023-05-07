@@ -1,6 +1,6 @@
 import { AnyQueryBuilder } from "objection"
 
-import { is_plain_object } from "./helpers/is_plain_object"
+import { is_plain_object } from "./helpers/is-plain-object"
 
 // TODO: per-field definitions
 export type FiltersDef = boolean

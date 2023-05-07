@@ -1,8 +1,8 @@
 import { ResolveTree } from "graphql-parse-resolve-info"
 import { Model, QueryBuilder } from "objection"
 
-import { field_ref } from "../helpers/field_ref"
-import { async_run_after } from "../helpers/run_after"
+import { field_ref } from "../helpers/field-ref"
+import { async_run_after } from "../helpers/run-after"
 import { ResolverContext, ResolveTreeFn } from "./graph"
 
 /* A function that modifies a query to return a field. */

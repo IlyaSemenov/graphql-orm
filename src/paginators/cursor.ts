@@ -1,6 +1,6 @@
 import { Model, QueryBuilder, raw } from "objection"
 
-import { field_ref } from "../helpers/field_ref"
+import { field_ref } from "../helpers/field-ref"
 import { PaginatorFn } from "."
 
 export interface CursorPaginatorOptions {
