@@ -86,26 +86,18 @@ const resolvers: ApolloServerOptions<any>["resolvers"] = {
 const knex = Knex({ client: "sqlite3", connection: ":memory:" })
 Model.knex(knex)
 
-async function migrate() {
-  await knex.schema.createTable("post", (post) => {
-    post.increments("id")
-    post.text("text").notNullable()
-  })
-}
-
-migrate()
+await knex.schema.createTable("post", (post) => {
+  post.increments("id")
+  post.text("text").notNullable()
+})
 
 // Start GraphQL server
 
-async function start() {
-  const server = new ApolloServer({ typeDefs, resolvers })
-  const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
-  })
-  console.log(`Listening on ${url}`)
-}
-
-start()
+const server = new ApolloServer({ typeDefs, resolvers })
+const { url } = await startStandaloneServer(server, {
+  listen: { port: 4000 },
+})
+console.log(`Listening on ${url}`)
 ```
 
 Query it with GraphQL client:
@@ -116,33 +108,29 @@ import gql from "graphql-tag"
 
 const client = new GraphQLClient("http://127.0.0.1:4000")
 
-async function main() {
-  await client.request(
-    gql`
-      mutation create_post($text: String!) {
-        new_post: create_post(text: $text) {
-          id
-        }
+await client.request(
+  gql`
+    mutation create_post($text: String!) {
+      new_post: create_post(text: $text) {
+        id
       }
-    `,
-    { text: "Hello, world!" }
-  )
+    }
+  `,
+  { text: "Hello, world!" }
+)
 
-  const { posts } = await client.request(
-    gql`
-      query {
-        posts {
-          id
-          text
-        }
+const { posts } = await client.request(
+  gql`
+    query {
+      posts {
+        id
+        text
       }
-    `
-  )
+    }
+  `
+)
 
-  console.log(posts)
-}
-
-main()
+console.log(posts)
 ```
 
 ## Relations

@@ -21,6 +21,7 @@
     "node": ">=14"
   },
   "scripts": {
+    "dev": "vite-node --watch playground/readme.sample.ts",
     "build": "tsup",
     "lint": "eslint --fix '**/*.{cjs,js,ts}'",
     "prepack": "npm run build",
@@ -57,7 +58,9 @@
     "tar": "~6.1.13",
     "tsup": "~6.7.0",
     "typescript": "~5.0.2",
-    "vite-tsconfig-paths": "~4.0.7",
-    "vitest": "~0.29.7"
+    "vite": "~4.3.8",
+    "vite-node": "~0.31.1",
+    "vite-tsconfig-paths": "~4.2.0",
+    "vitest": "~0.31.1"
   }
 }
