@@ -1,4 +1,4 @@
-// Replicate basic demo from README.md
+// Repeat demo sample from README.md
 
 import gql from "graphql-tag"
 import { Model } from "objection"
@@ -7,16 +7,12 @@ import { assert, test } from "vitest"
 
 import { Resolvers, setup } from "../setup"
 
-// Define Objection.js models
-
 class PostModel extends Model {
 	static tableName = "post"
 
 	id?: number
 	text?: string
 }
-
-// Define GraphQL schema
 
 const typeDefs = gql`
 	type Post {
@@ -33,13 +29,9 @@ const typeDefs = gql`
 	}
 `
 
-// Map GraphQL types to model resolvers
-
 const graph = r.graph({
 	Post: r.model(PostModel),
 })
-
-// Define resolvers
 
 const resolvers: Resolvers = {
 	Mutation: {
@@ -57,12 +49,12 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs, resolvers })
 
-test("basic demo", async () => {
-	await knex.schema.createTable("post", (post) => {
-		post.increments("id")
-		post.text("text").notNullable()
-	})
+await knex.schema.createTable("post", (post) => {
+	post.increments("id")
+	post.text("text").notNullable()
+})
 
+test("readme demo sample", async () => {
 	await client.request(
 		gql`
 			mutation create_post($text: String!) {
