@@ -26,7 +26,8 @@
     "lint": "eslint --fix '**/*.{cjs,js,ts}'",
     "prepack": "npm run build",
     "prepare": "husky install",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release": "npm run prepack && release-it"
   },
   "dependencies": {
     "graphql-parse-resolve-info": "^4.12.0"
