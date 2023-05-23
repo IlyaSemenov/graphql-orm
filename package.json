@@ -8,8 +8,9 @@
   },
   "author": "Ilya Semenov",
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "files": [
@@ -21,7 +22,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "lint": "eslint --fix '**/*.{js,ts}'",
+    "lint": "eslint --fix '**/*.{cjs,js,ts}'",
     "prepack": "npm run build",
     "prepare": "husky install",
     "test": "vitest run"
