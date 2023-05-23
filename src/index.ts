@@ -7,4 +7,4 @@ export { create_page_resolver as page } from "./resolvers/page"
 export { create_relation_resolver as relation } from "./resolvers/relation"
 
 // Legacy API
-export * from "./legacy-api"
+export * from "./v5-api"
