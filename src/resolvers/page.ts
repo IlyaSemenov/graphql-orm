@@ -1,7 +1,7 @@
 import { Model, QueryBuilder } from "objection"
 
-import { run_after_query } from "../helpers/run-after"
 import { Paginator } from "../paginators/base"
+import { run_after_query } from "../utils/run-after"
 import { create_field_resolver } from "./field"
 import { RelationResolverOptions } from "./relation"
 

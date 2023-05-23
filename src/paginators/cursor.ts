@@ -1,6 +1,6 @@
 import { Model, QueryBuilder, raw } from "objection"
 
-import { field_ref } from "../helpers/field-ref"
+import { field_ref } from "../utils/field-ref"
 import { Paginator } from "./base"
 
 export function create_cursor_paginator<M extends Model>(

@@ -1,8 +1,8 @@
 import { ResolveTree } from "graphql-parse-resolve-info"
 import { Model, QueryBuilder } from "objection"
 
-import { field_ref } from "../helpers/field-ref"
-import { run_after_query } from "../helpers/run-after"
+import { field_ref } from "../utils/field-ref"
+import { run_after_query } from "../utils/run-after"
 import type { GraphResolver, ResolverContext } from "./graph"
 
 /* A function that modifies the query to select a field. */
