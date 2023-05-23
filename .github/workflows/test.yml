@@ -1,10 +1,11 @@
-name: Release
+name: Test
+
 on:
   push:
-    branches:
-      - master
+    branches: ["**"]
+
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.1.0
@@ -21,10 +22,3 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm test
-
-      - uses: cycjimmy/semantic-release-action@v3
-        with:
-          semantic_version: 18.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

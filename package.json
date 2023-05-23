@@ -1,7 +1,7 @@
 {
   "name": "objection-graphql-resolver",
   "description": "objection.js plugin: resolve GraphQL query using withGraphFetched",
-  "version": "0.0.0-development",
+  "version": "6.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/IlyaSemenov/objection-graphql-resolver.git"
@@ -51,6 +51,7 @@
     "lint-staged": "~13.2.0",
     "objection": "^3.0.1",
     "prettier": "~2.8.7",
+    "release-it": "~15.10.3",
     "sqlite3": "~5.1.6",
     "tar": "~6.1.13",
     "tsup": "~6.7.0",
