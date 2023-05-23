@@ -7,7 +7,7 @@ import {
 	RelationMappings,
 } from "objection"
 
-import { apply_filters, FiltersDef } from "../filters"
+import { apply_filters, FiltersDef } from "../filters/filters"
 import { field_ref } from "../utils/field-ref"
 import { run_after_query } from "../utils/run-after"
 import { create_field_resolver, FieldResolverFn } from "./field"

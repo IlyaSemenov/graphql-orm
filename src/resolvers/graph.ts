@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from "graphql"
 import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
 import { AnyQueryBuilder, ModelType, QueryContext } from "objection"
 
-import { FiltersDef } from "../filters"
+import { FiltersDef } from "../filters/filters"
 import type { Paginator } from "../paginators/base"
 import type { ModelResolverFn, ModelResolverOptions } from "./model"
 

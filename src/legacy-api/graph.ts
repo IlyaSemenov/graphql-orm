@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from "graphql"
 import { Model, ModelType, QueryBuilder } from "objection"
 
-import { FiltersDef } from "../filters"
+import { FiltersDef } from "../filters/filters"
 import { Paginator } from "../paginators/base"
 import { create_graph_resolver, ResolverContext } from "../resolvers/graph"
 import { ModelResolverFn } from "../resolvers/model"

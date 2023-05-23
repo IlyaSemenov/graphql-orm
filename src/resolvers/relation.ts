@@ -1,6 +1,6 @@
 import { Model, QueryBuilder } from "objection"
 
-import { FiltersDef } from "../filters"
+import { FiltersDef } from "../filters/filters"
 import { create_field_resolver, FieldResolverOptions } from "./field"
 import { QueryTreeModifier } from "./model"
 

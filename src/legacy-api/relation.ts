@@ -1,6 +1,6 @@
 import { Model } from "objection"
 
-import { FiltersDef } from "../filters"
+import { FiltersDef } from "../filters/filters"
 import { Paginator } from "../paginators/base"
 import { QueryTreeModifier } from "../resolvers/model"
 import { create_page_resolver } from "../resolvers/page"
