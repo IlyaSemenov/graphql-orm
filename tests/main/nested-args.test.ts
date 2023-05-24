@@ -1,60 +1,68 @@
 import gql from "graphql-tag"
-import { Model } from "objection"
-import * as r from "objection-graphql-resolver"
+import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import { BaseTable, create_client, create_db, Resolvers } from "../setup"
 
-class AuthorModel extends Model {
-	static tableName = "author"
+class AuthorTable extends BaseTable {
+	readonly table = "author"
 
-	static get relationMappings() {
-		return {
-			books: {
-				relation: Model.ManyToManyRelation,
-				modelClass: BookModel,
-				join: {
-					from: "author.id",
-					through: {
-						from: "author_book_rel.author_id",
-						to: "author_book_rel.book_id",
-					},
-					to: "book.id",
-				},
-			},
-		}
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		name: t.string(1, 100),
+		country: t.string(1, 100).nullable(),
+	}))
+
+	relations = {
+		books: this.hasAndBelongsToMany(() => BookTable, {
+			primaryKey: "id",
+			foreignKey: "author_id",
+			associationPrimaryKey: "id",
+			associationForeignKey: "book_id",
+			joinTable: "author_book_rel",
+		}),
 	}
-
-	id?: number
-	name?: string
-	country?: string
-	books?: BookModel[]
 }
 
-class BookModel extends Model {
-	static tableName = "book"
+class BookTable extends BaseTable {
+	readonly table = "book"
 
-	static get relationMappings() {
-		return {
-			authors: {
-				relation: Model.ManyToManyRelation,
-				modelClass: AuthorModel,
-				join: {
-					from: "book.id",
-					through: {
-						from: "author_book_rel.book_id",
-						to: "author_book_rel.author_id",
-					},
-					to: "author.id",
-				},
-			},
-		}
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		title: t.text(1, 200),
+	}))
+
+	relations = {
+		authors: this.hasAndBelongsToMany(() => AuthorTable, {
+			primaryKey: "id",
+			foreignKey: "book_id",
+			associationPrimaryKey: "id",
+			associationForeignKey: "author_id",
+			joinTable: "author_book_rel",
+		}),
 	}
-
-	id?: number
-	title?: string
-	authors?: AuthorModel[]
 }
+
+const db = await create_db({
+	author: AuthorTable,
+	book: BookTable,
+})
+
+await db.$adapter.query(`
+	create table "author" (
+		id serial primary key,
+		name varchar(100) not null,
+		country varchar(100)
+	);
+	create table book (
+		id serial primary key,
+		title varchar(200) not null
+	);
+	create table author_book_rel (
+		author_id integer not null,
+		book_id integer not null
+	);
+`)
 
 const schema = gql`
 	type Author {
@@ -76,17 +84,18 @@ const schema = gql`
 `
 
 const graph = r.graph({
-	Author: r.model(AuthorModel),
-	Book: r.model(BookModel, {
+	Author: r.table(db.author),
+	Book: r.table(db.book, {
 		fields: {
 			id: true,
 			title: true,
 			authors: r.relation({
 				modify(authors, { args }) {
-					authors.orderBy("name")
+					authors = authors.order("name")
 					if (typeof args.country === "string" || args.country === null) {
-						authors.where("country", args.country)
+						authors = authors.where({ country: args.country })
 					}
+					return authors
 				},
 			}),
 		},
@@ -95,65 +104,29 @@ const graph = r.graph({
 
 const resolvers: Resolvers = {
 	Query: {
-		books: (_parent, _args, ctx, info) =>
-			graph.resolve(ctx, info, BookModel.query().orderBy("id")),
+		books: async (_parent, _args, context, info) =>
+			await graph.resolve(db.book.order("id"), { context, info }),
 	},
 }
 
-const { client, knex } = await setup({ typeDefs: schema, resolvers })
+const client = await create_client({ typeDefs: schema, resolvers })
 
 test("filter relation", async () => {
-	await knex.schema.createTable("author", (author) => {
-		author.integer("id").notNullable().primary()
-		author.string("name").notNullable()
-		author.string("country")
-	})
-	await knex.schema.createTable("book", (book) => {
-		book.integer("id").notNullable().primary()
-		book.string("title").notNullable()
-	})
-	await knex.schema.createTable("author_book_rel", (rel) => {
-		rel
-			.integer("author_id")
-			.notNullable()
-			.references("author.id")
-			.onDelete("cascade")
-			.index()
-		rel
-			.integer("book_id")
-			.notNullable()
-			.references("book.id")
-			.onDelete("cascade")
-			.index()
-		rel.primary(["author_id", "book_id"])
-	})
-
-	await AuthorModel.query().insertGraph([
+	await db.author.createMany([
 		{ id: 1, name: "George Orwell", country: "UK" },
 		{ id: 2, name: "Mark Twain", country: "USA" },
 		{ id: 3, name: "Bill Gates", country: "USA" },
 	])
 
-	await BookModel.query().insertGraph(
-		[
-			{
-				id: 1,
-				title: "1984",
-				authors: [{ id: 1 }],
-			},
-			{
-				id: 2,
-				title: "Tom Sawyer",
-				authors: [{ id: 2 }],
-			},
-			{
-				id: 3,
-				title: "Imaginary Book",
-				authors: [{ id: 1 }, { id: 2 }, { id: 3 }],
-			},
-		],
-		{ relate: true }
-	)
+	await db.book.createMany([
+		{ id: 1, title: "1984", authors: { connect: [{ id: 1 }] } },
+		{ id: 2, title: "Tom Sawyer", authors: { connect: [{ id: 2 }] } },
+		{
+			id: 3,
+			title: "Imaginary Book",
+			authors: { connect: [{ id: 1 }, { id: 2 }, { id: 3 }] },
+		},
+	])
 
 	assert.deepEqual(
 		await client.request(

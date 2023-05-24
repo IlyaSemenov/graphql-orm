@@ -1,29 +1,27 @@
-import { Model, QueryBuilder } from "objection"
-
 import { FiltersDef } from "../filters/filters"
-import { create_field_resolver, FieldResolverOptions } from "./field"
-import { QueryTreeModifier } from "./model"
+import { defineFieldResolver, FieldResolverOptions } from "./field"
+import { QueryTreeModifier } from "./table"
 
-export interface RelationResolverOptions<M extends Model, R extends Model>
-	extends Omit<FieldResolverOptions<M>, "modify"> {
+export interface RelationResolverOptions
+	extends Omit<FieldResolverOptions, "modify"> {
 	filters?: FiltersDef
-	modify?: QueryTreeModifier<R>
+	modify?: QueryTreeModifier
 }
 
-export function create_relation_resolver<M extends Model, R extends Model>(
-	options: RelationResolverOptions<M, R> = {}
-) {
-	const { modelField, filters, modify } = options
+export function defineRelationResolver(options: RelationResolverOptions = {}) {
+	const { tableField, filters, modify } = options
 
-	return create_field_resolver<M>({
-		modify(query, { field, tree, graph }) {
-			query
-				.withGraphFetched(`${modelField || field} as ${field}`)
-				.modifyGraph<R>(field, (_query) => {
-					const query = _query as QueryBuilder<R, any>
-					graph._resolve_model({ tree, query, filters })
-					modify?.(query, tree)
-				})
-		},
+	return defineFieldResolver({
+		modify: (query, { field, tree, graph }) =>
+			query.select({
+				[field]: (q) => {
+					const relation_query = graph._resolve_type({
+						tree,
+						query: (q as any)[tableField || field],
+						filters,
+					})
+					return modify ? modify(relation_query, tree) : relation_query
+				},
+			}),
 	})
 }

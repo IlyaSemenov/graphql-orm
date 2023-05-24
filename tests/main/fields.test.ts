@@ -1,17 +1,30 @@
 import gql from "graphql-tag"
-import { Model } from "objection"
-import * as r from "objection-graphql-resolver"
-import { assert, beforeAll, expect, test } from "vitest"
+import * as r from "orchid-graphql"
+import { assert, expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import { BaseTable, create_client, create_db, Resolvers } from "../setup"
 
-class UserModel extends Model {
-	static tableName = "user"
+class UserTable extends BaseTable {
+	readonly table = "user"
 
-	id?: number
-	name?: string
-	password?: string
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		name: t.string(1, 100),
+		password: t.string(1, 32),
+	}))
 }
+
+const db = await create_db({
+	user: UserTable,
+})
+
+await db.$adapter.query(`
+	create table "user" (
+		id serial primary key,
+		name varchar(100) not null,
+		password varchar(32) not null
+	);
+`)
 
 const schema = gql`
 	type User {
@@ -30,18 +43,18 @@ const schema = gql`
 `
 
 const default_graph = r.graph({
-	User: r.model(UserModel),
+	User: r.table(db.user),
 })
 
 const default_graph1 = r.graph(
 	{
-		User: r.model(UserModel),
+		User: r.table(db.user),
 	},
 	{ allowAllFields: false }
 )
 
 const secure_graph = r.graph({
-	User: r.model(UserModel, {
+	User: r.table(db.user, {
 		fields: {
 			id: true,
 			name: true,
@@ -50,7 +63,7 @@ const secure_graph = r.graph({
 })
 
 const graph1 = r.graph({
-	User: r.model(UserModel, {
+	User: r.table(db.user, {
 		allowAllFields: true,
 		fields: {
 			id: true,
@@ -61,7 +74,7 @@ const graph1 = r.graph({
 
 const graph2 = r.graph(
 	{
-		User: r.model(UserModel, {
+		User: r.table(db.user, {
 			fields: {
 				id: true,
 				name: true,
@@ -73,37 +86,38 @@ const graph2 = r.graph(
 
 const resolvers: Resolvers = {
 	Query: {
-		default_user(_parent, { id }, ctx, info) {
-			return default_graph.resolve(ctx, info, UserModel.query().findById(id))
+		async default_user(_parent, { id }, context, info) {
+			return await default_graph.resolve(db.user.findOptional(id), {
+				context,
+				info,
+			})
 		},
-		default_user1(_parent, { id }, ctx, info) {
-			return default_graph1.resolve(ctx, info, UserModel.query().findById(id))
+		async default_user1(_parent, { id }, context, info) {
+			return await default_graph1.resolve(db.user.findOptional(id), {
+				context,
+				info,
+			})
 		},
-		secure_user(_parent, { id }, ctx, info) {
-			return secure_graph.resolve(ctx, info, UserModel.query().findById(id))
+		async secure_user(_parent, { id }, context, info) {
+			return await secure_graph.resolve(db.user.findOptional(id), {
+				context,
+				info,
+			})
 		},
-		user1(_parent, { id }, ctx, info) {
-			return graph1.resolve(ctx, info, UserModel.query().findById(id))
+		async user1(_parent, { id }, context, info) {
+			return await graph1.resolve(db.user.findOptional(id), { context, info })
 		},
-		user2(_parent, { id }, ctx, info) {
-			return graph2.resolve(ctx, info, UserModel.query().findById(id))
+		async user2(_parent, { id }, context, info) {
+			return await graph2.resolve(db.user.findOptional(id), { context, info })
 		},
 	},
 }
 
-const { client, knex } = await setup({ typeDefs: schema, resolvers })
+const client = await create_client({ typeDefs: schema, resolvers })
 
-beforeAll(async () => {
-	await knex.schema.createTable("user", function (table) {
-		table.increments("id").notNullable().primary()
-		table.string("name").notNullable()
-		table.string("password").notNullable()
-	})
+test("table resolver fields access", async () => {
+	await db.user.create({ name: "Alice", password: "secret" })
 
-	await UserModel.query().insertGraph([{ name: "Alice", password: "secret" }])
-})
-
-test("model resolver fields access", async () => {
 	assert.deepEqual(
 		await client.request(
 			gql`
@@ -135,7 +149,7 @@ test("model resolver fields access", async () => {
 			`
 		)
 	).rejects.toThrow(
-		"Model resolver for User must either allow all fields or specify options.fields"
+		"Table resolver for User must either allow all fields or specify options.fields"
 	)
 
 	assert.deepEqual(
@@ -184,7 +198,7 @@ test("model resolver fields access", async () => {
 		{
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
-		"model-level allowAllFields"
+		"table-level allowAllFields"
 	)
 
 	assert.deepEqual(

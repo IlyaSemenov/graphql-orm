@@ -1,41 +1,29 @@
-import { Model, QueryBuilder } from "objection"
+import { addParserToQuery } from "pqb"
 
-import { Paginator } from "../paginators/base"
-import { run_after_query } from "../utils/run-after"
-import { create_field_resolver } from "./field"
+import { get_query_pagination_handler, Paginator } from "../paginators/base"
+import { defineFieldResolver } from "./field"
 import { RelationResolverOptions } from "./relation"
 
-export function create_page_resolver<M extends Model, R extends Model>(
-	paginator: Paginator<R, any>,
-	options: RelationResolverOptions<M, R> = {}
+export function definePageResolver(
+	paginator: Paginator,
+	options: RelationResolverOptions = {}
 ) {
-	const { modelField, filters, modify } = options
+	const { tableField, filters, modify } = options
 
-	return create_field_resolver<M>({
-		modify(query, { field, tree, graph }) {
-			// withGraphFetched will disregard paginator's runAfter callback (which converts object list into cursor and nodes).
-			// Save the results locally and then re-inject.
-			let paginated_results: any
-
-			query
-				.withGraphFetched(`${modelField || field} as ${field}`, {
-					maxBatchSize: 1,
-				})
-				.modifyGraph<R>(field, (_query) => {
-					const query = _query as QueryBuilder<R, any>
-					graph._resolve_page({ tree, query, paginator, filters })
-					query.runAfter((results) => {
-						// Save paginated results
-						paginated_results = results
+	return defineFieldResolver({
+		modify: (query, { field, tree, graph }) =>
+			query.select({
+				[field]: (q) => {
+					const page_query = graph._resolve_page({
+						tree,
+						query: (q as any)[tableField || field],
+						paginator,
+						filters,
 					})
-					modify?.(query, tree)
-				})
-
-			// Re-inject paginated results (they have been overwritten by objection.js by now).
-			run_after_query(query, (instance) => {
-				instance[field] = paginated_results
-				return instance
-			})
-		},
+					const get_page = get_query_pagination_handler(page_query)
+					addParserToQuery(page_query.query, field, get_page as any)
+					return modify ? modify(page_query, tree) : page_query
+				},
+			}),
 	})
 }

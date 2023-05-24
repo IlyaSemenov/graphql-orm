@@ -1,56 +1,61 @@
 import gql from "graphql-tag"
-import { Model, QueryBuilder, ref } from "objection"
-import * as r from "objection-graphql-resolver"
-import { assert, beforeAll, test } from "vitest"
+import * as r from "orchid-graphql"
+import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import { BaseTable, create_client, create_db, Resolvers } from "../setup"
 
-class UserModel extends Model {
-	static tableName = "user"
+class UserTable extends BaseTable {
+	readonly table = "user"
 
-	static get relationMappings() {
-		return {
-			posts: {
-				relation: Model.HasManyRelation,
-				modelClass: PostModel,
-				join: { from: "user.id", to: "post.author_id" },
-			},
-		}
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		name: t.string(1, 100),
+	}))
+
+	relations = {
+		posts: this.hasMany(() => PostTable, {
+			primaryKey: "id",
+			foreignKey: "author_id",
+		}),
 	}
-
-	id?: number
-	name?: string
-	posts?: PostModel[]
 }
 
-class PostModel extends Model {
-	static tableName = "post"
+class PostTable extends BaseTable {
+	readonly table = "post"
 
-	static get relationMappings() {
-		return {
-			author: {
-				relation: Model.BelongsToOneRelation,
-				modelClass: UserModel,
-				join: { from: "post.author_id", to: "user.id" },
-			},
-		}
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		text: t.text(1, 10000),
+		author_id: t.integer(),
+		is_draft: t.boolean().default(false),
+	}))
+
+	relations = {
+		author: this.belongsTo(() => UserTable, {
+			required: true,
+			primaryKey: "id",
+			foreignKey: "author_id",
+		}),
 	}
-
-	static modifiers = {
-		published(query: QueryBuilder<PostModel>) {
-			query.where(ref("post.is_draft"), false)
-		},
-		search(query: QueryBuilder<PostModel>, term: string) {
-			query.where(ref("post.text"), "like", `%${term}%`)
-		},
-	}
-
-	id?: number
-	text?: string
-	is_draft?: boolean
-	author_id?: number
-	author?: UserModel
 }
+
+const db = await create_db({
+	post: PostTable,
+	user: UserTable,
+})
+
+await db.$adapter.query(`
+	create table "user" (
+		id serial primary key,
+		name varchar(100) not null
+	);
+	create table post (
+		id serial primary key,
+		text text not null,
+		author_id integer not null,
+		is_draft boolean default false
+	);
+`)
 
 const schema = gql`
 	scalar Filter
@@ -81,7 +86,7 @@ const schema = gql`
 `
 
 const graph1 = r.graph({
-	User: r.model(UserModel, {
+	User: r.table(db.user, {
 		fields: {
 			id: true,
 			name: true,
@@ -89,18 +94,24 @@ const graph1 = r.graph({
 			non_filterable_posts: "posts",
 		},
 	}),
-	Post: r.model(PostModel),
+	Post: r.table(db.post, {
+		modifiers: {
+			published: (query) => query.where({ is_draft: false }),
+			search: (query, term: string) =>
+				query.where({ text: { contains: `%${term}%` } }),
+		},
+	}),
 })
 
 const graph2 = r.graph({
-	User: r.model(UserModel, {
+	User: r.table(db.user, {
 		allowAllFilters: true,
 	}),
 })
 
 const graph3 = r.graph(
 	{
-		User: r.model(UserModel),
+		User: r.table(db.user),
 	},
 	{
 		allowAllFilters: true,
@@ -109,64 +120,45 @@ const graph3 = r.graph(
 
 const resolvers: Resolvers = {
 	Query: {
-		user(_parent, { id }, ctx, info) {
-			return graph1.resolve(ctx, info, UserModel.query().findById(id))
+		async user(_parent, { id }, context, info) {
+			return await graph1.resolve(db.user.findOptional(id), { context, info })
 		},
-		posts(_parent, _args, ctx, info) {
-			return graph1.resolve(ctx, info, PostModel.query(), {
-				filters: true,
-			})
+		async posts(_parent, _args, context, info) {
+			return await graph1.resolve(db.post, { context, info, filters: true })
 		},
-		non_filterable_posts(_parent, _args, ctx, info) {
-			return graph1.resolve(ctx, info, PostModel.query())
+		async non_filterable_posts(_parent, _args, context, info) {
+			return await graph1.resolve(db.post, { context, info })
 		},
-		users1(_parent, _args, ctx, info) {
-			return graph1.resolve(ctx, info, UserModel.query())
+		async users1(_parent, _args, context, info) {
+			return await graph1.resolve(db.user, { context, info })
 		},
-		users2(_parent, _args, ctx, info) {
-			return graph2.resolve(ctx, info, UserModel.query())
+		async users2(_parent, _args, context, info) {
+			return await graph2.resolve(db.user, { context, info })
 		},
-		users3(_parent, _args, ctx, info) {
-			return graph3.resolve(ctx, info, UserModel.query())
+		async users3(_parent, _args, context, info) {
+			return await graph3.resolve(db.user, { context, info })
 		},
 	},
 }
 
-const { client, knex } = await setup({ typeDefs: schema, resolvers })
+const client = await create_client({ typeDefs: schema, resolvers })
 
-beforeAll(async () => {
-	await knex.schema.createTable("user", (user) => {
-		user.increments("id").notNullable().primary()
-		user.string("name").notNullable()
-	})
-
-	await knex.schema.createTable("post", (post) => {
-		post.increments("id").notNullable().primary()
-		post.string("text").notNullable()
-		post.boolean("is_draft").notNullable().defaultTo(false)
-		post.integer("author_id").notNullable().references("user.id")
-	})
-
-	await UserModel.query().insertGraph([
+test("filters", async () => {
+	await db.user.createMany([
 		{ name: "Alice" },
 		{ name: "Bob" },
 		{ name: "Charlie" },
 	])
 
-	await PostModel.query().insertGraph(
-		[
-			{ author_id: 1, text: "Oil price rising." },
-			{ author_id: 1, text: "Is communism dead yet?" },
-			{ author_id: 2, text: "Latest COVID news." },
-			{ author_id: 1, text: "Good news from China." },
-			{ author_id: 2, text: "COVID vs Flu?" },
-			{ author_id: 2, text: "This is draft...", is_draft: true },
-		],
-		{ relate: true }
-	)
-})
+	await db.post.createMany([
+		{ author_id: 1, text: "Oil price rising." },
+		{ author_id: 1, text: "Is communism dead yet?" },
+		{ author_id: 2, text: "Latest COVID news." },
+		{ author_id: 1, text: "Good news from China." },
+		{ author_id: 2, text: "COVID vs Flu?" },
+		{ author_id: 2, text: "This is draft...", is_draft: true },
+	])
 
-test("filters", async () => {
 	assert.deepEqual(
 		await client.request(
 			gql`
@@ -264,7 +256,21 @@ test("filters", async () => {
 			`
 		),
 		{ posts: [{ text: "Latest COVID news." }, { text: "COVID vs Flu?" }] },
-		"filter by text__like"
+		"filter operator like"
+	)
+
+	assert.deepEqual(
+		await client.request(
+			gql`
+				{
+					posts(filter: { text__contains: "%COVID%" }) {
+						text
+					}
+				}
+			`
+		),
+		{ posts: [{ text: "Latest COVID news." }, { text: "COVID vs Flu?" }] },
+		"filter operator contains"
 	)
 
 	assert.deepEqual(
@@ -387,7 +393,7 @@ test("allowAllFilters", async () => {
 		{
 			users: [{ id: 2 }],
 		},
-		"model-level allowAllFilters"
+		"table-level allowAllFilters"
 	)
 
 	assert.deepEqual(

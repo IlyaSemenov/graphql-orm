@@ -1,12 +1,11 @@
-import { Model, QueryBuilder, raw } from "objection"
+import { Query } from "pqb"
 
-import { field_ref } from "../utils/field-ref"
-import { Paginator } from "./base"
+import { Paginator, set_query_page_result } from "./base"
 
-export function create_cursor_paginator<M extends Model>(
+export function defineCursorPaginator(
 	options: Partial<CursorPaginatorOptions> = {}
 ) {
-	return new CursorPaginator<M>(options)
+	return new CursorPaginator(options)
 }
 
 export interface CursorPaginatorOptions {
@@ -24,10 +23,7 @@ export interface CursorPaginatorPage<M> {
 	cursor?: string
 }
 
-class CursorPaginator<M extends Model> extends Paginator<
-	M,
-	CursorPaginatorPage<M>
-> {
+class CursorPaginator implements Paginator {
 	readonly path = ["nodes"]
 	readonly options: CursorPaginatorOptions
 
@@ -37,7 +33,6 @@ class CursorPaginator<M extends Model> extends Paginator<
 	}>
 
 	constructor(options: Partial<CursorPaginatorOptions> = {}) {
-		super()
 		this.options = {
 			fields: ["id"],
 			take: 10,
@@ -52,27 +47,26 @@ class CursorPaginator<M extends Model> extends Paginator<
 		})
 	}
 
-	paginate(query: QueryBuilder<M, M[]>, args: CursorPaginatorArgs = {}) {
+	paginate(query: Query, args: CursorPaginatorArgs = {}) {
 		const take = args.take ?? this.options.take
 		const { cursor } = args
+		console.log("paginating query", query)
 
 		// Set query order
-		query.clearOrder()
+		query = query.clear("order")
 		for (const field of this.fields) {
-			const f = field_ref(query, field.name)
 			// TODO: prevent potential name clash with aliases like .as(`_${table_ref}_order_key_0`)
-			query.select(f).orderBy(f, field.desc ? "desc" : "asc")
+			query = query
+				.select(field.name)
+				.order({ [field.name]: field.desc ? "DESC" : "ASC" })
 		}
 
 		if (cursor) {
-			this._set_query_cursor(query, cursor)
+			query = this._set_query_cursor(query, cursor)
 		}
-		query.limit(take + 1)
+		query = query.limit(take + 1)
 
-		query.runAfter((nodes) => {
-			if (!Array.isArray(nodes)) {
-				throw new Error(`Paginator called for single result query.`)
-			}
+		query = set_query_page_result(query, (nodes) => {
 			let cursor: string | undefined
 			if (nodes.length > take) {
 				cursor = this._create_cursor(nodes[take - 1])
@@ -80,7 +74,8 @@ class CursorPaginator<M extends Model> extends Paginator<
 			}
 			return { nodes, cursor }
 		})
-		return query as unknown as QueryBuilder<M, CursorPaginatorPage<M>>
+
+		return query
 	}
 
 	_create_cursor(instance: any) {
@@ -97,28 +92,23 @@ class CursorPaginator<M extends Model> extends Paginator<
 		)
 	}
 
-	_set_query_cursor(query: QueryBuilder<M, M[]>, cursor: string) {
+	_set_query_cursor(query: Query, cursor: string) {
 		const values = JSON.parse(cursor)
-		type P = [string, any]
-		const left: P[] = []
-		const right: P[] = []
+		const left: string[] = []
+		const right: string[] = []
+		const expr_values: Record<string, any> = {}
 		// TODO: refactor
 		for (let i = 0; i < this.fields.length; ++i) {
 			const field = this.fields[i]
-			const field_part = field.desc ? right : left
-			const value_part = field.desc ? left : right
-			field_part.push(["??", field.name])
-			value_part.push(["?", values[i]])
+			const expressions = field.desc ? right : left
+			const placeholders = field.desc ? left : right
+			expressions.push(`"${field.name}"`)
+			const placeholder = `value${i}`
+			placeholders.push("$" + placeholder)
+			expr_values[placeholder] = values[i]
 		}
-		const get_placeholders = (pairs: P[]) => pairs.map(([p]) => p)
-		const get_values = (pairs: P[]) => pairs.map(([, v]) => v)
-		const cond = raw(
-			`(${get_placeholders(left).join(",")}) > (${get_placeholders(right).join(
-				","
-			)})`,
-			...get_values(left),
-			...get_values(right)
+		return query.where(
+			query.raw(`(${left.join(",")}) > (${right.join(",")})`, expr_values)
 		)
-		query.where(cond)
 	}
 }

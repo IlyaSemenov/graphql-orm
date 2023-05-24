@@ -1,16 +1,28 @@
 import gql from "graphql-tag"
-import { Model } from "objection"
-import * as r from "objection-graphql-resolver"
+import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import { BaseTable, create_client, create_db, Resolvers } from "../setup"
 
-class UserModel extends Model {
-	static tableName = "user"
+class UserTable extends BaseTable {
+	readonly table = "user"
 
-	id?: number
-	name?: string
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		name: t.string(1, 100),
+	}))
 }
+
+const db = await create_db({
+	user: UserTable,
+})
+
+await db.$adapter.query(`
+	create table "user" (
+		id serial primary key,
+		name varchar(100) not null
+	);
+`)
 
 const schema = gql`
 	type User {
@@ -25,29 +37,24 @@ const schema = gql`
 `
 
 const graph = r.graph({
-	User: r.model(UserModel),
+	User: r.table(db.user),
 })
 
 const resolvers: Resolvers = {
 	Query: {
-		user(_parent, { id }, ctx, info) {
-			return graph.resolve(ctx, info, UserModel.query().findById(id))
+		async user(_parent, { id }, context, info) {
+			return await graph.resolve(db.user.findOptional(id), { context, info })
 		},
-		users(_parent, _args, ctx, info) {
-			return graph.resolve(ctx, info, UserModel.query())
+		async users(_parent, _args, context, info) {
+			return await graph.resolve(db.user, { context, info })
 		},
 	},
 }
 
-const { client, knex } = await setup({ typeDefs: schema, resolvers })
+const client = await create_client({ typeDefs: schema, resolvers })
 
 test("access fields", async () => {
-	await knex.schema.createTable("user", function (table) {
-		table.increments("id").notNullable().primary()
-		table.string("name").notNullable()
-	})
-
-	await UserModel.query().insertGraph([
+	await db.user.createMany([
 		{ name: "Alice" },
 		{ name: "Bob" },
 		{ name: "Charlie" },

@@ -1,10 +1,24 @@
-export { create_cursor_paginator as cursor } from "./paginators/cursor"
-export { create_field_resolver as field } from "./resolvers/field"
-export { create_graph_resolver as graph } from "./resolvers/graph"
-export { ResolverContext } from "./resolvers/graph"
-export { create_model_resolver as model } from "./resolvers/model"
-export { create_page_resolver as page } from "./resolvers/page"
-export { create_relation_resolver as relation } from "./resolvers/relation"
-
-// Legacy API
-export * from "./v5-api"
+export {
+	defineCursorPaginator as cursor,
+	defineCursorPaginator,
+} from "./paginators/cursor"
+export {
+	defineFieldResolver,
+	defineFieldResolver as field,
+} from "./resolvers/field"
+export {
+	createGraphResolver,
+	createGraphResolver as graph,
+} from "./resolvers/graph"
+export {
+	definePageResolver,
+	definePageResolver as page,
+} from "./resolvers/page"
+export {
+	defineRelationResolver,
+	defineRelationResolver as relation,
+} from "./resolvers/relation"
+export {
+	defineTableResolver,
+	defineTableResolver as table,
+} from "./resolvers/table"

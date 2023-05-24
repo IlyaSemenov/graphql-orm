@@ -1,23 +1,42 @@
 // Everything is put into a single file for demonstration purposes.
 //
-// In real projects, you will want to separate models, typedefs,
-// model resolvers, and the server into their own modules.
+// In real projects, you will want to separate tables, typedefs,
+// resolvers, and the server into their own modules.
 
 import { ApolloServer, ApolloServerOptions } from "@apollo/server"
 import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
-import Knex from "knex"
-import { Model } from "objection"
-import * as r from "objection-graphql-resolver"
+import * as r from "orchid-graphql"
+import { createBaseTable, orchidORM } from "orchid-orm"
 
-// Define Objection.js models
+// Define database tables
 
-class PostModel extends Model {
-	static tableName = "post"
+const BaseTable = createBaseTable()
 
-	id?: number
-	text?: string
+class PostTable extends BaseTable {
+	readonly table = "post"
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		text: t.text(0, 5000),
+	}))
 }
+
+const db = orchidORM(
+	{
+		databaseURL: process.env.DATABASE_URL,
+		log: true,
+	},
+	{
+		post: PostTable,
+	}
+)
+
+await db.$adapter.query(`
+	create table post (
+		id serial primary key,
+		text text not null
+	);
+`)
 
 // Define GraphQL schema
 
@@ -36,37 +55,27 @@ const typeDefs = gql`
 	}
 `
 
-// Map GraphQL types to model resolvers
+// Map GraphQL types to table resolvers
 
 const graph = r.graph({
-	Post: r.model(PostModel),
+	Post: r.table(db.post),
 })
 
 // Define resolvers
 
 const resolvers: ApolloServerOptions<any>["resolvers"] = {
 	Mutation: {
-		async create_post(_parent, args, ctx, info) {
-			const post = await PostModel.query().insert(args)
-			return graph.resolve(ctx, info, post.$query())
+		async create_post(_parent, args, context, info) {
+			const post = await db.post.create(args)
+			return await graph.resolve(db.post.find(post.id), { context, info })
 		},
 	},
 	Query: {
-		posts(_parent, _args, ctx, info) {
-			return graph.resolve(ctx, info, PostModel.query().orderBy("id"))
+		async posts(_parent, _args, context, info) {
+			return await graph.resolve(db.post, { context, info })
 		},
 	},
 }
-
-// Configure database backend
-
-const knex = Knex({ client: "sqlite3", connection: ":memory:" })
-Model.knex(knex)
-
-await knex.schema.createTable("post", (post) => {
-	post.increments("id")
-	post.text("text").notNullable()
-})
 
 // Start GraphQL server
 

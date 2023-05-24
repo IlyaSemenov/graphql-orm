@@ -1,16 +1,28 @@
 import gql from "graphql-tag"
-import { Model } from "objection"
-import * as r from "objection-graphql-resolver"
+import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import { BaseTable, create_client, create_db, Resolvers } from "../setup"
 
-class UserModel extends Model {
-	static tableName = "user"
+class UserTable extends BaseTable {
+	readonly table = "user"
 
-	id?: number
-	name?: string
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		name: t.string(1, 100),
+	}))
 }
+
+const db = await create_db({
+	user: UserTable,
+})
+
+await db.$adapter.query(`
+	create table "user" (
+		id serial primary key,
+		name varchar(100) not null
+	);
+`)
 
 const schema = gql`
 	type User {
@@ -30,39 +42,35 @@ const schema = gql`
 `
 
 const graph = r.graph({
-	User: r.model(UserModel),
+	User: r.table(db.user),
 })
 
 const resolvers: Resolvers = {
 	Query: {
-		users(_parent, _args, ctx, info) {
-			return graph.resolvePage(
-				ctx,
-				info,
-				UserModel.query(),
-				r.cursor({ fields: ["name", "-id"], take: 2 })
+		async users(_parent, _args, context, info) {
+			return await graph.resolvePage(
+				db.user,
+				r.cursor({ fields: ["name", "-id"], take: 2 }),
+				{
+					context,
+					info,
+				}
 			)
 		},
-		reverse_users(_parent, _args, ctx, info) {
-			return graph.resolvePage(
-				ctx,
-				info,
-				UserModel.query(),
-				r.cursor({ fields: ["-name", "-id"], take: 2 })
+		async reverse_users(_parent, _args, context, info) {
+			return await graph.resolvePage(
+				db.user,
+				r.cursor({ fields: ["-name", "-id"], take: 2 }),
+				{ context, info }
 			)
 		},
 	},
 }
 
-const { client, knex } = await setup({ typeDefs: schema, resolvers })
+const client = await create_client({ typeDefs: schema, resolvers })
 
 test("root pagination", async () => {
-	await knex.schema.createTable("user", function (table) {
-		table.increments("id").notNullable().primary()
-		table.string("name").notNullable()
-	})
-
-	await UserModel.query().insertGraph([
+	await db.user.createMany([
 		{ name: "Alice" },
 		{ name: "Charlie" },
 		{ name: "Bob" },

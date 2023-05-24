@@ -50,34 +50,42 @@ type Query {
 ```
 
 ```ts
-class PostModel extends Model {
-  static tableName = "posts"
-  static get relationMappings() {
-    return {
-      author: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: UserModel,
-        join: { from: "posts.author_id", to: "users.id" },
-      },
-    }
+class UserTable extends BaseTable {
+  readonly table = "user"
+
+  columns = this.setColumns((t) => ({
+    id: t.identity().primaryKey(),
+    name: t.string(1, 100),
+  }))
+
+  relations = {
+    posts: this.hasMany(() => PostTable, {
+      primaryKey: "id",
+      foreignKey: "author_id",
+    }),
   }
 }
 
-class UserModel extends Model {
-  static tableName = "users"
-  static get relationMappings() {
-    return {
-      posts: {
-        relation: Model.HasManyRelation,
-        modelClass: PostModel,
-        join: { from: "posts.author_id", to: "users.id" },
-      },
-    }
+class PostTable extends BaseTable {
+  readonly table = "post"
+
+  columns = this.setColumns((t) => ({
+    id: t.identity().primaryKey(),
+    text: t.text(1, 10000),
+    author_id: t.integer(),
+  }))
+
+  relations = {
+    author: this.belongsTo(() => UserTable, {
+      required: true,
+      primaryKey: "id",
+      foreignKey: "author_id",
+    }),
   }
 }
 
 const graph = r.graph({
-  User: r.model(UserModel, {
+  User: r.type(db.user, {
     fields: {
       id: true,
       name: true,
@@ -86,23 +94,22 @@ const graph = r.graph({
       posts: r.page(r.cursor({ fields: ["-id"], take: 10 })),
       // Should you want this, it's still possible to pull all posts (non-paginated)
       // under a different GraphQL field
-      all_posts: r.relation({ modelField: "posts" }),
+      all_posts: r.relation({ tableField: "posts" }),
     },
   }),
-  Post: r.model(PostModel),
+  Post: r.type(db.post),
 })
 
 const resolvers = {
   Query: {
-    user: (parent, args, ctx, info) => {
-      return graph.resolve(ctx, info, User.query().findById(args.id))
+    user: async (parent, args, context, info) => {
+      return await graph.resolve(db.user.find(args.id), { context, info })
     },
-    posts: (parent, args, ctx, info) => {
-      return graph.resolvePage(
-        ctx,
-        info,
-        Post.query(),
-        r.cursor({ fields: ["-id"], take: 10 })
+    posts: async (parent, args, context, info) => {
+      return await graph.resolvePage(
+        db.post,
+        r.cursor({ fields: ["-id"], take: 10 }),
+        { context, info }
       )
     },
   },

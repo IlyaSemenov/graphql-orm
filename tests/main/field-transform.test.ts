@@ -1,17 +1,30 @@
 import gql from "graphql-tag"
-import { Model } from "objection"
-import * as r from "objection-graphql-resolver"
+import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import { BaseTable, create_client, create_db, Resolvers } from "../setup"
 
-class UserModel extends Model {
-	static tableName = "user"
+class UserTable extends BaseTable {
+	readonly table = "user"
 
-	id?: number
-	name?: string
-	password?: string
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		name: t.string(1, 100),
+		password: t.string(1, 32),
+	}))
 }
+
+const db = await create_db({
+	user: UserTable,
+})
+
+await db.$adapter.query(`
+	create table "user" (
+		id serial primary key,
+		name varchar(100) not null,
+		password varchar(32) not null
+	);
+`)
 
 const schema = gql`
 	type User {
@@ -27,7 +40,7 @@ const schema = gql`
 `
 
 const graph = r.graph({
-	User: r.model(UserModel, {
+	User: r.table(db.user, {
 		fields: {
 			id: true,
 			name: true,
@@ -46,22 +59,16 @@ const graph = r.graph({
 
 const resolvers: Resolvers = {
 	Query: {
-		user(_parent, { id }, ctx, info) {
-			return graph.resolve(ctx, info, UserModel.query().findById(id))
+		async user(_parent, { id }, context, info) {
+			return await graph.resolve(db.user.findOptional(id), { context, info })
 		},
 	},
 }
 
-const { client, knex } = await setup({ typeDefs: schema, resolvers })
+const client = await create_client({ typeDefs: schema, resolvers })
 
 test("field transform", async () => {
-	await knex.schema.createTable("user", function (table) {
-		table.increments("id").notNullable().primary()
-		table.string("name").notNullable()
-		table.string("password").notNullable()
-	})
-
-	await UserModel.query().insert({ name: "Alice", password: "secret" })
+	await db.user.create({ name: "Alice", password: "secret" })
 
 	assert.deepEqual(
 		await client.request(

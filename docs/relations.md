@@ -1,6 +1,6 @@
 # Relations
 
-Relations will be fetched automatically using `withGraphFetched()` when resolving nested fields.
+Relations will be fetched automatically using orchid-orm subqueries when resolving nested fields.
 
 Example:
 
@@ -45,34 +45,34 @@ query user_with_posts {
 
 ```ts
 const graph = r.graph({
-  User: r.model(UserModel, {
+  User: r.type(db.user, {
     fields: {
       id: true,
       name: true,
-      // Use withGraphFetched("posts")
-      // and process subquery with Post model resolver defined below.
+      // Fetch posts with ORM subquery.
+      // Use Post table resolver defined below.
       //
       // See r.relation() API for advanced options.
       posts: true,
     },
   }),
   // No resolver options = access to all fields (including relations)
-  Post: r.model(PostModel),
+  Post: r.type(db.post),
 })
 
 const resolvers = {
   Query: {
-    user: (parent, args, ctx, info) => {
-      return graph.resolve(ctx, info, User.query().findById(args.id))
+    user: async (parent, args, context, info) => {
+      return await graph.resolve(db.user.find(args.id), { context, info })
     },
-    posts: (parent, args, ctx, info) => {
-      return graph.resolve(ctx, info, Post.query())
+    posts: (parent, args, context, info) => {
+      return graph.resolve(db.post, { context, info })
     },
   },
 }
 ```
 
-Internally, this traverses `Model.relationMappings` and can handle unlimited nesting levels. Using the graph above, one could run a request like:
+Internally, this traverses `table.relations` and can handle unlimited nesting levels. Using the graph above, one could run a request like:
 
 ```gql
 query deep_nesting {
@@ -91,3 +91,5 @@ query deep_nesting {
   }
 }
 ```
+
+_\* Not currently true due to orchid-orm bug: https://github.com/romeerez/orchid-orm/issues/89_

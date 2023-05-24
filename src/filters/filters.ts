@@ -1,6 +1,7 @@
-import { AnyQueryBuilder } from "objection"
+import { Query } from "pqb"
 
 import { is_plain_object } from "../utils/is-plain-object"
+import { Modifier } from "../utils/modifier"
 
 // TODO: per-field definitions
 export type FiltersDef = boolean
@@ -22,60 +23,71 @@ export function apply_filters({
 	query,
 	filters,
 	args,
+	modifiers,
 }: {
-	query: AnyQueryBuilder
+	query: Query
 	filters: FiltersDef
 	args?: Record<string, any>
+	modifiers?: Record<string, Modifier>
 }) {
 	if (!filters) {
-		return
+		return query
 	}
 	const filter_obj = args?.filter
 	if (!filter_obj) {
-		return
+		return query
 	}
 	if (!is_plain_object(filter_obj)) {
 		throw new Error(`Invalid filter: ${filter_obj}, must be object.`)
 	}
-	const ThisModel = query.modelClass()
-	const table_name = ThisModel.tableName
 	for (const [field, value] of Object.entries(filter_obj)) {
 		if (value === undefined) {
 			// Support optional GraphQL arguments in filter
 			continue
 		}
-		if (ThisModel.modifiers?.[field]) {
-			// Call modifier
-			query.modify(field, value)
+		if (modifiers?.[field]) {
+			query = modifiers[field](query, value)
 		} else {
 			// Normal filter
 			const [dbfield, op0] = field.split("__")
 			const op = op0?.toLowerCase() || "exact"
-			if (["exact", "lt", "lte", "gt", "gte", "like", "ilike"].includes(op)) {
+			if (
+				// TODO: add the rest of orchid ops (or allow all of them?)
+				[
+					"exact",
+					"lt",
+					"lte",
+					"gt",
+					"gte",
+					"like",
+					"ilike",
+					"contains",
+				].includes(op)
+			) {
 				if (!is_scalar(value)) {
 					throw new Error(
-						`Unsupported filter value for ${table_name}.${field}: must be scalar.`
+						`Unsupported filter value for ${query.table}.${field}: must be scalar.`
 					)
 				}
-				if (op === "exact" && value === null) {
-					query.whereNull(dbfield)
+				if (op === "exact") {
+					query = query.where({ [dbfield]: value })
 				} else {
-					const objection_op =
-						{ exact: "=", lt: "<", lte: "<=", gt: ">", gte: ">=" }[op] || op
-					query.where(dbfield, objection_op, value)
+					const query_op = { like: "contains" }[op] || op
+					query = query.where({ [dbfield]: { [query_op]: value } })
 				}
 			} else if (op === "in") {
 				if (!(Array.isArray(value) && value.every(is_scalar))) {
 					throw new Error(
-						`Invalid filter value for ${table_name}.${field}: must be an array of scalars.`
+						`Invalid filter value for ${query.table}.${field}: must be an array of scalars.`
 					)
 				}
-				query.whereIn(dbfield, value)
+				query = query.whereIn(dbfield, value)
 			} else {
 				throw new Error(
-					`Invalid filter ${table_name}.${field}: unsupported operator ${op}.`
+					`Invalid filter ${query.table}.${field}: unsupported operator ${op}.`
 				)
 			}
 		}
 	}
+	return query
 }

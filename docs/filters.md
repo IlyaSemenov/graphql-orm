@@ -31,26 +31,26 @@ Filters can be enabled for individual relations:
 
 ```ts
 const graph = r.graph({
-  User: r.model(UserModel, {
+  User: r.type(db.user, {
     fields: {
       id: true,
       name: true,
       posts: r.relation({ filters: true }),
     },
   }),
-  Post: r.model(PostModel),
+  Post: r.type(db.post),
 })
 ```
 
-or on model level:
+or on table level:
 
 ```ts
 const graph = r.graph({
-  User: r.model(UserModel, {
+  User: r.type(db.user, {
     // enable filters on all user relations
     allowAllFilters: true,
   }),
-  Post: r.model(PostModel),
+  Post: r.type(db.post),
 })
 ```
 
@@ -59,8 +59,8 @@ or on graph level:
 ```ts
 const graph = r.graph(
   {
-    User: r.model(UserModel),
-    Post: r.model(PostModel),
+    User: r.type(db.user),
+    Post: r.type(db.post),
   },
   {
     // enable filters on all relations
@@ -71,15 +71,13 @@ const graph = r.graph(
 
 ## Filters on root query
 
-To filter root query (if not enabled for model or graph), use:
+To filter root query (if not enabled for table or graph), use:
 
 ```ts
 const resolvers = {
   Query: {
-    posts: async (parent, args, ctx, info) => {
-      return graph.resolve(ctx, info, Post.query(), {
-        filters: true,
-      })
+    posts: async (parent, args, context, info) => {
+      return graph.resolve(db.post, { context, info, filters: true })
     },
   },
 }
@@ -101,17 +99,19 @@ Supported operators:
 - `like`, `ilike`
 - `in` (expects an array of scalars)
 
-## Filtering with model modifiers
+## Filtering with table modifiers
 
-Define modifiers on a model class:
+Define modifiers in a table resolver:
 
 ```ts
-class PostModel extends Model {
-  static modifiers = {
-    public: (query) => query.whereNull("delete_time"),
-    search: (query, term) => query.where("text", "ilike", `%${term}%`),
-  }
-}
+const graph = r.graph({
+  Post: r.table(db.post, {
+    modifiers: {
+      public: (q) => q.where({ delete_time: null }),
+      search: (q, term: string) => q.where({ text: { contains: `%${term}%` } }),
+    },
+  }),
+})
 ```
 
 Then you can filter results with:
@@ -125,4 +125,4 @@ query get_all_posts {
 }
 ```
 
-Modifier filters take precedence over database field filters.
+Table filters take precedence over database field filters.
