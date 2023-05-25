@@ -21,6 +21,10 @@ class UserTable extends BaseTable {
 			primaryKey: "id",
 			foreignKey: "user_id",
 		}),
+		likes: this.hasMany(() => LikeTable, {
+			primaryKey: "id",
+			foreignKey: "user_id",
+		}),
 	}
 }
 
@@ -62,9 +66,35 @@ class CommentTable extends BaseTable {
 			primaryKey: "id",
 			foreignKey: "user_id",
 		}),
-		posts: this.belongsTo(() => PostTable, {
+		post: this.belongsTo(() => PostTable, {
 			primaryKey: "id",
 			foreignKey: "post_id",
+		}),
+		likes: this.hasMany(() => LikeTable, {
+			primaryKey: "id",
+			foreignKey: "comment_id",
+		}),
+	}
+}
+
+class LikeTable extends BaseTable {
+	readonly table = "like"
+
+	columns = this.setColumns((t) => ({
+		id: t.identity().primaryKey(),
+		user_id: t.integer(),
+		comment_id: t.integer(),
+	}))
+
+	relations = {
+		user: this.belongsTo(() => UserTable, {
+			required: true,
+			primaryKey: "id",
+			foreignKey: "user_id",
+		}),
+		comment: this.belongsTo(() => CommentTable, {
+			primaryKey: "id",
+			foreignKey: "comment_id",
 		}),
 	}
 }
@@ -73,6 +103,7 @@ const db = await create_db({
 	user: UserTable,
 	post: PostTable,
 	comment: CommentTable,
+	like: LikeTable,
 })
 
 await db.$adapter.query(`
@@ -91,6 +122,11 @@ await db.$adapter.query(`
 		user_id integer not null,
 		post_id integer not null
 	);
+	create table "like" (
+		id serial primary key,
+		user_id integer not null,
+		comment_id integer not null
+	);
 `)
 
 const schema = gql`
@@ -101,6 +137,7 @@ const schema = gql`
 		posts_by_one(cursor: String, take: Int): PostPage!
 		all_posts: [Post!]!
 		all_posts_verbose: [Post!]!
+		comments_page(cursor: String, take: Int): CommentPage!
 	}
 
 	type Post {
@@ -120,10 +157,21 @@ const schema = gql`
 		id: Int!
 		text: String!
 		user: User!
+		likes_page(cursor: String, take: Int): LikePage!
 	}
 
 	type CommentPage {
 		nodes: [Comment!]!
+		cursor: ID
+	}
+
+	type Like {
+		id: Int!
+		user: User!
+	}
+
+	type LikePage {
+		nodes: [Like!]!
 		cursor: ID
 	}
 
@@ -144,6 +192,9 @@ const graph = r.graph(
 				}),
 				all_posts: "posts",
 				all_posts_verbose: r.relation({ tableField: "posts" }),
+				comments_page: r.page(r.cursor({ take: 2 }), {
+					tableField: "comments",
+				}),
 			},
 		}),
 		Post: r.table(db.post, {
@@ -153,7 +204,14 @@ const graph = r.graph(
 				}),
 			},
 		}),
-		Comment: r.table(db.comment),
+		Comment: r.table(db.comment, {
+			fields: {
+				likes_page: r.page(r.cursor({ take: 2 }), {
+					tableField: "likes",
+				}),
+			},
+		}),
+		Like: r.table(db.like),
 	},
 	{ allowAllFields: true }
 )
@@ -196,6 +254,8 @@ await db.comment.createMany([
 	{ post_id: 6, user_id: 3, text: "Who cares in 2023?" },
 ])
 
+await db.like.create({ comment_id: 1, user_id: 2 })
+
 test("relation pagination", async () => {
 	expect(
 		await client.request(
@@ -233,7 +293,7 @@ test("relation pagination", async () => {
 	`)
 })
 
-test.todo("nested pagination", async () => {
+test("double nested pagination", async () => {
 	expect(
 		await client.request(
 			gql`
@@ -259,29 +319,81 @@ test.todo("nested pagination", async () => {
 				}
 			`
 		)
-	).toMatchInlineSnapshot()
+	).toMatchInlineSnapshot(`
+		{
+		  "user": {
+		    "name": "Alice",
+		    "posts_page": {
+		      "cursor": "[\\"2\\"]",
+		      "nodes": [
+		        {
+		          "author": {
+		            "name": "Alice",
+		          },
+		          "comments_page": {
+		            "cursor": "[\\"2\\"]",
+		            "nodes": [
+		              {
+		                "text": "I am so good.",
+		              },
+		              {
+		                "text": "Boring.",
+		              },
+		            ],
+		          },
+		          "text": "Oil price rising.",
+		        },
+		        {
+		          "author": {
+		            "name": "Alice",
+		          },
+		          "comments_page": {
+		            "cursor": null,
+		            "nodes": [],
+		          },
+		          "text": "Is communism dead yet?",
+		        },
+		      ],
+		    },
+		  },
+		}
+	`)
 })
 
-test.todo("double nested pagination", async () => {
+test("double and triple nested pagination", async () => {
 	expect(
 		await client.request(
 			gql`
 				{
-					user(id: 2) {
+					user(id: 1) {
 						name
+						comments_page {
+							nodes {
+								text
+								likes_page {
+									nodes {
+										id
+									}
+								}
+							}
+							cursor
+						}
 						posts_page {
 							nodes {
 								text
 								author {
 									name
-									posts {
-										nodes {
-											text
-											author {
-												name
+								}
+								comments_page {
+									nodes {
+										text
+										likes_page {
+											nodes {
+												id
 											}
 										}
 									}
+									cursor
 								}
 							}
 							cursor
@@ -290,5 +402,68 @@ test.todo("double nested pagination", async () => {
 				}
 			`
 		)
-	).toMatchInlineSnapshot()
+	).toMatchInlineSnapshot(`
+		{
+		  "user": {
+		    "comments_page": {
+		      "cursor": null,
+		      "nodes": [
+		        {
+		          "likes_page": {
+		            "nodes": [
+		              {
+		                "id": 1,
+		              },
+		            ],
+		          },
+		          "text": "I am so good.",
+		        },
+		      ],
+		    },
+		    "name": "Alice",
+		    "posts_page": {
+		      "cursor": "[\\"2\\"]",
+		      "nodes": [
+		        {
+		          "author": {
+		            "name": "Alice",
+		          },
+		          "comments_page": {
+		            "cursor": "[\\"2\\"]",
+		            "nodes": [
+		              {
+		                "likes_page": {
+		                  "nodes": [
+		                    {
+		                      "id": 1,
+		                    },
+		                  ],
+		                },
+		                "text": "I am so good.",
+		              },
+		              {
+		                "likes_page": {
+		                  "nodes": [],
+		                },
+		                "text": "Boring.",
+		              },
+		            ],
+		          },
+		          "text": "Oil price rising.",
+		        },
+		        {
+		          "author": {
+		            "name": "Alice",
+		          },
+		          "comments_page": {
+		            "cursor": null,
+		            "nodes": [],
+		          },
+		          "text": "Is communism dead yet?",
+		        },
+		      ],
+		    },
+		  },
+		}
+	`)
 })

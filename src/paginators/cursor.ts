@@ -50,7 +50,6 @@ class CursorPaginator implements Paginator {
 	paginate(query: Query, args: CursorPaginatorArgs = {}) {
 		const take = args.take ?? this.options.take
 		const { cursor } = args
-		console.log("paginating query", query)
 
 		// Set query order
 		query = query.clear("order")

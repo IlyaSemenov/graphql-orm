@@ -20,14 +20,17 @@ export function set_query_page_result<P>(query: Query, get_page: GetPageFn<P>) {
 	}
 
 	// For root query
-	const { handleResult } = query.query as any
-	;(query.query as any).handleResult = (...args: any[]) => {
-		const data = handleResult(...args)
-		return _get_page(data)
+	const _query = query.query
+	const { handleResult } = _query
+	_query.handleResult = (q, result, s) => {
+		const data = handleResult(q, result, s)
+		// Sometimes this is called for subqueries, sometimes not.
+		// TODO: investigate and use always.
+		return s ? data : _get_page(data)
 	}
 
-	// For nested query
-	;(query.query as any)[s] = _get_page
+	// For subqueries
+	;(_query as any)[s] = _get_page
 
 	return query
 }
