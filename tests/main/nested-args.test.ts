@@ -90,7 +90,7 @@ const graph = r.graph({
 			id: true,
 			title: true,
 			authors: r.relation({
-				modify(authors, { args }) {
+				modify(authors, { tree: { args } }) {
 					authors = authors.order("name")
 					if (typeof args.country === "string" || args.country === null) {
 						authors = authors.where({ country: args.country })

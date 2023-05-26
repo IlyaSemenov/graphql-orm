@@ -1,24 +1,24 @@
-import { ResolveTree } from "graphql-parse-resolve-info"
 import { DbTable, TableClass } from "orchid-orm"
 import { Query } from "pqb"
 
-import { apply_filters, FiltersDef } from "../filters/filters"
+import { apply_filters } from "../filters/filters"
 import { Modifier } from "../utils/modifier"
-import { get_query_context } from "../utils/query-context"
 import { run_after_query } from "../utils/run-after"
 import { defineFieldResolver, FieldResolverFn } from "./field"
-import type { GraphResolver } from "./graph"
+import type { GraphResolveContext, GraphResolver } from "./graph"
 import { defineRelationResolver } from "./relation"
 
-/** A function that modifies the query to select fields/relations and filter the result set. */
-export type TableResolverFn = (args: {
-	tree: ResolveTree
+export interface TableResolveContext extends GraphResolveContext {
+	graph: GraphResolver
 	/** GraphQL type */
 	type: string
-	query: Query
-	filters?: FiltersDef
-	graph: GraphResolver
-}) => Query
+}
+
+/** A function that modifies the query to select fields/relations and filter the result set. */
+export type TableResolverFn = (
+	query: Query,
+	context: TableResolveContext
+) => Query
 
 export interface TableResolverOptions {
 	/** allow to resolve all table fields without explicitly listing them */
@@ -27,13 +27,11 @@ export interface TableResolverOptions {
 	allowAllFilters?: boolean
 	fields?: Record<string, SimpleFieldResolver>
 	modifiers?: Record<string, Modifier>
-	modify?: QueryTreeModifier
+	modify?: TableResolverFn
 	transform?(instance: any, context: any): void | PromiseLike<void>
 }
 
 export type SimpleFieldResolver = true | string | FieldResolverFn
-
-export type QueryTreeModifier = (query: Query, tree: ResolveTree) => Query
 
 export function defineTableResolver<T extends TableClass>(
 	table: DbTable<T>,
@@ -85,7 +83,9 @@ export function defineTableResolver<T extends TableClass>(
 
 	const { modify, transform } = options
 
-	return function resolve({ tree, type, query, filters, graph }) {
+	return function resolve(query, context) {
+		const { graph, tree, type, filters } = context
+
 		if (query.table !== table.table) {
 			throw new Error(
 				`Mismatching query type (expected ${table.table}, found ${query.table}).`
@@ -104,19 +104,19 @@ export function defineTableResolver<T extends TableClass>(
 		}
 
 		if (modify) {
-			query = modify(query, tree)
+			query = modify(query, context)
 		}
 
 		for (const subtree of Object.values(tree.fieldsByTypeName[type])) {
 			const field = subtree.name
-			const r =
+			const r: FieldResolverFn | undefined =
 				table_field_resolvers?.[field] ||
 				(allow_all_fields ? get_default_field_resolver(field) : undefined)
 			if (!r) {
 				throw new Error(`No field resolver defined for field ${type}.${field}`)
 			}
 			if (r) {
-				query = r(query, { field, tree: subtree, graph })
+				query = r(query, { ...context, tree: subtree, field })
 			}
 		}
 
@@ -135,7 +135,6 @@ export function defineTableResolver<T extends TableClass>(
 		}
 
 		if (transform) {
-			const context = get_query_context(query)
 			query = run_after_query(query, (instance) => {
 				return transform(instance, context)
 			})

@@ -8,23 +8,23 @@ export function definePageResolver(
 	paginator: Paginator,
 	options: RelationResolverOptions = {}
 ) {
-	const { tableField, filters, modify } = options
+	const { tableField, modify } = options
 
 	return defineFieldResolver({
-		modify: (query, { field, tree, graph }) => {
+		modify(query, context) {
+			const { field, graph } = context
 			// FIXME: refactor, add types
 			let get_page: any
 			query = query.select({
 				[field]: (q) => {
-					q = graph._resolve_page({
-						tree,
-						query: (q as any)[tableField || field],
+					q = graph._resolve_page(
+						(q as any)[tableField || field],
 						paginator,
-						filters,
-					})
+						context
+					)
 					// Calling addParserToQuery here doesn't work, save the paginator for later.
 					get_page = get_query_pagination_handler(q)
-					return modify ? modify(q, tree) : q
+					return modify ? modify(q, context) : q
 				},
 			})
 			overrideParserInQuery(query.query, field, get_page)

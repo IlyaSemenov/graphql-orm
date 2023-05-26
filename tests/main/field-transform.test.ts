@@ -45,7 +45,7 @@ const graph = r.graph({
 			id: true,
 			name: true,
 			password: r.field({
-				transform(password, user, context) {
+				transform(password, user, { context }) {
 					if (context.user_id && context.user_id === user.id) {
 						return password
 					} else {

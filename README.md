@@ -307,7 +307,7 @@ const graph = r.graph(
               preview,
               // Current instance
               post,
-              // Query context
+              // Field resolve context: graph, tree, type, field, filters, context
               context
             ) {
               if (preview.length < 100) {
@@ -351,7 +351,12 @@ const graph = r.graph(
           ),
         },
         // Modify all queries to this table
-        modify: (q, { args }) => q.where(args).order({ id: "DESC" }),
+        modify: (
+          // ORM (sub)query
+          query,
+          // Table resolve context: graph, tree, type, filters, context
+          context
+        ) => query.where(context.tree.args).order({ id: "DESC" }),
         // Allow all fields (`fields` will be used for overrides)
         allowAllFields: true,
         // Allow filters in all relations
