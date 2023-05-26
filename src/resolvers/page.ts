@@ -1,4 +1,4 @@
-import { addParserToQuery } from "pqb"
+import { overrideParserInQuery } from "orchid-core"
 
 import { get_query_pagination_handler, Paginator } from "../paginators/base"
 import { defineFieldResolver } from "./field"
@@ -27,11 +27,7 @@ export function definePageResolver(
 					return modify ? modify(q, tree) : q
 				},
 			})
-			const parser = query.query.parsers?.[field]
-			addParserToQuery(query.query, field, (nodes) => {
-				nodes = parser ? parser(nodes) : nodes
-				return get_page(nodes)
-			})
+			overrideParserInQuery(query.query, field, get_page)
 			return query
 		},
 	})
