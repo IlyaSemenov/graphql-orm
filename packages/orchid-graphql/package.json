@@ -1,0 +1,58 @@
+{
+  "name": "orchid-graphql",
+  "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
+  "version": "0.0.4",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IlyaSemenov/orchid-graphql"
+  },
+  "author": "Ilya Semenov",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "dev": "vite-node --watch playground/readme.sample.ts",
+    "build": "tsup",
+    "lint": "eslint --fix '**/*.{cjs,js,ts}'",
+    "prepack": "npm run build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.12.0"
+  },
+  "peerDependencies": {
+    "graphql": "^16",
+    "orchid-core": "^0.4.11",
+    "orchid-orm": "^1.9.36",
+    "pqb": "^0.11.29"
+  },
+  "devDependencies": {
+    "@apollo/server": "~4.7.1",
+    "@tsconfig/node18": "~2.0.1",
+    "@types/pg": "~8.10.1",
+    "graphql": "~16.6.0",
+    "graphql-orm-resolver": "workspace:*",
+    "graphql-request": "~6.0.0",
+    "graphql-tag": "^2.12.6",
+    "orchid-core": "~0.4.13",
+    "orchid-orm": "~1.9.40",
+    "pg": "~8.11.0",
+    "pqb": "~0.11.32",
+    "tsup": "~6.7.0",
+    "typescript": "~5.0.4",
+    "vite": "~4.3.8",
+    "vite-node": "~0.31.1",
+    "vite-tsconfig-paths": "~4.2.0",
+    "vitest": "~0.31.1"
+  }
+}

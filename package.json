@@ -1,70 +1,26 @@
 {
-  "name": "orchid-graphql",
-  "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
-  "version": "0.0.4",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/IlyaSemenov/orchid-graphql"
-  },
+  "description": "graphql-orm-resolver monorepo root",
+  "private": true,
+  "version": "0.0.0",
   "author": "Ilya Semenov",
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "source": "src/index.ts",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=14"
-  },
   "scripts": {
-    "dev": "vite-node --watch playground/readme.sample.ts",
-    "build": "tsup",
     "lint": "eslint --fix '**/*.{cjs,js,ts}'",
-    "prepack": "npm run build",
-    "prepare": "husky install",
-    "test": "vitest run",
-    "release": "npm run prepack && release-it"
-  },
-  "dependencies": {
-    "graphql-parse-resolve-info": "^4.12.0"
-  },
-  "peerDependencies": {
-    "orchid-core": "^0.4.11",
-    "orchid-orm": "^1.9.36",
-    "pqb": "^0.11.29"
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "@apollo/server": "~4.7.1",
     "@commitlint/cli": "~17.6.3",
     "@commitlint/config-conventional": "~17.6.3",
-    "@tsconfig/node18": "~2.0.1",
-    "@types/pg": "~8.10.1",
     "@typescript-eslint/eslint-plugin": "~5.59.7",
     "@typescript-eslint/parser": "~5.59.7",
     "eslint": "~8.41.0",
     "eslint-config-prettier": "~8.8.0",
     "eslint-plugin-prettier": "~4.2.1",
     "eslint-plugin-simple-import-sort": "~10.0.0",
-    "graphql": "~16.6.0",
-    "graphql-request": "~6.0.0",
-    "graphql-tag": "^2.12.6",
     "husky": "~8.0.3",
     "lint-staged": "~13.2.2",
-    "orchid-core": "~0.4.13",
-    "orchid-orm": "~1.9.40",
-    "pg": "~8.11.0",
-    "pqb": "~0.11.32",
     "prettier": "~2.8.8",
-    "release-it": "~15.10.3",
-    "tsup": "~6.7.0",
-    "typescript": "~5.0.4",
-    "vite": "~4.3.8",
-    "vite-node": "~0.31.1",
-    "vite-tsconfig-paths": "~4.2.0",
-    "vitest": "~0.31.1"
+    "typescript": "~5.0.4"
   }
 }

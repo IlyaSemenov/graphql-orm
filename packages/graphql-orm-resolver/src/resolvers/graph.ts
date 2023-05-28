@@ -1,22 +1,15 @@
-import { GraphQLResolveInfo } from "graphql"
+import type { GraphQLResolveInfo } from "graphql"
 import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
-import { Query } from "pqb"
 
 import { FiltersDef } from "../filters/filters"
+import { OrmAdapter } from "../orm/orm"
 import { Paginator } from "../paginators/base"
-import type { TableResolverFn, TableResolverOptions } from "./table"
+import type { TableResolver, TableResolverOptions } from "./table"
 
 export type GraphResolverOptions = Pick<
 	TableResolverOptions,
 	"allowAllFields" | "allowAllFilters"
 >
-
-export function createGraphResolver(
-	types: Record<string, TableResolverFn>,
-	options?: GraphResolverOptions
-) {
-	return new GraphResolver(types, options)
-}
 
 export interface GraphResolveOptions {
 	info: GraphQLResolveInfo
@@ -30,13 +23,17 @@ export interface GraphResolveContext {
 	context: any
 }
 
-export class GraphResolver {
+export class GraphResolver<Query = unknown> {
 	constructor(
-		public readonly tables: Record<string, TableResolverFn>,
-		public readonly options: GraphResolverOptions = {}
+		readonly orm: OrmAdapter<any, Query>,
+		readonly tables: Record<string, TableResolver>,
+		readonly options: GraphResolverOptions = {}
 	) {}
 
-	resolve(query: Query, { info, context, filters }: GraphResolveOptions) {
+	resolve(
+		query: Query,
+		{ info, context, filters }: GraphResolveOptions
+	): Query {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_type(query, { tree, filters, context })
 	}
@@ -45,7 +42,7 @@ export class GraphResolver {
 		query: Query,
 		paginator: Paginator,
 		{ info, context, filters }: GraphResolveOptions
-	) {
+	): Query {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_page(query, paginator, { tree, filters, context })
 	}
@@ -54,24 +51,27 @@ export class GraphResolver {
 		return parseResolveInfo(info) as ResolveTree
 	}
 
-	_resolve_type(query: Query, context: GraphResolveContext) {
+	_resolve_type(query: Query, context: GraphResolveContext): Query {
 		const { tree } = context
 		const type = Object.keys(tree.fieldsByTypeName)[0]
 		const table_resolver = this.tables[type]
 		if (!table_resolver) {
-			throw new Error(`Table resolver not found for type ${type}.`)
+			throw new Error(`Resolver not found for type ${type}.`)
 		}
-		return table_resolver(query, { ...context, graph: this, tree, type })
+		return table_resolver.resolve(query, {
+			...context,
+			graph: this as any,
+			tree,
+			type,
+		}) as Query
 	}
 
 	_resolve_page(
 		query: Query,
 		paginator: Paginator,
 		context: GraphResolveContext
-	) {
+	): Query {
 		let { tree } = context
-		// Save pagination args
-		const { args } = tree
 		// Skip page subtree(s)
 		for (const field of paginator.path) {
 			const type = Object.keys(tree.fieldsByTypeName)[0]
@@ -79,6 +79,9 @@ export class GraphResolver {
 			// TODO: raise exception if not found
 		}
 		query = this._resolve_type(query, { ...context, tree })
-		return paginator.paginate(query, args)
+		return paginator.paginate(query, {
+			...context,
+			graph: this as any,
+		}) as Query
 	}
 }

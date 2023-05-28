@@ -1,6 +1,4 @@
-import { Query } from "pqb"
-
-import { Paginator, set_query_page_result } from "./base"
+import { PaginateContext, Paginator } from "./base"
 
 export function defineCursorPaginator(
 	options: Partial<CursorPaginatorOptions> = {}
@@ -47,25 +45,28 @@ class CursorPaginator implements Paginator {
 		})
 	}
 
-	paginate(query: Query, args: CursorPaginatorArgs = {}) {
-		const take = args.take ?? this.options.take
-		const { cursor } = args
+	paginate(query: unknown, context: PaginateContext) {
+		const { orm } = context.graph
+		const { args } = context.tree
+
+		const take = (args.take as number | undefined) ?? this.options.take
+		const cursor = args.cursor as string | undefined
 
 		// Set query order
-		query = query.clear("order")
+		query = orm.reset_query_order(query)
 		for (const field of this.fields) {
 			// TODO: prevent potential name clash with aliases like .as(`_${table_ref}_order_key_0`)
-			query = query
-				.select(field.name)
-				.order({ [field.name]: field.desc ? "DESC" : "ASC" })
+			query = orm.select_field(query, { field: field.name, as: field.name })
+			query = orm.add_query_order(query, field.name, field.desc)
 		}
 
 		if (cursor) {
-			query = this._set_query_cursor(query, cursor)
+			const { expression, bindings } = this._parse_cursor(cursor)
+			query = orm.where_raw(query, expression, bindings)
 		}
-		query = query.limit(take + 1)
+		query = orm.set_query_limit(query, take + 1)
 
-		query = set_query_page_result(query, (nodes) => {
+		query = orm.set_query_page_result(query, (nodes) => {
 			let cursor: string | undefined
 			if (nodes.length > take) {
 				cursor = this._create_cursor(nodes[take - 1])
@@ -91,23 +92,22 @@ class CursorPaginator implements Paginator {
 		)
 	}
 
-	_set_query_cursor(query: Query, cursor: string) {
+	_parse_cursor(cursor: string) {
 		const values = JSON.parse(cursor)
 		const left: string[] = []
 		const right: string[] = []
-		const expr_values: Record<string, any> = {}
-		// TODO: refactor
+		const bindings: Record<string, any> = {}
 		for (let i = 0; i < this.fields.length; ++i) {
 			const field = this.fields[i]
 			const expressions = field.desc ? right : left
 			const placeholders = field.desc ? left : right
 			expressions.push(`"${field.name}"`)
-			const placeholder = `value${i}`
-			placeholders.push("$" + placeholder)
-			expr_values[placeholder] = values[i]
+			placeholders.push("$" + field.name)
+			bindings[field.name] = values[i]
 		}
-		return query.where(
-			query.raw(`(${left.join(",")}) > (${right.join(",")})`, expr_values)
-		)
+		return {
+			expression: `(${left.join(",")}) > (${right.join(",")})`,
+			bindings,
+		}
 	}
 }

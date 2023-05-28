@@ -1,0 +1,19 @@
+{
+  "name": "graphql-orm-resolver",
+  "description": "Common base for objection-graphql-resolver and orchid-graphql",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Ilya Semenov",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.12.0"
+  },
+  "peerDependencies": {
+    "graphql": "^16"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "~2.0.1",
+    "typescript": "~5.0.4"
+  }
+}

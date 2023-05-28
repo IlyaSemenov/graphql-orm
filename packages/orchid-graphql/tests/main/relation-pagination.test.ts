@@ -219,12 +219,7 @@ const graph = r.graph(
 const resolvers: Resolvers = {
 	Query: {
 		async user(_parent, { id }, context, info) {
-			try {
-				return await graph.resolve(db.user.findOptional(id), { context, info })
-			} catch (e) {
-				console.error(e)
-				throw e
-			}
+			return await graph.resolve(db.user.findOptional(id), { context, info })
 		},
 	},
 }

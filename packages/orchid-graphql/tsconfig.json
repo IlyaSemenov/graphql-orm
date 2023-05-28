@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"module": "ESNext",
 		"paths": {
-			"orchid-graphql": ["./src"]
+			"orchid-graphql": ["./src"],
+			"graphql-orm-resolver": ["../graphql-orm-resolver/src"]
 		}
 	}
 }

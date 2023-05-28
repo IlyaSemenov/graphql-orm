@@ -249,7 +249,7 @@ test("filters", async () => {
 		await client.request(
 			gql`
 				{
-					posts(filter: { text__like: "%COVID%" }) {
+					posts(filter: { text__contains: "%COVID%" }) {
 						text
 					}
 				}
@@ -368,7 +368,7 @@ test("allowAllFilters", async () => {
 		await client.request(
 			gql`
 				{
-					users: users1(filter: { name__like: "%ob" }) {
+					users: users1(filter: { name__contains: "%ob" }) {
 						id
 					}
 				}
@@ -384,7 +384,7 @@ test("allowAllFilters", async () => {
 		await client.request(
 			gql`
 				{
-					users: users2(filter: { name__like: "%ob" }) {
+					users: users2(filter: { name__contains: "%ob" }) {
 						id
 					}
 				}
@@ -400,7 +400,7 @@ test("allowAllFilters", async () => {
 		await client.request(
 			gql`
 				{
-					users: users3(filter: { name__like: "%ob" }) {
+					users: users3(filter: { name__contains: "%ob" }) {
 						id
 					}
 				}

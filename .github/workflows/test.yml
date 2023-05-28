@@ -20,6 +20,5 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      # TODO: somehow install Postgres and run tests
-      # - run: pnpm test
+      - run: cd packages/orchid-graphql && pnpm build
+      # TODO: somehow install Postgres and run tests: && pnpm test
