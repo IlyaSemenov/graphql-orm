@@ -1,0 +1,10 @@
+{
+	"extends": "@tsconfig/node14/tsconfig.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"paths": {
+			"graphql-orm-resolver": ["../graphql-orm-resolver/src"],
+			"objection-graphql-resolver": ["./src"]
+		}
+	}
+}

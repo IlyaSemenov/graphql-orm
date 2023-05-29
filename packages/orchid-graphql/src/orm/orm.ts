@@ -4,46 +4,70 @@ import { DbTable } from "orchid-orm"
 import { Query } from "pqb"
 
 export const orm: OrmAdapter<DbTable<any>, Query> = {
+	// Reflection
+
 	get_table_table(table) {
 		return table.table
 	},
+
 	get_table_relations(table) {
 		return Object.keys(table.relations)
 	},
+
+	get_table_virtual_fields() {
+		// Not supported by Orchid.
+		return []
+	},
+
+	get_table_modifiers() {
+		return undefined
+	},
+
 	get_query_table(query) {
 		if (!query.table) {
 			throw new Error("Query must have table.")
 		}
 		return query.table
 	},
-	run_after_query(query, fn) {
-		return query.afterQuery(async (_, result) => fn(result))
-	},
+
+	// Select
+
 	select_field(query, { field, as }) {
 		return query.select({ [as]: field })
 	},
+
 	select_relation(query, { relation, as, modify }) {
 		return query.select({
-			[as]: (q) => {
-				return modify((q as any)[relation])
-			},
+			[as]: (q) => modify((q as any)[relation]),
 		})
 	},
-	reset_query_order(query) {
-		return query.clear("order")
-	},
-	add_query_order(query, field, desc) {
-		return query.order({ [field]: desc ? "DESC" : "ASC" })
-	},
-	set_query_limit(query, limit) {
-		return query.limit(limit)
-	},
+
+	// Find
+
 	where(query, field, op, value) {
 		return query.where({ [field]: op ? { [op]: value } : value })
 	},
+
 	where_raw(query, expression, bindings) {
 		return query.where(query.raw(expression, bindings))
 	},
+
+	// Order & Limit
+
+	reset_query_order(query) {
+		return query.clear("order")
+	},
+
+	add_query_order(query, field, desc) {
+		return query.order({ [field]: desc ? "DESC" : "ASC" })
+	},
+
+	set_query_limit(query, limit) {
+		return query.limit(limit)
+	},
+
+	// Pagination helpers
+
 	set_query_page_result(query, get_page) {
 		// For root query
 		const _query = query.query
@@ -58,11 +82,29 @@ export const orm: OrmAdapter<DbTable<any>, Query> = {
 		;(_query as any)[s] = get_page
 		return query
 	},
-	get_subquery_pagination_handler(query) {
-		return (query.query as any)[s]
+
+	modify_subquery_pagination(subquery, context) {
+		context.get_page = (subquery.query as any)[s]
+		return subquery
 	},
-	finish_subquery_pagination(query, field, get_page) {
-		overrideParserInQuery(query.query, field, get_page as any)
+
+	finish_query_pagination(query, field, context) {
+		const { get_page } = context
+		if (!get_page) {
+			throw new Error(`Internal error: paginator didn't provide page callback.`)
+		}
+		overrideParserInQuery(query.query, field, get_page)
+		return query
+	},
+
+	// Misc
+
+	run_after_query(query, fn) {
+		return query.afterQuery(async (_, result) => fn(result))
+	},
+
+	prevent_select_all(query) {
+		// Not needed in Orchid
 		return query
 	},
 }

@@ -26,7 +26,7 @@ export interface GraphResolveContext {
 export class GraphResolver<Query = unknown> {
 	constructor(
 		readonly orm: OrmAdapter<any, Query>,
-		readonly tables: Record<string, TableResolver>,
+		readonly type_resolvers: Record<string, TableResolver>,
 		readonly options: GraphResolverOptions = {}
 	) {}
 
@@ -54,11 +54,11 @@ export class GraphResolver<Query = unknown> {
 	_resolve_type(query: Query, context: GraphResolveContext): Query {
 		const { tree } = context
 		const type = Object.keys(tree.fieldsByTypeName)[0]
-		const table_resolver = this.tables[type]
-		if (!table_resolver) {
+		const type_resolver = this.type_resolvers[type]
+		if (!type_resolver) {
 			throw new Error(`Resolver not found for type ${type}.`)
 		}
-		return table_resolver.resolve(query, {
+		return type_resolver.resolve(query, {
 			...context,
 			graph: this as any,
 			tree,

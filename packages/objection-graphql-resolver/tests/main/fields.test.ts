@@ -1,30 +1,17 @@
 import gql from "graphql-tag"
-import * as r from "orchid-graphql"
+import { Model } from "objection"
+import * as r from "objection-graphql-resolver"
 import { assert, expect, test } from "vitest"
 
-import { BaseTable, create_client, create_db, Resolvers } from "../setup"
+import { Resolvers, setup } from "../setup"
 
-class UserTable extends BaseTable {
-	readonly table = "user"
+class UserModel extends Model {
+	static tableName = "user"
 
-	columns = this.setColumns((t) => ({
-		id: t.identity().primaryKey(),
-		name: t.string(1, 100),
-		password: t.string(1, 32),
-	}))
+	id?: number
+	name?: string
+	password?: string
 }
-
-const db = await create_db({
-	user: UserTable,
-})
-
-await db.$adapter.query(`
-	create table "user" (
-		id serial primary key,
-		name varchar(100) not null,
-		password varchar(32) not null
-	);
-`)
 
 const schema = gql`
 	type User {
@@ -43,18 +30,18 @@ const schema = gql`
 `
 
 const default_graph = r.graph({
-	User: r.table(db.user),
+	User: r.model(UserModel),
 })
 
 const default_graph1 = r.graph(
 	{
-		User: r.table(db.user),
+		User: r.model(UserModel),
 	},
 	{ allowAllFields: false }
 )
 
 const secure_graph = r.graph({
-	User: r.table(db.user, {
+	User: r.model(UserModel, {
 		fields: {
 			id: true,
 			name: true,
@@ -63,7 +50,7 @@ const secure_graph = r.graph({
 })
 
 const graph1 = r.graph({
-	User: r.table(db.user, {
+	User: r.model(UserModel, {
 		allowAllFields: true,
 		fields: {
 			id: true,
@@ -74,7 +61,7 @@ const graph1 = r.graph({
 
 const graph2 = r.graph(
 	{
-		User: r.table(db.user, {
+		User: r.model(UserModel, {
 			fields: {
 				id: true,
 				name: true,
@@ -86,37 +73,43 @@ const graph2 = r.graph(
 
 const resolvers: Resolvers = {
 	Query: {
-		async default_user(_parent, { id }, context, info) {
-			return await default_graph.resolve(db.user.findOptional(id), {
+		default_user(_parent, { id }, context, info) {
+			return default_graph.resolve(UserModel.query().findById(id), {
 				context,
 				info,
 			})
 		},
-		async default_user1(_parent, { id }, context, info) {
-			return await default_graph1.resolve(db.user.findOptional(id), {
+		default_user1(_parent, { id }, context, info) {
+			return default_graph1.resolve(UserModel.query().findById(id), {
 				context,
 				info,
 			})
 		},
-		async secure_user(_parent, { id }, context, info) {
-			return await secure_graph.resolve(db.user.findOptional(id), {
+		secure_user(_parent, { id }, context, info) {
+			return secure_graph.resolve(UserModel.query().findById(id), {
 				context,
 				info,
 			})
 		},
-		async user1(_parent, { id }, context, info) {
-			return await graph1.resolve(db.user.findOptional(id), { context, info })
+		user1(_parent, { id }, context, info) {
+			return graph1.resolve(UserModel.query().findById(id), { context, info })
 		},
-		async user2(_parent, { id }, context, info) {
-			return await graph2.resolve(db.user.findOptional(id), { context, info })
+		user2(_parent, { id }, context, info) {
+			return graph2.resolve(UserModel.query().findById(id), { context, info })
 		},
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-test("table resolver fields access", async () => {
-	await db.user.create({ name: "Alice", password: "secret" })
+await knex.schema.createTable("user", function (table) {
+	table.increments("id").notNullable().primary()
+	table.string("name").notNullable()
+	table.string("password").notNullable()
+})
+
+test("model resolver fields access", async () => {
+	await UserModel.query().insertGraph([{ name: "Alice", password: "secret" }])
 
 	assert.deepEqual(
 		await client.request(
@@ -198,7 +191,7 @@ test("table resolver fields access", async () => {
 		{
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
-		"table-level allowAllFields"
+		"model-level allowAllFields"
 	)
 
 	assert.deepEqual(

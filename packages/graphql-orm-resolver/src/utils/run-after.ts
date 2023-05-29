@@ -1,7 +1,7 @@
 import { OrmAdapter } from "../orm/orm"
 
 export function run_after_query(
-	orm: OrmAdapter,
+	orm: OrmAdapter<any, any>,
 	query: unknown,
 	transform: (instance: any) => any
 ) {

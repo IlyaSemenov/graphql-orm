@@ -1,4 +1,4 @@
-export { OrmAdapter } from "./orm/orm"
+export { OrmAdapter, OrmModifier } from "./orm/orm"
 export { Paginator } from "./paginators/base"
 export { defineCursorPaginator } from "./paginators/cursor"
 export { defineFieldResolver } from "./resolvers/field"
@@ -15,3 +15,4 @@ export {
 	TableResolver,
 	TableResolverOptions,
 } from "./resolvers/table"
+export { run_after_query } from "./utils/run-after"

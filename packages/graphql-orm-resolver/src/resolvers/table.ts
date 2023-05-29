@@ -30,7 +30,11 @@ export interface TableResolveContext extends GraphResolveContext {
 }
 
 export class TableResolver {
+	// Introspection results
 	readonly relations: Set<string>
+	readonly virtual_fields: Set<string>
+	readonly modifiers?: Record<string, ApplyFiltersModifier>
+
 	readonly table_field_resolvers?: Record<string, FieldResolver>
 
 	constructor(
@@ -39,6 +43,8 @@ export class TableResolver {
 		readonly options: TableResolverOptions = {}
 	) {
 		this.relations = new Set(orm.get_table_relations(table))
+		this.virtual_fields = new Set(orm.get_table_virtual_fields(table))
+		this.modifiers = { ...orm.get_table_modifiers(table), ...options.modifiers }
 
 		// Pre-create field resolvers
 		const { fields } = options
@@ -71,8 +77,8 @@ export class TableResolver {
 		const { modify, transform } = this.options
 		const { graph, tree, type, filters } = context
 
-		const query_table = context.graph.orm.get_query_table(query)
-		const table_table = context.graph.orm.get_table_table(this.table)
+		const query_table = this.orm.get_query_table(query)
+		const table_table = this.orm.get_table_table(this.table)
 
 		if (query_table !== table_table) {
 			throw new Error(
@@ -87,7 +93,7 @@ export class TableResolver {
 
 		if (!allow_all_fields && !this.table_field_resolvers) {
 			throw new Error(
-				`Table resolver for ${type} must either allow all fields or specify options.fields.`
+				`Resolver for type ${type} must either allow all fields or specify options.fields.`
 			)
 		}
 
@@ -116,16 +122,18 @@ export class TableResolver {
 		if (effective_filters) {
 			query = apply_filters(query, {
 				filters: effective_filters,
-				modifiers: this.options.modifiers,
+				modifiers: this.modifiers,
 				context,
 			})
 		}
 
 		if (transform) {
-			query = run_after_query(graph.orm, query, (instance) => {
+			query = run_after_query(this.orm, query, (instance) => {
 				return transform(instance, context)
 			})
 		}
+
+		query = this.orm.prevent_select_all(query)
 
 		return query
 	}
@@ -138,7 +146,10 @@ export class TableResolver {
 		tableField?: string
 	): FieldResolver {
 		const table_field_lookup = tableField || field
-		if (this.options.modifiers?.[table_field_lookup]) {
+		if (
+			this.options.modifiers?.[table_field_lookup] ||
+			this.virtual_fields.has(table_field_lookup)
+		) {
 			// Keep query as is.
 			return (query) => query
 		} else if (this.relations.has(table_field_lookup)) {

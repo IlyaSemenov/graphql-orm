@@ -1,10 +1,10 @@
 {
-  "name": "orchid-graphql",
-  "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
-  "version": "0.0.4",
+  "name": "objection-graphql-resolver",
+  "description": "objection.js plugin: resolve GraphQL query using withGraphFetched",
+  "version": "6.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/IlyaSemenov/orchid-graphql"
+    "url": "https://github.com/IlyaSemenov/objection-graphql-resolver.git"
   },
   "author": "Ilya Semenov",
   "license": "MIT",
@@ -31,22 +31,18 @@
   },
   "peerDependencies": {
     "graphql": "^16",
-    "orchid-core": "^0.4.11",
-    "orchid-orm": "^1.9.36",
-    "pqb": "^0.11.29"
+    "objection": "^2 || ^3"
   },
   "devDependencies": {
     "@apollo/server": "~4.7.1",
-    "@tsconfig/node18": "~2.0.1",
-    "@types/pg": "~8.10.1",
+    "@tsconfig/node14": "~1.0.3",
     "graphql": "~16.6.0",
-    "graphql-orm-resolver": "workspace:*",
     "graphql-request": "~6.0.0",
     "graphql-tag": "^2.12.6",
-    "orchid-core": "~0.4.13",
-    "orchid-orm": "~1.9.40",
-    "pg": "~8.11.0",
-    "pqb": "~0.11.32",
+    "knex": "~2.4.2",
+    "objection": "^3.0.1",
+    "sqlite3": "~5.1.6",
+    "tar": "~6.1.15",
     "tsup": "~6.7.0",
     "typescript": "~5.0.4",
     "vite": "~4.3.8",

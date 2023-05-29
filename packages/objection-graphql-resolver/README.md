@@ -1,26 +1,21 @@
-# orchid-graphql
+# objection-graphql-resolver
 
-A helper library to resolve GraphQL queries directly with [Orchid ORM](https://orchid-orm.netlify.app) tables and relations.
+A helper library to resolve GraphQL queries directly with [Objection.js](https://vincit.github.io/objection.js/) models and relations.
 
-- Highly effective: selects only requested fields and relations.
-- Unlimited nested resolvers.
-- Pagination.
-- Filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`.
-- Hook into (sub)queries with query modifiers.
-- Hook into field results to restrict access to sensitive information.
+- Highly effective: selects only requested fields and relations (using fine-tuned `withGraphFetched`).
+- Supports unlimited nested resolvers (traversing `relationMappings`).
+- Supports pagination.
+- Supports virtual attributes.
+- Supports filters like `{ date: "2020-10-01", category__in: ["News", "Politics"] }`.
+- Hooks into subqueries with query modifiers.
+- Hooks into field results to restrict access to sensitive information.
 
-_Note that there is a sister project: `objection-graphql-resolver` which does the same for [Objection.js ORM](https://vincit.github.io/objection.js/)._
-
-## Status and limitations
-
-This is pre-release and not battle tested. `orchid-graphql` is a quick adaptation of `objection-graphql-resolver`.
-
-In particular the typings are not ready. The resolver returns a generic `Query` most of the time.
+_Note that there is a sister project: `orchid-graphql` which does the same for [Orchid ORM](https://orchid-orm.netlify.app)._
 
 ## Install
 
 ```sh
-npm i orchid-graphql
+npm i objection-graphql-resolver
 ```
 
 ## Minimal all-in-one example
@@ -30,43 +25,24 @@ Run GraphQL server:
 ```ts
 // Everything is put into a single file for demonstration purposes.
 //
-// In real projects, you will want to separate tables, typedefs,
-// resolvers, and the server into their own modules.
+// In real projects, you will want to separate models, typedefs,
+// model resolvers, and the server into their own modules.
 
 import { ApolloServer, ApolloServerOptions } from "@apollo/server"
 import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
-import * as r from "orchid-graphql"
-import { createBaseTable, orchidORM } from "orchid-orm"
+import Knex from "knex"
+import { Model } from "objection"
+import * as r from "objection-graphql-resolver"
 
-// Define database tables
+// Define Objection.js models
 
-const BaseTable = createBaseTable()
+class PostModel extends Model {
+  static tableName = "post"
 
-class PostTable extends BaseTable {
-  readonly table = "post"
-  columns = this.setColumns((t) => ({
-    id: t.identity().primaryKey(),
-    text: t.text(0, 5000),
-  }))
+  id?: number
+  text?: string
 }
-
-const db = orchidORM(
-  {
-    databaseURL: process.env.DATABASE_URL,
-    log: true,
-  },
-  {
-    post: PostTable,
-  }
-)
-
-await db.$adapter.query(`
-  create table post (
-    id serial primary key,
-    text text not null
-  );
-`)
 
 // Define GraphQL schema
 
@@ -85,10 +61,10 @@ const typeDefs = gql`
   }
 `
 
-// Map GraphQL types to table resolvers
+// Map GraphQL types to model resolvers
 
 const graph = r.graph({
-  Post: r.table(db.post),
+  Post: r.model(PostModel),
 })
 
 // Define resolvers
@@ -96,16 +72,26 @@ const graph = r.graph({
 const resolvers: ApolloServerOptions<any>["resolvers"] = {
   Mutation: {
     async create_post(_parent, args, context, info) {
-      const post = await db.post.create(args)
-      return await graph.resolve(db.post.find(post.id), { context, info })
+      const post = await PostModel.query().insert(args)
+      return graph.resolve(post.$query(), { context, info })
     },
   },
   Query: {
-    async posts(_parent, _args, context, info) {
-      return await graph.resolve(db.post, { context, info })
+    posts(_parent, _args, context, info) {
+      return graph.resolve(PostModel.query().orderBy("id"), { context, info })
     },
   },
 }
+
+// Configure database backend
+
+const knex = Knex({ client: "sqlite3", connection: ":memory:" })
+Model.knex(knex)
+
+await knex.schema.createTable("post", (post) => {
+  post.increments("id")
+  post.text("text").notNullable()
+})
 
 // Start GraphQL server
 
@@ -151,14 +137,14 @@ console.log(posts)
 
 ## Relations
 
-Relations will be fetched automatically when resolving nested fields.
+Relations will be fetched automatically using `withGraphFetched()` when resolving nested fields.
 
 Example:
 
 ```ts
 const graph = r.graph({
-  User: r.type(db.user),
-  Post: r.type(db.post),
+  User: r.model(UserModel),
+  Post: r.model(PostModel),
 })
 ```
 
@@ -167,7 +153,7 @@ query posts_with_author {
   posts {
     id
     text
-    # will use subquery if requested
+    # will use withGraphFetched("author") if requested
     author {
       name
     }
@@ -177,7 +163,7 @@ query posts_with_author {
 query user_with_posts {
   user(id: ID!) {
     name
-    # will use subquery if requested
+    # will use withGraphFetched("posts") if requested
     posts {
       id
       text
@@ -194,7 +180,7 @@ Access to individual fields can be limited:
 
 ```ts
 const graph = r.graph({
-  User: r.type(db.user, {
+  User: r.model(UserModel, {
     fields: {
       id: true,
       name: true,
@@ -213,7 +199,7 @@ Root queries and -to-many nested relations can be paginated.
 
 ```ts
 const graph = r.graph({
-  User: r.type(db.user, {
+  User: r.model(UserModel, {
     fields: {
       id: true,
       name: true,
@@ -221,7 +207,7 @@ const graph = r.graph({
       posts: r.page(r.cursor({ fields: ["-id"], take: 10 })),
     },
   }),
-  Post: r.type(db.post),
+  Post: r.model(PostModel),
 })
 ```
 
@@ -231,10 +217,10 @@ To paginate root query, use:
 const resolvers = {
   Query: {
     posts: async (parent, args, context, info) => {
-      return await graph.resolvePage(
-        db.post,
+      return graph.resolvePage(
+        Post.query(),
         r.cursor({ take: 10, fields: ["-id"] }),
-        { ctx, info }
+        { context, info }
       )
     },
   },
@@ -261,43 +247,75 @@ query {
 }
 ```
 
-Filters will run against database fields, or call field modifiers.
+Filters will run against database fields, or call model modifiers.
 
 [More details and examples for filters.](docs/filters.md)
+
+## Virtual attributes
+
+Virtual attributes (getters on models) can be accessed the same way as database fields:
+
+```ts
+class PostModel extends Model {
+  declare id?: number
+  declare title?: string
+
+  get url() {
+    assert(this.id)
+    return `/${this.id}.html`
+  }
+}
+```
+
+```gql
+query {
+  posts {
+    id
+    title
+    url
+  }
+}
+```
+
+[More details and examples for virtual attributes.](docs/virtual-attributes.md)
 
 ## API
 
 ```ts
-import * as r from "orchid-graphql"
+import * as r from "objection-graphql-resolver"
 
 const graph = r.graph(
-  // Map GraphQL types to table resolvers (required)
+  // Map GraphQL types to model resolvers (required)
   {
-    Post: r.table(
-      // orchid-orm bound table (required)
-      db.post,
-      // Table resolver options
+    Post: r.model(
+      // Objection.js model class (required)
+      PostModel,
+      // Model resolver options
       {
         // List fields that can be accessed via GraphQL
         // if not provided, all fields can be accessed
         fields: {
           // Select field from database
           id: true,
+          // Call model getter with this name
+          url: true,
           // Descend into relation
-          // (related table must be also registered in this graph resolver)
+          // (related model must be also registered in this graph resolver)
           author: true,
           // Modify query when this field is resolved
-          preview: (q) => q.select({ preview: q.raw("substr(text,1,100)") }),
+          preview: (query) =>
+            query.select(raw("substr(text,1,100) as preview")),
           // Same as text: true
           text: r.field(),
           // Custom field resolver
           text2: r.field({
-            // Table field, if different from GraphQL field
+            // Model (database) field, if different from GraphQL field
             tableField: "text",
           }),
           preview2: r.field({
             // Modify query
-            modify: (q) => q.select({ preview2: q.raw("substr(text,1,100)") }),
+            modify: (query) =>
+              query.select(raw("substr(text,1,100) as preview2")),
             // Post-process selected value
             transform(
               // Selected value
@@ -318,12 +336,13 @@ const graph = r.graph(
           comments: true,
           // Select all objects in -to-many relation
           all_comments: r.relation({
-            // Table field, if different from GraphQL field
-            tableField: "comments",
+            // Model field, if different from GraphQL field
+            modelField: "comments",
             // Enable filters on -to-many relation
             filters: true,
             // Modify subquery
-            modify: (q, { liked }) => q.where({ liked }).order({ id: "DESC" }),
+            modify: (query, { liked }) =>
+              query.where({ liked }).orderBy("id", "desc"),
             // Post-process selected values, see r.field()
             // transform: ...,
           }),
@@ -347,13 +366,13 @@ const graph = r.graph(
             }
           ),
         },
-        // Modify all queries to this table
+        // Modify all queries to this model
         modify: (
           // ORM (sub)query
           query,
           // Table resolve context: graph, tree, type, filters, context
           context
-        ) => query.where(context.tree.args).order({ id: "DESC" }),
+        ) => query.where(context.tree.args).orderBy("id", "desc"),
         // Allow all fields (`fields` will be used for overrides)
         allowAllFields: true,
         // Allow filters in all relations
@@ -363,19 +382,19 @@ const graph = r.graph(
   },
   // Graph options
   {
-    // Allow all fields in all tables (`fields` will be used for overrides)
+    // Allow all fields in all models (`fields` will be used for overrides)
     allowAllFields: true,
-    // Allow filters in all relations of all tables
+    // Allow filters in all models' relations
     allowAllFilters: true,
   }
 )
 
 const resolvers = {
   Query: {
-    posts: async (parent, args, context, info) => {
-      return await graph.resolve(
+    posts: (parent, args, context, info) => {
+      return graph.resolve(
         // Root query (required)
-        db.post,
+        Post.query(),
         // Options (required)
         {
           // Resolver context
@@ -387,10 +406,10 @@ const resolvers = {
         }
       )
     },
-    posts_page: async (parent, args, context, info) => {
-      return await graph.resolvePage(
+    posts_page: (parent, args, context, info) => {
+      return graph.resolvePage(
         // Root query (required)
-        db.post,
+        Post.query(),
         // Paginator (required)
         r.cursor({ fields: ["-id"], take: 10 }),
         // Options (required) - see graph.resolve
