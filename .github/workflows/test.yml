@@ -32,3 +32,11 @@ jobs:
       - name: Test orchid-graphql
         run: cd packages/orchid-graphql && pnpm build
         # TODO: somehow install Postgres and run tests: && pnpm test
+
+      - name: Create Release Pull Request
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: changesets/action@v1
+        with:
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
