@@ -40,9 +40,6 @@ class PostModel extends Model {
 		published(query: QueryBuilder<PostModel>) {
 			query.where(ref("post.is_draft"), false)
 		},
-		search(query: QueryBuilder<PostModel>, term: string) {
-			query.where(ref("post.text"), "like", `%${term}%`)
-		},
 	}
 
 	id?: number
@@ -89,7 +86,13 @@ const graph1 = r.graph({
 			non_filterable_posts: "posts",
 		},
 	}),
-	Post: r.model(PostModel),
+	Post: r.model(PostModel, {
+		modifiers: {
+			search(query, term: string) {
+				return query.where(ref("post.text"), "like", `%${term}%`)
+			},
+		},
+	}),
 })
 
 const graph2 = r.graph({
