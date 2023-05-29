@@ -1,5 +1,5 @@
 {
-  "name": "graphql-orm-resolver",
+  "name": "graphql-orm",
   "description": "Common base for objection-graphql-resolver and orchid-graphql",
   "private": true,
   "version": "1.0.0",

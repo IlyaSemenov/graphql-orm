@@ -9,16 +9,10 @@ export {
 export {
 	defineCursorPaginator as cursor,
 	defineCursorPaginator,
-} from "graphql-orm-resolver"
-export {
-	defineFieldResolver,
-	defineFieldResolver as field,
-} from "graphql-orm-resolver"
-export {
-	definePageResolver,
-	definePageResolver as page,
-} from "graphql-orm-resolver"
+} from "graphql-orm"
+export { defineFieldResolver, defineFieldResolver as field } from "graphql-orm"
+export { definePageResolver, definePageResolver as page } from "graphql-orm"
 export {
 	defineRelationResolver,
 	defineRelationResolver as relation,
-} from "graphql-orm-resolver"
+} from "graphql-orm"

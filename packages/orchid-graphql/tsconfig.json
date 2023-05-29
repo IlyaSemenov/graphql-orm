@@ -4,7 +4,7 @@
 		"module": "ESNext",
 		"paths": {
 			"orchid-graphql": ["./src"],
-			"graphql-orm-resolver": ["../graphql-orm-resolver/src"]
+			"graphql-orm": ["../graphql-orm/src"]
 		}
 	}
 }

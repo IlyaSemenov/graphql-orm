@@ -4,4 +4,4 @@
 
 ### Major Changes
 
-- 463ebee: Merge objection-graphql-resolver and orchid-orm, extract common core to graphql-orm-resolver.
+- 463ebee: Merge objection-graphql-resolver and orchid-orm, extract common core to graphql-orm.

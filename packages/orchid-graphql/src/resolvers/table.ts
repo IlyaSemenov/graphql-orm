@@ -1,4 +1,4 @@
-import { TableResolver, TableResolverOptions } from "graphql-orm-resolver"
+import { TableResolver, TableResolverOptions } from "graphql-orm"
 import { DbTable, TableClass } from "orchid-orm"
 import { Query } from "pqb"
 

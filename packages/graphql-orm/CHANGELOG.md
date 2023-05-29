@@ -1,6 +1,6 @@
-# objection-graphql-resolver
+# graphql-orm
 
-## 7.0.0
+## 1.0.0
 
 ### Major Changes
 

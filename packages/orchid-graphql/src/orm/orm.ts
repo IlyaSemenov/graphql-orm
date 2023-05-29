@@ -1,4 +1,4 @@
-import { OrmAdapter } from "graphql-orm-resolver"
+import { OrmAdapter } from "graphql-orm"
 import { overrideParserInQuery } from "orchid-core"
 import { DbTable } from "orchid-orm"
 import { Query } from "pqb"

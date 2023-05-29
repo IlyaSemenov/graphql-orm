@@ -1,8 +1,4 @@
-import {
-	GraphResolver,
-	GraphResolverOptions,
-	TableResolver,
-} from "graphql-orm-resolver"
+import { GraphResolver, GraphResolverOptions, TableResolver } from "graphql-orm"
 import { Query } from "pqb"
 
 import { orm } from "../orm/orm"

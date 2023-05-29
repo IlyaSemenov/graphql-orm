@@ -44,7 +44,7 @@ importers:
         specifier: ~5.0.4
         version: 5.0.4
 
-  packages/graphql-orm-resolver:
+  packages/graphql-orm:
     dependencies:
       graphql:
         specifier: ^16
@@ -133,9 +133,9 @@ importers:
       graphql:
         specifier: ~16.6.0
         version: 16.6.0
-      graphql-orm-resolver:
+      graphql-orm:
         specifier: workspace:*
-        version: link:../graphql-orm-resolver
+        version: link:../graphql-orm
       graphql-request:
         specifier: ~6.0.0
         version: 6.0.0(graphql@16.6.0)

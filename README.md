@@ -1,4 +1,4 @@
-# graphql-orm-resolver
+# graphql-orm
 
 Monorepo for helper libraries to resolve GraphQL queries with ORM tables and relations.
 

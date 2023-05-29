@@ -4,7 +4,7 @@ import {
 	GraphResolverOptions,
 	Paginator,
 	TableResolver,
-} from "graphql-orm-resolver"
+} from "graphql-orm"
 import { AnyQueryBuilder, Model, QueryBuilder } from "objection"
 
 import { orm } from "../orm/orm"

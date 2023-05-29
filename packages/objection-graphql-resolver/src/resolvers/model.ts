@@ -1,4 +1,4 @@
-import { TableResolver, TableResolverOptions } from "graphql-orm-resolver"
+import { TableResolver, TableResolverOptions } from "graphql-orm"
 import { Model, ModelConstructor, QueryBuilder } from "objection"
 
 import { orm } from "../orm/orm"

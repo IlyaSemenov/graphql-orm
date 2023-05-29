@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"module": "ESNext",
 		"paths": {
-			"graphql-orm-resolver": ["../graphql-orm-resolver/src"],
+			"graphql-orm": ["../graphql-orm/src"],
 			"objection-graphql-resolver": ["./src"]
 		}
 	}

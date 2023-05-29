@@ -1,4 +1,4 @@
-import { OrmAdapter, OrmModifier, run_after_query } from "graphql-orm-resolver"
+import { OrmAdapter, OrmModifier, run_after_query } from "graphql-orm"
 import { QueryBuilder, raw, ref, RelationMappings } from "objection"
 import { Model } from "objection"
 import { AnyModelConstructor, AnyQueryBuilder, ModelClass } from "objection"
