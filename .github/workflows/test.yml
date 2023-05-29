@@ -6,20 +6,29 @@ on:
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
 
-      - uses: pnpm/action-setup@v2.2.4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
         with:
           version: 8.5.1
 
-      - uses: actions/setup-node@v3.5.1
+      - name: Setup node
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: 18.12.1
           cache: "pnpm"
 
-      - run: pnpm install --frozen-lockfile
-      - run: cd packages/orchid-graphql && pnpm build
-      # TODO: somehow install Postgres and run tests: && pnpm test
-      - run: cd packages/objection-graphql-resolver && pnpm build && pnpm test
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Test objection-graphql-resolver
+        run: cd packages/objection-graphql-resolver && pnpm build && pnpm test
+
+      - name: Test orchid-graphql
+        run: cd packages/orchid-graphql && pnpm build
+        # TODO: somehow install Postgres and run tests: && pnpm test
