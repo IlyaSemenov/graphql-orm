@@ -6,8 +6,8 @@ import { OrmAdapter } from "../orm/orm"
 import { Paginator } from "../paginators/base"
 import type { TableResolver, TableResolverOptions } from "./table"
 
-export type GraphResolverOptions = Pick<
-	TableResolverOptions,
+export type GraphResolverOptions<Query = unknown> = Pick<
+	TableResolverOptions<Query>,
 	"allowAllFields" | "allowAllFilters"
 >
 
@@ -26,8 +26,8 @@ export interface GraphResolveContext {
 export class GraphResolver<Query = unknown> {
 	constructor(
 		readonly orm: OrmAdapter<any, Query>,
-		readonly type_resolvers: Record<string, TableResolver>,
-		readonly options: GraphResolverOptions = {}
+		readonly type_resolvers: Record<string, TableResolver<Query>>,
+		readonly options: GraphResolverOptions<Query> = {}
 	) {}
 
 	resolve(

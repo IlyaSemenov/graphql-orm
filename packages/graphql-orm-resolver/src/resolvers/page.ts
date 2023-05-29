@@ -1,11 +1,11 @@
-import { GetPageFn, Paginator } from "../paginators/base"
+import { Paginator } from "../paginators/base"
 import { FieldResolver } from "./field"
 import { RelationResolverOptions } from "./relation"
 
-export function definePageResolver(
+export function definePageResolver<Query = unknown>(
 	paginator: Paginator,
-	options: RelationResolverOptions = {}
-): FieldResolver {
+	options: RelationResolverOptions<Query> = {}
+): FieldResolver<Query> {
 	const { tableField, modify } = options
 
 	return function resolve(query, context) {

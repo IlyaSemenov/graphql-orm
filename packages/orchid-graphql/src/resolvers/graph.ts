@@ -8,8 +8,8 @@ import { Query } from "pqb"
 import { orm } from "../orm/orm"
 
 export function createGraphResolver(
-	types: Record<string, TableResolver>,
-	options?: GraphResolverOptions
+	types: Record<string, TableResolver<Query>>,
+	options?: GraphResolverOptions<Query>
 ) {
 	return new GraphResolver<Query>(orm, types, options)
 }

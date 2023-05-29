@@ -10,16 +10,16 @@ import { AnyQueryBuilder, Model, QueryBuilder } from "objection"
 import { orm } from "../orm/orm"
 
 export function createGraphResolver(
-	types: Record<string, TableResolver>,
-	options?: GraphResolverOptions
+	types: Record<string, TableResolver<AnyQueryBuilder>>,
+	options?: GraphResolverOptions<AnyQueryBuilder>
 ) {
 	return new ObjectionGraphResolver(types, options)
 }
 
 class ObjectionGraphResolver extends GraphResolver<AnyQueryBuilder> {
 	constructor(
-		public readonly types: Record<string, TableResolver>,
-		public readonly options: GraphResolverOptions = {}
+		public readonly types: Record<string, TableResolver<AnyQueryBuilder>>,
+		public readonly options: GraphResolverOptions<AnyQueryBuilder> = {}
 	) {
 		super(orm, types, options)
 	}

@@ -1,31 +1,36 @@
 import { run_after_query } from "../utils/run-after"
 import { TableResolveContext } from "./table"
 
-export interface FieldResolverOptions {
+export interface FieldResolverOptions<Query = unknown> {
 	/** Table field (if different from GraphQL field) */
 	tableField?: string
 	/** Custom query modifier (if different than simply selecting a field). */
-	modify?: FieldResolveModifier
+	modify?: FieldResolveModifier<Query>
 	/** Post-process selected value. Return a new value or a promise. */
-	transform?(value: any, instance: any, context: FieldResolveContext): any
+	transform?(
+		value: any,
+		instance: any,
+		context: FieldResolveContext<Query>
+	): any
 }
 
-export type FieldResolveModifier = (
-	query: unknown,
-	context: FieldResolveContext
-) => unknown
+export type FieldResolveModifier<Query = unknown> = (
+	query: Query,
+	context: FieldResolveContext<Query>
+) => Query
 
-export interface FieldResolveContext extends TableResolveContext {
+export interface FieldResolveContext<Query = unknown>
+	extends TableResolveContext<Query> {
 	/** GraphQL field */
 	field: string
 }
 
 // That is a coincidence for now.
-export type FieldResolver = FieldResolveModifier
+export type FieldResolver<Query = unknown> = FieldResolveModifier<Query>
 
-export function defineFieldResolver(
-	options: FieldResolverOptions = {}
-): FieldResolver {
+export function defineFieldResolver<Query = unknown>(
+	options: FieldResolverOptions<Query> = {}
+): FieldResolver<Query> {
 	const { tableField, modify, transform } = options
 
 	return function resolve(query, context) {

@@ -8,22 +8,22 @@ export type FilterScalarValue = null | string | number | boolean
 export type FilterValue = FilterScalarValue | Exclude<FilterScalarValue, null>[]
 export type Filter = { [property: string]: FilterValue }
 
-interface ApplyFiltersOptions {
+interface ApplyFiltersOptions<Query = unknown> {
 	filters: FiltersDef
-	modifiers?: Record<string, ApplyFiltersModifier>
-	context: TableResolveContext
+	modifiers?: Record<string, ApplyFiltersModifier<Query>>
+	context: TableResolveContext<Query>
 }
 
-export type ApplyFiltersModifier = (
-	query: unknown,
+export type ApplyFiltersModifier<Query = unknown> = (
+	query: Query,
 	value: any,
-	context: TableResolveContext
-) => unknown
+	context: TableResolveContext<Query>
+) => Query
 
-export function apply_filters(
-	query: unknown,
-	{ filters, modifiers, context }: ApplyFiltersOptions
-) {
+export function apply_filters<Query = unknown>(
+	query: Query,
+	{ filters, modifiers, context }: ApplyFiltersOptions<Query>
+): Query {
 	if (!filters) {
 		return query
 	}
