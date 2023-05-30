@@ -2,7 +2,7 @@
   "name": "graphql-orm",
   "description": "Common base for objection-graphql-resolver and orchid-graphql",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Ilya Semenov",
   "license": "MIT",
   "type": "module",

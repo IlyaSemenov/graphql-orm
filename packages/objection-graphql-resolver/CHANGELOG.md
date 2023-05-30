@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.1.0
+
+### Minor Changes
+
+- 030b302: Define graph resolver context type and pass it to callbacks.
+
 ## 7.0.0
 
 ### Major Changes
