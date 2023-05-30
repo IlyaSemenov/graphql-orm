@@ -1,11 +1,11 @@
 import { TableResolver, TableResolverOptions } from "graphql-orm"
-import { Model, ModelConstructor } from "objection"
+import { AnyModelConstructor } from "objection"
 
 import { ObjectionOrm, orm } from "../orm/orm"
 
-export function defineModelResolver<M extends Model>(
-	model: ModelConstructor<M>,
-	options: TableResolverOptions<ObjectionOrm> = {} // TODO: pass M
-) {
+export function defineModelResolver<Context = unknown>(
+	model: AnyModelConstructor,
+	options: TableResolverOptions<ObjectionOrm, Context> = {} // TODO: pass model shape
+): TableResolver<ObjectionOrm, Context> {
 	return new TableResolver(orm, model, options)
 }

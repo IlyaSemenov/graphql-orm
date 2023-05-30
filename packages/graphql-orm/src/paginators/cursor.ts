@@ -22,7 +22,9 @@ export interface CursorPaginatorPage<M> {
 	cursor?: string
 }
 
-class CursorPaginator<Orm extends OrmAdapter> implements Paginator<Orm> {
+class CursorPaginator<Orm extends OrmAdapter, Context>
+	implements Paginator<Orm, Context>
+{
 	readonly path = ["nodes"]
 	readonly options: CursorPaginatorOptions
 
@@ -46,7 +48,7 @@ class CursorPaginator<Orm extends OrmAdapter> implements Paginator<Orm> {
 		})
 	}
 
-	paginate(query: Orm["Query"], context: PaginateContext<Orm>) {
+	paginate(query: Orm["Query"], context: PaginateContext<Orm, Context>) {
 		const { orm } = context.graph
 		const { args } = context.tree
 

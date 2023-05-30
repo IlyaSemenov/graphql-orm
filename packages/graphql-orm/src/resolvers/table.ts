@@ -5,46 +5,46 @@ import { defineFieldResolver, FieldResolver } from "./field"
 import type { GraphResolveContext, GraphResolver } from "./graph"
 import { defineRelationResolver } from "./relation"
 
-export interface TableResolverOptions<Orm extends OrmAdapter> {
+export interface TableResolverOptions<Orm extends OrmAdapter, Context> {
 	/** allow to resolve all table fields without explicitly listing them */
 	allowAllFields?: boolean
 	/** allow to filter all table fields without explicitly listing them */
 	allowAllFilters?: boolean
-	fields?: Record<string, SimpleFieldResolver<Orm>>
-	modifiers?: Record<string, ApplyFiltersModifier<Orm>>
-	modify?: TableResolveModifier<Orm>
+	fields?: Record<string, SimpleFieldResolver<Orm, Context>>
+	modifiers?: Record<string, ApplyFiltersModifier<Orm, Context>>
+	modify?: TableResolveModifier<Orm, Context>
 	transform?(instance: any, context: any): void | PromiseLike<void>
 }
 
-export type SimpleFieldResolver<Orm extends OrmAdapter> =
+export type SimpleFieldResolver<Orm extends OrmAdapter, Context> =
 	| true
 	| string
-	| FieldResolver<Orm>
+	| FieldResolver<Orm, Context>
 
-export type TableResolveModifier<Orm extends OrmAdapter> = (
+export type TableResolveModifier<Orm extends OrmAdapter, Context> = (
 	query: Orm["Query"],
-	context: TableResolveContext<Orm>
+	context: TableResolveContext<Orm, Context>
 ) => Orm["Query"]
 
-export interface TableResolveContext<Orm extends OrmAdapter>
-	extends GraphResolveContext {
-	graph: GraphResolver<Orm>
+export interface TableResolveContext<Orm extends OrmAdapter, Context>
+	extends GraphResolveContext<Context> {
+	graph: GraphResolver<Orm, Context>
 	/** GraphQL type */
 	type: string
 }
 
-export class TableResolver<Orm extends OrmAdapter> {
+export class TableResolver<Orm extends OrmAdapter, Context> {
 	// Introspection results
 	readonly relations: Set<string>
 	readonly virtual_fields: Set<string>
-	readonly modifiers?: Record<string, ApplyFiltersModifier<Orm>>
+	readonly modifiers?: Record<string, ApplyFiltersModifier<Orm, Context>>
 
-	readonly table_field_resolvers?: Record<string, FieldResolver<Orm>>
+	readonly table_field_resolvers?: Record<string, FieldResolver<Orm, Context>>
 
 	constructor(
 		readonly orm: Orm,
 		readonly table: Orm["Table"],
-		readonly options: TableResolverOptions<Orm> = {}
+		readonly options: TableResolverOptions<Orm, Context> = {}
 	) {
 		this.relations = new Set(orm.get_table_relations(table))
 		this.virtual_fields = new Set(orm.get_table_virtual_fields(table))
@@ -54,10 +54,10 @@ export class TableResolver<Orm extends OrmAdapter> {
 		const { fields } = options
 		if (fields) {
 			this.table_field_resolvers = Object.keys(fields).reduce<
-				Record<string, FieldResolver<Orm>>
+				Record<string, FieldResolver<Orm, Context>>
 			>((resolvers, field) => {
 				const r0 = fields[field]
-				const r: FieldResolver<Orm> | undefined =
+				const r: FieldResolver<Orm, Context> | undefined =
 					typeof r0 === "function"
 						? r0
 						: r0 === true
@@ -77,7 +77,7 @@ export class TableResolver<Orm extends OrmAdapter> {
 	}
 
 	/** Modify query to select fields/relations and filter the result set. */
-	resolve(query: Orm["Query"], context: TableResolveContext<Orm>) {
+	resolve(query: Orm["Query"], context: TableResolveContext<Orm, Context>) {
 		const { modify, transform } = this.options
 		const { graph, tree, type, filters } = context
 
@@ -107,7 +107,7 @@ export class TableResolver<Orm extends OrmAdapter> {
 
 		for (const subtree of Object.values(tree.fieldsByTypeName[type])) {
 			const field = subtree.name
-			const r: FieldResolver<Orm> | undefined =
+			const r: FieldResolver<Orm, Context> | undefined =
 				this.table_field_resolvers?.[field] ||
 				(allow_all_fields ? this._get_default_field_resolver(field) : undefined)
 			if (!r) {
@@ -124,7 +124,7 @@ export class TableResolver<Orm extends OrmAdapter> {
 		const effective_filters = allow_all_filters ? true : filters
 
 		if (effective_filters) {
-			query = apply_filters<Orm>(query, {
+			query = apply_filters<Orm, Context>(query, {
 				filters: effective_filters,
 				modifiers: this.modifiers,
 				context,
@@ -148,7 +148,7 @@ export class TableResolver<Orm extends OrmAdapter> {
 	_get_default_field_resolver(
 		field: string,
 		tableField?: string
-	): FieldResolver<Orm> {
+	): FieldResolver<Orm, Context> {
 		const table_field_lookup = tableField || field
 		if (
 			this.options.modifiers?.[table_field_lookup] ||

@@ -2,32 +2,39 @@ import { OrmAdapter } from "../orm/orm"
 import { run_after_query } from "../utils/run-after"
 import { TableResolveContext } from "./table"
 
-export interface FieldResolverOptions<Orm extends OrmAdapter> {
+export interface FieldResolverOptions<Orm extends OrmAdapter, Context> {
 	/** Table field (if different from GraphQL field) */
 	tableField?: string
 	/** Custom query modifier (if different than simply selecting a field). */
-	modify?: FieldResolveModifier<Orm>
+	modify?: FieldResolveModifier<Orm, Context>
 	/** Post-process selected value. Return a new value or a promise. */
-	transform?(value: any, instance: any, context: FieldResolveContext<Orm>): any
+	transform?(
+		value: any,
+		instance: any,
+		context: FieldResolveContext<Orm, Context>
+	): any
 }
 
-export type FieldResolveModifier<Orm extends OrmAdapter> = (
+export type FieldResolveModifier<Orm extends OrmAdapter, Context> = (
 	query: Orm["Query"],
-	context: FieldResolveContext<Orm>
+	context: FieldResolveContext<Orm, Context>
 ) => Orm["Query"]
 
-export interface FieldResolveContext<Orm extends OrmAdapter>
-	extends TableResolveContext<Orm> {
+export interface FieldResolveContext<Orm extends OrmAdapter, Context>
+	extends TableResolveContext<Orm, Context> {
 	/** GraphQL field */
 	field: string
 }
 
 // That is a coincidence for now.
-export type FieldResolver<Orm extends OrmAdapter> = FieldResolveModifier<Orm>
+export type FieldResolver<
+	Orm extends OrmAdapter,
+	Context
+> = FieldResolveModifier<Orm, Context>
 
-export function defineFieldResolver<Orm extends OrmAdapter>(
-	options: FieldResolverOptions<Orm> = {}
-): FieldResolver<Orm> {
+export function defineFieldResolver<Orm extends OrmAdapter, Context>(
+	options: FieldResolverOptions<Orm, Context> = {}
+): FieldResolver<Orm, Context> {
 	const { tableField, modify, transform } = options
 
 	return function resolve(query, context) {

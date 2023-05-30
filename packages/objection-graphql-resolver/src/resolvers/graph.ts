@@ -9,17 +9,20 @@ import { AnyQueryBuilder, Model, QueryBuilder } from "objection"
 
 import { ObjectionOrm, orm } from "../orm/orm"
 
-export function createGraphResolver(
-	types: Record<string, TableResolver<ObjectionOrm>>,
-	options?: GraphResolverOptions<ObjectionOrm>
+export function createGraphResolver<Context = unknown>(
+	types: Record<string, TableResolver<ObjectionOrm, Context>>,
+	options?: GraphResolverOptions<ObjectionOrm, Context>
 ) {
-	return new ObjectionGraphResolver(types, options)
+	return new ObjectionGraphResolver<Context>(types, options)
 }
 
-class ObjectionGraphResolver extends GraphResolver<ObjectionOrm> {
+class ObjectionGraphResolver<Context> extends GraphResolver<
+	ObjectionOrm,
+	Context
+> {
 	constructor(
-		public readonly types: Record<string, TableResolver<ObjectionOrm>>,
-		public readonly options: GraphResolverOptions<ObjectionOrm> = {}
+		public readonly types: Record<string, TableResolver<ObjectionOrm, Context>>,
+		public readonly options: GraphResolverOptions<ObjectionOrm, Context> = {}
 	) {
 		super(orm, types, options)
 	}
@@ -33,7 +36,7 @@ class ObjectionGraphResolver extends GraphResolver<ObjectionOrm> {
 
 	resolvePage<M extends Model, Query extends QueryBuilder<M, M[]>>(
 		query: Query,
-		paginator: Paginator<ObjectionOrm>,
+		paginator: Paginator<ObjectionOrm, Context>,
 		options: GraphResolveOptions
 	) {
 		return super.resolvePage(query, paginator, options) as QueryBuilder<M, any> // FIXME: infer paginator page type

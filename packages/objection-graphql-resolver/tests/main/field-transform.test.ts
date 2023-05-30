@@ -26,7 +26,7 @@ const schema = gql`
 	}
 `
 
-const graph = r.graph({
+const graph = r.graph<{ user_id: string }>({
 	User: r.model(UserModel, {
 		fields: {
 			id: true,

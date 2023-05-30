@@ -6,8 +6,8 @@ import { OrmAdapter } from "../orm/orm"
 import { Paginator } from "../paginators/base"
 import type { TableResolver, TableResolverOptions } from "./table"
 
-export type GraphResolverOptions<Orm extends OrmAdapter> = Pick<
-	TableResolverOptions<Orm>,
+export type GraphResolverOptions<Orm extends OrmAdapter, Context> = Pick<
+	TableResolverOptions<Orm, Context>,
 	"allowAllFields" | "allowAllFilters"
 >
 
@@ -17,17 +17,17 @@ export interface GraphResolveOptions {
 	filters?: FiltersDef
 }
 
-export interface GraphResolveContext {
+export interface GraphResolveContext<Context> {
 	tree: ResolveTree
 	filters?: FiltersDef
-	context: any
+	context: Context
 }
 
-export class GraphResolver<Orm extends OrmAdapter> {
+export class GraphResolver<Orm extends OrmAdapter, Context> {
 	constructor(
 		readonly orm: Orm,
-		readonly type_resolvers: Record<string, TableResolver<Orm>>,
-		readonly options: GraphResolverOptions<Orm> = {}
+		readonly type_resolvers: Record<string, TableResolver<Orm, Context>>,
+		readonly options: GraphResolverOptions<Orm, Context> = {}
 	) {}
 
 	resolve(
@@ -40,7 +40,7 @@ export class GraphResolver<Orm extends OrmAdapter> {
 
 	resolvePage(
 		query: Orm["Query"],
-		paginator: Paginator<Orm>,
+		paginator: Paginator<Orm, Context>,
 		{ info, context, filters }: GraphResolveOptions
 	): Orm["Query"] {
 		const tree = this._get_resolve_tree(info)
@@ -53,7 +53,7 @@ export class GraphResolver<Orm extends OrmAdapter> {
 
 	_resolve_type(
 		query: Orm["Query"],
-		context: GraphResolveContext
+		context: GraphResolveContext<Context>
 	): Orm["Query"] {
 		const { tree } = context
 		const type = Object.keys(tree.fieldsByTypeName)[0]
@@ -71,8 +71,8 @@ export class GraphResolver<Orm extends OrmAdapter> {
 
 	_resolve_page(
 		query: Orm["Query"],
-		paginator: Paginator<Orm>,
-		context: GraphResolveContext
+		paginator: Paginator<Orm, Context>,
+		context: GraphResolveContext<Context>
 	): Orm["Query"] {
 		let { tree } = context
 		// Skip page subtree(s)

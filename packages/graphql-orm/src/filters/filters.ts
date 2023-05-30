@@ -9,21 +9,21 @@ export type FilterScalarValue = null | string | number | boolean
 export type FilterValue = FilterScalarValue | Exclude<FilterScalarValue, null>[]
 export type Filter = { [property: string]: FilterValue }
 
-interface ApplyFiltersOptions<Orm extends OrmAdapter> {
+interface ApplyFiltersOptions<Orm extends OrmAdapter, Context> {
 	filters: FiltersDef
-	modifiers?: Record<string, ApplyFiltersModifier<Orm>>
-	context: TableResolveContext<Orm>
+	modifiers?: Record<string, ApplyFiltersModifier<Orm, Context>>
+	context: TableResolveContext<Orm, Context>
 }
 
-export type ApplyFiltersModifier<Orm extends OrmAdapter> = (
+export type ApplyFiltersModifier<Orm extends OrmAdapter, Context> = (
 	query: Orm["Query"],
 	value: any,
-	context: TableResolveContext<Orm>
+	context: TableResolveContext<Orm, Context>
 ) => Orm["Query"]
 
-export function apply_filters<Orm extends OrmAdapter>(
+export function apply_filters<Orm extends OrmAdapter, Context>(
 	query: Orm["Query"],
-	{ filters, modifiers, context }: ApplyFiltersOptions<Orm>
+	{ filters, modifiers, context }: ApplyFiltersOptions<Orm, Context>
 ): Orm["Query"] {
 	if (!filters) {
 		return query
