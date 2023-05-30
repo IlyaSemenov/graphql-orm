@@ -3,7 +3,12 @@ import { overrideParserInQuery } from "orchid-core"
 import { DbTable } from "orchid-orm"
 import { Query } from "pqb"
 
-export const orm: OrmAdapter<DbTable<any>, Query> = {
+export type OrchidOrm = OrmAdapter<DbTable<any>, Query>
+
+export const orm: OrchidOrm = {
+	Table: undefined as unknown as OrchidOrm["Table"],
+	Query: undefined as unknown as OrchidOrm["Query"],
+
 	// Reflection
 
 	get_table_table(table) {

@@ -8,7 +8,12 @@ export function field_ref(query: AnyQueryBuilder, field: string) {
 	return ref(field).from(query.tableRefFor(query.modelClass() as typeof Model))
 }
 
-export const orm: OrmAdapter<AnyModelConstructor, AnyQueryBuilder> = {
+export type ObjectionOrm = OrmAdapter<AnyModelConstructor, AnyQueryBuilder>
+
+export const orm: ObjectionOrm = {
+	Table: undefined as unknown as ObjectionOrm["Table"],
+	Query: undefined as unknown as ObjectionOrm["Query"],
+
 	// Reflection
 
 	get_table_table(table) {
@@ -33,7 +38,9 @@ export const orm: OrmAdapter<AnyModelConstructor, AnyQueryBuilder> = {
 	get_table_modifiers(table) {
 		const modifiers = (table as ModelClass<Model>).modifiers
 		return modifiers
-			? Object.entries(modifiers).reduce((modifiers, [field, modifier]) => {
+			? Object.entries(modifiers).reduce<
+					Record<string, OrmModifier<ObjectionOrm>>
+			  >((modifiers, [field, modifier]) => {
 					// Objection modifiers return void, convert them to return query
 					if (typeof modifier === "function") {
 						modifiers[field] = (query, ...args) => {
@@ -42,7 +49,7 @@ export const orm: OrmAdapter<AnyModelConstructor, AnyQueryBuilder> = {
 						}
 					}
 					return modifiers
-			  }, {} as Record<string, OrmModifier<AnyQueryBuilder>>)
+			  }, {})
 			: undefined
 	},
 

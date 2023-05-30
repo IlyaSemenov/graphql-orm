@@ -1,3 +1,4 @@
+import { OrmAdapter } from "../orm/orm"
 import { PaginateContext, Paginator } from "./base"
 
 export function defineCursorPaginator(
@@ -21,7 +22,7 @@ export interface CursorPaginatorPage<M> {
 	cursor?: string
 }
 
-class CursorPaginator implements Paginator {
+class CursorPaginator<Orm extends OrmAdapter> implements Paginator<Orm> {
 	readonly path = ["nodes"]
 	readonly options: CursorPaginatorOptions
 
@@ -45,7 +46,7 @@ class CursorPaginator implements Paginator {
 		})
 	}
 
-	paginate(query: unknown, context: PaginateContext) {
+	paginate(query: Orm["Query"], context: PaginateContext<Orm>) {
 		const { orm } = context.graph
 		const { args } = context.tree
 

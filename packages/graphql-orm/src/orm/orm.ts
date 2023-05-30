@@ -1,11 +1,16 @@
 import { GetPageFn } from "../paginators/base"
 
-export type OrmModifier<Query = unknown> = (
-	query: Query,
+export type OrmModifier<Orm extends OrmAdapter> = (
+	query: Orm["Query"],
 	...args: any[]
-) => Query
+) => Orm["Query"]
 
-export interface OrmAdapter<Table = unknown, Query = unknown> {
+export interface OrmAdapter<Table = any, Query = any> {
+	// Types
+
+	Table: Table
+	Query: Query
+
 	// Reflection
 
 	/** ORM table -> db table */
@@ -19,7 +24,7 @@ export interface OrmAdapter<Table = unknown, Query = unknown> {
 
 	get_table_modifiers(
 		table: Table
-	): Record<string, OrmModifier<Query>> | undefined
+	): Record<string, OrmModifier<this>> | undefined
 
 	/** ORM query -> db table */
 	get_query_table(query: Query): string

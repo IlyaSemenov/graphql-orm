@@ -1,16 +1,17 @@
 import { FiltersDef } from "../filters/filters"
+import { OrmAdapter } from "../orm/orm"
 import { FieldResolver, FieldResolverOptions } from "./field"
 import { TableResolveModifier } from "./table"
 
-export interface RelationResolverOptions<Query = unknown>
-	extends Omit<FieldResolverOptions<Query>, "modify"> {
+export interface RelationResolverOptions<Orm extends OrmAdapter>
+	extends Omit<FieldResolverOptions<Orm>, "modify"> {
 	filters?: FiltersDef
-	modify?: TableResolveModifier<Query>
+	modify?: TableResolveModifier<Orm>
 }
 
-export function defineRelationResolver<Query = unknown>(
-	options: RelationResolverOptions<Query> = {}
-): FieldResolver<Query> {
+export function defineRelationResolver<Orm extends OrmAdapter>(
+	options: RelationResolverOptions<Orm> = {}
+): FieldResolver<Orm> {
 	const { tableField, filters, modify } = options
 
 	return function resolve(query, context) {

@@ -1,11 +1,12 @@
+import { OrmAdapter } from "../orm/orm"
 import { Paginator } from "../paginators/base"
 import { FieldResolver } from "./field"
 import { RelationResolverOptions } from "./relation"
 
-export function definePageResolver<Query = unknown>(
-	paginator: Paginator,
-	options: RelationResolverOptions<Query> = {}
-): FieldResolver<Query> {
+export function definePageResolver<Orm extends OrmAdapter>(
+	paginator: Paginator<Orm>,
+	options: RelationResolverOptions<Orm> = {}
+): FieldResolver<Orm> {
 	const { tableField, modify } = options
 
 	return function resolve(query, context) {

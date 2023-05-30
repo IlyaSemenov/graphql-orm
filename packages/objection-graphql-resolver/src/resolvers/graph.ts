@@ -7,19 +7,19 @@ import {
 } from "graphql-orm"
 import { AnyQueryBuilder, Model, QueryBuilder } from "objection"
 
-import { orm } from "../orm/orm"
+import { ObjectionOrm, orm } from "../orm/orm"
 
 export function createGraphResolver(
-	types: Record<string, TableResolver<AnyQueryBuilder>>,
-	options?: GraphResolverOptions<AnyQueryBuilder>
+	types: Record<string, TableResolver<ObjectionOrm>>,
+	options?: GraphResolverOptions<ObjectionOrm>
 ) {
 	return new ObjectionGraphResolver(types, options)
 }
 
-class ObjectionGraphResolver extends GraphResolver<AnyQueryBuilder> {
+class ObjectionGraphResolver extends GraphResolver<ObjectionOrm> {
 	constructor(
-		public readonly types: Record<string, TableResolver<AnyQueryBuilder>>,
-		public readonly options: GraphResolverOptions<AnyQueryBuilder> = {}
+		public readonly types: Record<string, TableResolver<ObjectionOrm>>,
+		public readonly options: GraphResolverOptions<ObjectionOrm> = {}
 	) {
 		super(orm, types, options)
 	}
@@ -33,7 +33,7 @@ class ObjectionGraphResolver extends GraphResolver<AnyQueryBuilder> {
 
 	resolvePage<M extends Model, Query extends QueryBuilder<M, M[]>>(
 		query: Query,
-		paginator: Paginator,
+		paginator: Paginator<ObjectionOrm>,
 		options: GraphResolveOptions
 	) {
 		return super.resolvePage(query, paginator, options) as QueryBuilder<M, any> // FIXME: infer paginator page type

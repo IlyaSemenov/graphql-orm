@@ -1,3 +1,4 @@
+import { OrmAdapter } from "../orm/orm"
 import { TableResolveContext } from "../resolvers/table"
 import { is_plain_object } from "../utils/is-plain-object"
 
@@ -8,22 +9,22 @@ export type FilterScalarValue = null | string | number | boolean
 export type FilterValue = FilterScalarValue | Exclude<FilterScalarValue, null>[]
 export type Filter = { [property: string]: FilterValue }
 
-interface ApplyFiltersOptions<Query = unknown> {
+interface ApplyFiltersOptions<Orm extends OrmAdapter> {
 	filters: FiltersDef
-	modifiers?: Record<string, ApplyFiltersModifier<Query>>
-	context: TableResolveContext<Query>
+	modifiers?: Record<string, ApplyFiltersModifier<Orm>>
+	context: TableResolveContext<Orm>
 }
 
-export type ApplyFiltersModifier<Query = unknown> = (
-	query: Query,
+export type ApplyFiltersModifier<Orm extends OrmAdapter> = (
+	query: Orm["Query"],
 	value: any,
-	context: TableResolveContext<Query>
-) => Query
+	context: TableResolveContext<Orm>
+) => Orm["Query"]
 
-export function apply_filters<Query = unknown>(
-	query: Query,
-	{ filters, modifiers, context }: ApplyFiltersOptions<Query>
-): Query {
+export function apply_filters<Orm extends OrmAdapter>(
+	query: Orm["Query"],
+	{ filters, modifiers, context }: ApplyFiltersOptions<Orm>
+): Orm["Query"] {
 	if (!filters) {
 		return query
 	}

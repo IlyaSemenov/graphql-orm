@@ -1,13 +1,15 @@
+import { OrmAdapter } from "../orm/orm"
 import { GraphResolveContext, GraphResolver } from "../resolvers/graph"
 
-export interface Paginator {
+export interface Paginator<Orm extends OrmAdapter> {
 	/** GraphQL path, for example: `["nodes"]` */
 	readonly path: string[]
-	paginate(query: unknown, context: PaginateContext): unknown
+	paginate(query: Orm["Query"], context: PaginateContext<Orm>): Orm["Query"]
 }
 
-export interface PaginateContext extends GraphResolveContext {
-	graph: GraphResolver
+export interface PaginateContext<Orm extends OrmAdapter>
+	extends GraphResolveContext {
+	graph: GraphResolver<Orm>
 }
 
 export type GetPageFn = (nodes: any[]) => any

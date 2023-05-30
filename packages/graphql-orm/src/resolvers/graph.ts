@@ -6,8 +6,8 @@ import { OrmAdapter } from "../orm/orm"
 import { Paginator } from "../paginators/base"
 import type { TableResolver, TableResolverOptions } from "./table"
 
-export type GraphResolverOptions<Query = unknown> = Pick<
-	TableResolverOptions<Query>,
+export type GraphResolverOptions<Orm extends OrmAdapter> = Pick<
+	TableResolverOptions<Orm>,
 	"allowAllFields" | "allowAllFilters"
 >
 
@@ -23,26 +23,26 @@ export interface GraphResolveContext {
 	context: any
 }
 
-export class GraphResolver<Query = unknown> {
+export class GraphResolver<Orm extends OrmAdapter> {
 	constructor(
-		readonly orm: OrmAdapter<any, Query>,
-		readonly type_resolvers: Record<string, TableResolver<Query>>,
-		readonly options: GraphResolverOptions<Query> = {}
+		readonly orm: Orm,
+		readonly type_resolvers: Record<string, TableResolver<Orm>>,
+		readonly options: GraphResolverOptions<Orm> = {}
 	) {}
 
 	resolve(
-		query: Query,
+		query: Orm["Query"],
 		{ info, context, filters }: GraphResolveOptions
-	): Query {
+	): Orm["Query"] {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_type(query, { tree, filters, context })
 	}
 
 	resolvePage(
-		query: Query,
-		paginator: Paginator,
+		query: Orm["Query"],
+		paginator: Paginator<Orm>,
 		{ info, context, filters }: GraphResolveOptions
-	): Query {
+	): Orm["Query"] {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_page(query, paginator, { tree, filters, context })
 	}
@@ -51,7 +51,10 @@ export class GraphResolver<Query = unknown> {
 		return parseResolveInfo(info) as ResolveTree
 	}
 
-	_resolve_type(query: Query, context: GraphResolveContext): Query {
+	_resolve_type(
+		query: Orm["Query"],
+		context: GraphResolveContext
+	): Orm["Query"] {
 		const { tree } = context
 		const type = Object.keys(tree.fieldsByTypeName)[0]
 		const type_resolver = this.type_resolvers[type]
@@ -63,14 +66,14 @@ export class GraphResolver<Query = unknown> {
 			graph: this as any,
 			tree,
 			type,
-		}) as Query
+		})
 	}
 
 	_resolve_page(
-		query: Query,
-		paginator: Paginator,
+		query: Orm["Query"],
+		paginator: Paginator<Orm>,
 		context: GraphResolveContext
-	): Query {
+	): Orm["Query"] {
 		let { tree } = context
 		// Skip page subtree(s)
 		for (const field of paginator.path) {
@@ -82,6 +85,6 @@ export class GraphResolver<Query = unknown> {
 		return paginator.paginate(query, {
 			...context,
 			graph: this as any,
-		}) as Query
+		})
 	}
 }

@@ -1,11 +1,10 @@
 import { GraphResolver, GraphResolverOptions, TableResolver } from "graphql-orm"
-import { Query } from "pqb"
 
-import { orm } from "../orm/orm"
+import { OrchidOrm, orm } from "../orm/orm"
 
 export function createGraphResolver(
-	types: Record<string, TableResolver<Query>>,
-	options?: GraphResolverOptions<Query>
+	types: Record<string, TableResolver<OrchidOrm>>,
+	options?: GraphResolverOptions<OrchidOrm>
 ) {
-	return new GraphResolver<Query>(orm, types, options)
+	return new GraphResolver<OrchidOrm>(orm, types, options)
 }

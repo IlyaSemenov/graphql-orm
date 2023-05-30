@@ -1,10 +1,10 @@
 import { OrmAdapter } from "../orm/orm"
 
-export function run_after_query(
-	orm: OrmAdapter<any, any>,
-	query: unknown,
+export function run_after_query<Orm extends OrmAdapter>(
+	orm: Orm,
+	query: Orm["Query"],
 	transform: (instance: any) => any
-) {
+): Orm["Query"] {
 	return orm.run_after_query(query, async (result) => {
 		// FIXME: returning result is ignored in orchid (unlike objection). Add some hacks instead.
 		if (Array.isArray(result)) {
