@@ -146,14 +146,14 @@ importers:
         specifier: ~0.4.13
         version: 0.4.13
       orchid-orm:
-        specifier: ~1.9.40
-        version: 1.9.40(typescript@5.0.4)
+        specifier: ~1.9.42
+        version: 1.9.42(typescript@5.0.4)
       pg:
         specifier: ~8.11.0
         version: 8.11.0
       pqb:
-        specifier: ~0.11.32
-        version: 0.11.32
+        specifier: ~0.11.34
+        version: 0.11.34
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(ts-node@10.9.1)(typescript@5.0.4)
@@ -4415,15 +4415,15 @@ packages:
     resolution: {integrity: sha512-c9PbYN+MsCY4/EbnG7Qkk8XWy7v+7/vR1ngxJbiqmJKnAvuVdHubVqjDdoRRzCQKiY24fOKYJGyV7gACDkTBNw==}
     dev: true
 
-  /orchid-orm@1.9.40(typescript@5.0.4):
-    resolution: {integrity: sha512-6vtTBiSlwaqqciQ1v5CmwkfNedp9dF1RzTqBVShtH2lpI9g8Sj1Ue79pmaTphHGQnYEmlJGn5U+Sb9dFHf3SPg==}
+  /orchid-orm@1.9.42(typescript@5.0.4):
+    resolution: {integrity: sha512-3qwLhfKTD8lKMfymejFcazAhWuLA3bIDfXWCaFt3nRb2iQ/TMRaX0TdGdTGadOafHeHQRJUHWRDCD2JmSxnbMA==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
       orchid-core: 0.4.13
-      pqb: 0.11.32
+      pqb: 0.11.34
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4765,8 +4765,8 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.11.32:
-    resolution: {integrity: sha512-rnx2Nx7ipienDJxy/rELQVABnOrq4h7CmZLDaWiX+aqk548UIzBA60HBt0Yc2FyRiUiGTIQECtGmlbdtoAxO5w==}
+  /pqb@0.11.34:
+    resolution: {integrity: sha512-WU3/kx7iwRjuM14KlYOgoQoaHY2UpQ73cjSshbrVPNAi2AaFZYPiuwuxylLmfK5WKuz++RtvSUwtfPnegUH3JA==}
     dependencies:
       orchid-core: 0.4.13
       pg: 8.11.0
