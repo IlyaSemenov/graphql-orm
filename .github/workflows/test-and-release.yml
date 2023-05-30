@@ -1,11 +1,13 @@
-name: Test
+name: Test and Release
 
 on:
   push:
     branches: ["**"]
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  test:
+  test-and-release:
     name: Test
     runs-on: ubuntu-latest
     steps:
@@ -26,17 +28,19 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Test objection-graphql-resolver
-        run: cd packages/objection-graphql-resolver && pnpm build && pnpm test
+      - name: Build packages
+        run: pnpm run -r build
 
-      - name: Test orchid-graphql
-        run: cd packages/orchid-graphql && pnpm build
-        # TODO: somehow install Postgres and run tests: && pnpm test
+      - name: Test packages
+        # TODO: somehow install Postgres and test orchid-graphql
+        run: pnpm run -r --filter='!orchid-graphql' test
 
-      - name: Create Release Pull Request
+      - name: Create Release Pull Request or Publish to npm
         if: ${{ github.ref == 'refs/heads/master' }}
         uses: changesets/action@v1
         with:
           commit: "chore: version packages"
+          publish: pnpm changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

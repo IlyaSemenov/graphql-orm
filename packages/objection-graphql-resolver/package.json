@@ -23,8 +23,8 @@
   "scripts": {
     "dev": "vite-node --watch playground/readme.sample.ts",
     "build": "tsup",
-    "prepack": "npm run build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "graphql-parse-resolve-info": "^4.12.0"
