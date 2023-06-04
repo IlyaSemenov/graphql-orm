@@ -18,7 +18,7 @@ export async function create_db<T extends TableClasses>(tables: T) {
 	const db = orchidORM(
 		{
 			databaseURL: url.toString(),
-			log: true,
+			log: !process.env.CI,
 		},
 		tables
 	)
