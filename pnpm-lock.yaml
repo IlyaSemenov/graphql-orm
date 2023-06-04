@@ -141,17 +141,17 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-core:
-        specifier: ~0.4.13
-        version: 0.4.13
+        specifier: ~0.4.14
+        version: 0.4.14
       orchid-orm:
-        specifier: ~1.9.42
-        version: 1.9.42(typescript@5.0.4)
+        specifier: ~1.10.2
+        version: 1.10.2(typescript@5.0.4)
       pg:
         specifier: ~8.11.0
         version: 8.11.0
       pqb:
-        specifier: ~0.11.34
-        version: 0.11.34
+        specifier: ~0.12.2
+        version: 0.12.2
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3980,19 +3980,19 @@ packages:
       word-wrap: 1.2.3
     dev: true
 
-  /orchid-core@0.4.13:
-    resolution: {integrity: sha512-c9PbYN+MsCY4/EbnG7Qkk8XWy7v+7/vR1ngxJbiqmJKnAvuVdHubVqjDdoRRzCQKiY24fOKYJGyV7gACDkTBNw==}
+  /orchid-core@0.4.14:
+    resolution: {integrity: sha512-hs3j2oGlSXCpWcSCP99fHWNi8HjoO0RYsGPOtyjSFn38gHzo84UK/BAeTeAJsaAVHqlLdWNvayK3uMKHSYUZpA==}
     dev: true
 
-  /orchid-orm@1.9.42(typescript@5.0.4):
-    resolution: {integrity: sha512-3qwLhfKTD8lKMfymejFcazAhWuLA3bIDfXWCaFt3nRb2iQ/TMRaX0TdGdTGadOafHeHQRJUHWRDCD2JmSxnbMA==}
+  /orchid-orm@1.10.2(typescript@5.0.4):
+    resolution: {integrity: sha512-bSQZpP0jvCzHOiM682Vbo0MKvYhmYdHOLyzT4smE76h1sunZX4RkDnayxKiYftO55XvspRAyb/mCWPAF8osP4Q==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.4.13
-      pqb: 0.11.34
+      orchid-core: 0.4.14
+      pqb: 0.12.2
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4333,10 +4333,10 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.11.34:
-    resolution: {integrity: sha512-WU3/kx7iwRjuM14KlYOgoQoaHY2UpQ73cjSshbrVPNAi2AaFZYPiuwuxylLmfK5WKuz++RtvSUwtfPnegUH3JA==}
+  /pqb@0.12.2:
+    resolution: {integrity: sha512-JuKHzt9reHZm/pzlug/rxFL1wClWoaaIFWqUw8DYgOxJDspj/DqpD8i+yvHvuVlIQdIlvxdwZ+4p7c8KfxoeHg==}
     dependencies:
-      orchid-core: 0.4.13
+      orchid-core: 0.4.14
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native
