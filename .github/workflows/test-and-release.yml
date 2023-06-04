@@ -10,6 +10,22 @@ jobs:
   test-and-release:
     name: Test and Release
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        # See https://docs.github.com/en/actions/using-containerized-services/creating-postgresql-service-containers
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
@@ -32,8 +48,9 @@ jobs:
         run: pnpm run -r build
 
       - name: Test packages
-        # TODO: somehow install Postgres and test orchid-graphql
-        run: pnpm run -r --filter='!orchid-graphql' test
+        run: pnpm run -r test
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost
 
       - name: Create Release Pull Request or Publish to npm
         if: ${{ github.ref == 'refs/heads/master' }}
