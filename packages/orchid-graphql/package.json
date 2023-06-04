@@ -33,7 +33,7 @@
     "graphql": "^16",
     "orchid-core": "^0.4.11",
     "orchid-orm": "^1.9.36",
-    "pqb": "^0.11.29"
+    "pqb": ">=0.11.29 <0.13"
   },
   "devDependencies": {
     "@apollo/server": "~4.7.1",

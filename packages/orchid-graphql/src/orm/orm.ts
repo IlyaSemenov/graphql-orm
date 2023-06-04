@@ -1,7 +1,7 @@
 import { OrmAdapter } from "graphql-orm"
 import { overrideParserInQuery } from "orchid-core"
 import { DbTable } from "orchid-orm"
-import { Query } from "pqb"
+import type { Query } from "pqb"
 
 export type OrchidOrm = OrmAdapter<DbTable<any>, Query>
 
