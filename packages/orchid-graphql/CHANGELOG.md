@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.2.0
+
+### Minor Changes
+
+- f90441e: Update orchid-orm, pqb and use the new Orchid `transform` method for pagination in `orchid-graphql`.
+
 ## 1.1.1
 
 ### Patch Changes
