@@ -1,13 +1,18 @@
 import { OrmAdapter } from "graphql-orm"
-import { overrideParserInQuery } from "orchid-core"
 import { DbTable } from "orchid-orm"
 import type { Query } from "pqb"
 
-export type OrchidOrm = OrmAdapter<DbTable<any>, Query>
+export type OrchidOrm = OrmAdapter<
+	DbTable<any>,
+	Query,
+	// TODO: Type as QueryTransform once it's published.
+	Pick<Promise<any>, "then" | "catch">
+>
 
 export const orm: OrchidOrm = {
 	Table: undefined as unknown as OrchidOrm["Table"],
 	Query: undefined as unknown as OrchidOrm["Query"],
+	QueryTransform: undefined as unknown as OrchidOrm["QueryTransform"],
 
 	// Reflection
 
@@ -74,31 +79,14 @@ export const orm: OrchidOrm = {
 	// Pagination helpers
 
 	set_query_page_result(query, get_page) {
-		// For root query
-		const _query = query.query
-		const { handleResult } = _query
-		_query.handleResult = (q, result, s) => {
-			const data = handleResult(q, result, s)
-			// Sometimes this is called for subqueries, sometimes not.
-			// TODO: investigate and use always.
-			return s ? data : get_page(data as any[])
-		}
-		// For subqueries
-		;(_query as any)[s] = get_page
-		return query
+		return query.transform((nodes) => get_page(nodes as any))
 	},
 
-	modify_subquery_pagination(subquery, context) {
-		context.get_page = (subquery.query as any)[s]
+	modify_subquery_pagination(subquery) {
 		return subquery
 	},
 
-	finish_query_pagination(query, field, context) {
-		const { get_page } = context
-		if (!get_page) {
-			throw new Error(`Internal error: paginator didn't provide page callback.`)
-		}
-		overrideParserInQuery(query.query, field, get_page)
+	finish_query_pagination(query) {
 		return query
 	},
 
@@ -113,5 +101,3 @@ export const orm: OrchidOrm = {
 		return query
 	},
 }
-
-const s = Symbol("subquery_pagination_handler")

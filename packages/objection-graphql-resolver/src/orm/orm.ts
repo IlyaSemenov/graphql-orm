@@ -8,11 +8,16 @@ export function field_ref(query: AnyQueryBuilder, field: string) {
 	return ref(field).from(query.tableRefFor(query.modelClass() as typeof Model))
 }
 
-export type ObjectionOrm = OrmAdapter<AnyModelConstructor, AnyQueryBuilder>
+export type ObjectionOrm = OrmAdapter<
+	AnyModelConstructor,
+	AnyQueryBuilder,
+	AnyQueryBuilder
+>
 
 export const orm: ObjectionOrm = {
 	Table: undefined as unknown as ObjectionOrm["Table"],
 	Query: undefined as unknown as ObjectionOrm["Query"],
+	QueryTransform: undefined as unknown as ObjectionOrm["QueryTransform"],
 
 	// Reflection
 

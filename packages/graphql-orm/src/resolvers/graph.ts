@@ -33,7 +33,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 	resolve(
 		query: Orm["Query"],
 		{ info, context, filters }: GraphResolveOptions
-	): Orm["Query"] {
+	) {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_type(query, { tree, filters, context })
 	}
@@ -42,7 +42,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		query: Orm["Query"],
 		paginator: Paginator<Orm, Context>,
 		{ info, context, filters }: GraphResolveOptions
-	): Orm["Query"] {
+	) {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_page(query, paginator, { tree, filters, context })
 	}
@@ -51,10 +51,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		return parseResolveInfo(info) as ResolveTree
 	}
 
-	_resolve_type(
-		query: Orm["Query"],
-		context: GraphResolveContext<Context>
-	): Orm["Query"] {
+	_resolve_type(query: Orm["Query"], context: GraphResolveContext<Context>) {
 		const { tree } = context
 		const type = Object.keys(tree.fieldsByTypeName)[0]
 		const type_resolver = this.type_resolvers[type]
@@ -73,7 +70,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		query: Orm["Query"],
 		paginator: Paginator<Orm, Context>,
 		context: GraphResolveContext<Context>
-	): Orm["Query"] {
+	) {
 		let { tree } = context
 		// Skip page subtree(s)
 		for (const field of paginator.path) {

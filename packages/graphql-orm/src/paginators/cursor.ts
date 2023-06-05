@@ -69,7 +69,7 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 		}
 		query = orm.set_query_limit(query, take + 1)
 
-		query = orm.set_query_page_result(query, (nodes) => {
+		return orm.set_query_page_result(query, (nodes) => {
 			let cursor: string | undefined
 			if (nodes.length > take) {
 				cursor = this._create_cursor(nodes[take - 1])
@@ -77,8 +77,6 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 			}
 			return { nodes, cursor }
 		})
-
-		return query
 	}
 
 	_create_cursor(instance: any) {

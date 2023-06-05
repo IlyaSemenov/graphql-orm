@@ -5,11 +5,12 @@ export type OrmModifier<Orm extends OrmAdapter> = (
 	...args: any[]
 ) => Orm["Query"]
 
-export interface OrmAdapter<Table = any, Query = any> {
+export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 	// Types
 
 	Table: Table
 	Query: Query
+	QueryTransform: QueryTransform
 
 	// Reflection
 
@@ -62,7 +63,7 @@ export interface OrmAdapter<Table = any, Query = any> {
 
 	// Pagination helpers
 
-	set_query_page_result(query: Query, get_page: GetPageFn): Query
+	set_query_page_result(query: Query, get_page: GetPageFn): QueryTransform
 
 	modify_subquery_pagination(
 		subquery: Query,

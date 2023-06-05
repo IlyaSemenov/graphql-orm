@@ -11,13 +11,15 @@ export function definePageResolver<Orm extends OrmAdapter, Context>(
 
 	return function resolve(query, context) {
 		const { graph, field } = context
+		// Objection.js requires a workaround to handle paginated content,
+		// it must be saved into context and re-injected later.
+		// The modify + finish is a no-op in Orchid.
 		const pagination_context = {}
 		query = graph.orm.select_relation(query, {
 			relation: tableField || field,
 			as: field,
 			modify(subquery) {
 				subquery = graph._resolve_page(subquery, paginator, context)
-				// The modify+finish hack is needed for both Objection and Orchid (with completely different implementations)
 				subquery = graph.orm.modify_subquery_pagination(
 					subquery,
 					pagination_context

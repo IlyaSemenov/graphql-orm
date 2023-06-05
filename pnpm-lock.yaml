@@ -140,18 +140,15 @@ importers:
       graphql-tag:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
-      orchid-core:
-        specifier: ~0.4.14
-        version: 0.4.14
       orchid-orm:
-        specifier: ~1.10.2
-        version: 1.10.2(typescript@5.0.4)
+        specifier: ~1.10.3
+        version: 1.10.3(typescript@5.0.4)
       pg:
         specifier: ~8.11.0
         version: 8.11.0
       pqb:
-        specifier: ~0.12.2
-        version: 0.12.2
+        specifier: ~0.12.3
+        version: 0.12.3
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3984,15 +3981,15 @@ packages:
     resolution: {integrity: sha512-hs3j2oGlSXCpWcSCP99fHWNi8HjoO0RYsGPOtyjSFn38gHzo84UK/BAeTeAJsaAVHqlLdWNvayK3uMKHSYUZpA==}
     dev: true
 
-  /orchid-orm@1.10.2(typescript@5.0.4):
-    resolution: {integrity: sha512-bSQZpP0jvCzHOiM682Vbo0MKvYhmYdHOLyzT4smE76h1sunZX4RkDnayxKiYftO55XvspRAyb/mCWPAF8osP4Q==}
+  /orchid-orm@1.10.3(typescript@5.0.4):
+    resolution: {integrity: sha512-AP0rbzQNZxwl6XRSuCcPph0rho1KY2unxy86Fpk19IWO2sJUC/fSXipx3sp/2qC7LbH5QwdGFRuwsQkLqYl6Ng==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
       orchid-core: 0.4.14
-      pqb: 0.12.2
+      pqb: 0.12.3
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4333,8 +4330,8 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.12.2:
-    resolution: {integrity: sha512-JuKHzt9reHZm/pzlug/rxFL1wClWoaaIFWqUw8DYgOxJDspj/DqpD8i+yvHvuVlIQdIlvxdwZ+4p7c8KfxoeHg==}
+  /pqb@0.12.3:
+    resolution: {integrity: sha512-vr7kgyf5pDxd/J3Hez6D9G6JRdwoiXkoHiZYlwJHn9OoedS09z6upPGs5IRejZ8ZWxZV+jzOsw8X6WHI9tM0aw==}
     dependencies:
       orchid-core: 0.4.14
       pg: 8.11.0

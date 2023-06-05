@@ -7,7 +7,7 @@ export interface Paginator<Orm extends OrmAdapter, Context> {
 	paginate(
 		query: Orm["Query"],
 		context: PaginateContext<Orm, Context>
-	): Orm["Query"]
+	): Orm["QueryTransform"]
 }
 
 export interface PaginateContext<Orm extends OrmAdapter, Context>
