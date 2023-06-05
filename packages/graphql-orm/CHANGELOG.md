@@ -1,5 +1,11 @@
 # graphql-orm
 
+## 1.2.0
+
+### Minor Changes
+
+- f90441e: Introduce `OrmAdapter` generic argument `QueryTransform`.
+
 ## 1.1.0
 
 ### Minor Changes
