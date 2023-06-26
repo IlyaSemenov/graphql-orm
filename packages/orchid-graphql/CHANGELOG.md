@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.3.0
+
+### Minor Changes
+
+- 0dc1798: Use pqb 0.14 with new raw SQL and afterQuery hook.
+
 ## 1.2.0
 
 ### Minor Changes
