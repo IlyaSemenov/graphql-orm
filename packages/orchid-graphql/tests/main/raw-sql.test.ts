@@ -43,7 +43,7 @@ const graph = r.graph({
 			name: true,
 			upper_name: (q) =>
 				q.select({
-					upper_name: q.raw(`upper("user".name)`),
+					upper_name: q.sql<string>`upper("user".name)`,
 				}),
 		},
 	}),

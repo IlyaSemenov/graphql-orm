@@ -287,7 +287,8 @@ const graph = r.graph(
           // (related table must be also registered in this graph resolver)
           author: true,
           // Modify query when this field is resolved
-          preview: (q) => q.select({ preview: q.raw("substr(text,1,100)") }),
+          preview: (q) =>
+            q.select({ preview: q.sql<string>`substr(text,1,100)` }),
           // Same as text: true
           text: r.field(),
           // Custom field resolver
@@ -297,7 +298,8 @@ const graph = r.graph(
           }),
           preview2: r.field({
             // Modify query
-            modify: (q) => q.select({ preview2: q.raw("substr(text,1,100)") }),
+            modify: (q) =>
+              q.select({ preview2: q.sql<string>`substr(text,1,100)` }),
             // Post-process selected value
             transform(
               // Selected value

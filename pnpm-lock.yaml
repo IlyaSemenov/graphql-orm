@@ -141,14 +141,14 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-orm:
-        specifier: ~1.10.3
-        version: 1.10.3(typescript@5.0.4)
+        specifier: ~1.12.0
+        version: 1.12.0(typescript@5.0.4)
       pg:
         specifier: ~8.11.0
         version: 8.11.0
       pqb:
-        specifier: ~0.12.3
-        version: 0.12.3
+        specifier: ~0.14.0
+        version: 0.14.0
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3977,19 +3977,19 @@ packages:
       word-wrap: 1.2.3
     dev: true
 
-  /orchid-core@0.4.14:
-    resolution: {integrity: sha512-hs3j2oGlSXCpWcSCP99fHWNi8HjoO0RYsGPOtyjSFn38gHzo84UK/BAeTeAJsaAVHqlLdWNvayK3uMKHSYUZpA==}
+  /orchid-core@0.6.0:
+    resolution: {integrity: sha512-VqEX1flyo0KJL6k1clFo2ZQy/AH7Q1sfFVZkSUpsDqi2sXRwFcvIjVo06HclUg0wX1yW1ctn9dnyguQC95UrSA==}
     dev: true
 
-  /orchid-orm@1.10.3(typescript@5.0.4):
-    resolution: {integrity: sha512-AP0rbzQNZxwl6XRSuCcPph0rho1KY2unxy86Fpk19IWO2sJUC/fSXipx3sp/2qC7LbH5QwdGFRuwsQkLqYl6Ng==}
+  /orchid-orm@1.12.0(typescript@5.0.4):
+    resolution: {integrity: sha512-x8nhN2q0jAxxtt56PUi92Hj/dB1UUcI4yPXy+Y/6KQx65tkUMo0+JwHra/3HIlgLcX3vB1qnYkQzc1uzAsV0JQ==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.4.14
-      pqb: 0.12.3
+      orchid-core: 0.6.0
+      pqb: 0.14.0
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4131,8 +4131,8 @@ packages:
     resolution: {integrity: sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==}
     dev: true
 
-  /pg-cloudflare@1.1.0:
-    resolution: {integrity: sha512-tGM8/s6frwuAIyRcJ6nWcIvd3+3NmUKIs6OjviIm1HPPFEt5MzQDOTBQyhPWg/m0kCl95M6gA1JaIXtS8KovOA==}
+  /pg-cloudflare@1.1.1:
+    resolution: {integrity: sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==}
     requiresBuild: true
     dev: true
     optional: true
@@ -4208,7 +4208,7 @@ packages:
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
-      pg-cloudflare: 1.1.0
+      pg-cloudflare: 1.1.1
     dev: true
 
   /pgpass@1.0.5:
@@ -4330,10 +4330,10 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.12.3:
-    resolution: {integrity: sha512-vr7kgyf5pDxd/J3Hez6D9G6JRdwoiXkoHiZYlwJHn9OoedS09z6upPGs5IRejZ8ZWxZV+jzOsw8X6WHI9tM0aw==}
+  /pqb@0.14.0:
+    resolution: {integrity: sha512-gL6jtePK70FwLPJ/bWxLdBZJsaWXpXu7nfryQV2pESj6ok9J6xPlWaeaDD7UM0ZGBrwmvuy1CUhnW6mPopaEOA==}
     dependencies:
-      orchid-core: 0.4.14
+      orchid-core: 0.6.0
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native

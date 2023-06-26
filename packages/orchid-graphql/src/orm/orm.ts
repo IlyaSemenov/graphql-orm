@@ -59,7 +59,7 @@ export const orm: OrchidOrm = {
 	},
 
 	where_raw(query, expression, bindings) {
-		return query.where(query.raw(expression, bindings))
+		return query.where(query.sql({ raw: expression }).values(bindings))
 	},
 
 	// Order & Limit
@@ -93,7 +93,7 @@ export const orm: OrchidOrm = {
 	// Misc
 
 	run_after_query(query, fn) {
-		return query.afterQuery(async (_, result) => fn(result))
+		return query.afterQuery((data) => fn(data))
 	},
 
 	prevent_select_all(query) {
