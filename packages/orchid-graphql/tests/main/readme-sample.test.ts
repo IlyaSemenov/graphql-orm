@@ -19,12 +19,12 @@ const db = await create_db({
 	post: PostTable,
 })
 
-await db.$adapter.query(`
+await db.$query`
 	create table post (
 		id serial primary key,
 		text text not null
 	);
-`)
+`
 
 const typeDefs = gql`
 	type Post {

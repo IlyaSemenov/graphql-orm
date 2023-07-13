@@ -44,7 +44,7 @@ const db = await create_db({
 	user: UserTable,
 })
 
-await db.$adapter.query(`
+await db.$query`
 	create table "user" (
 		id serial primary key,
 		name varchar(100) not null
@@ -55,7 +55,7 @@ await db.$adapter.query(`
 		author_id integer not null,
 		is_draft boolean default false
 	);
-`)
+`
 
 const schema = gql`
 	scalar Filter
@@ -143,22 +143,22 @@ const resolvers: Resolvers = {
 
 const client = await create_client({ typeDefs: schema, resolvers })
 
+await db.user.createMany([
+	{ name: "Alice" },
+	{ name: "Bob" },
+	{ name: "Charlie" },
+])
+
+await db.post.createMany([
+	{ author_id: 1, text: "Oil price rising." },
+	{ author_id: 1, text: "Is communism dead yet?" },
+	{ author_id: 2, text: "Latest COVID news." },
+	{ author_id: 1, text: "Good news from China." },
+	{ author_id: 2, text: "COVID vs Flu?" },
+	{ author_id: 2, text: "This is draft...", is_draft: true },
+])
+
 test("filters", async () => {
-	await db.user.createMany([
-		{ name: "Alice" },
-		{ name: "Bob" },
-		{ name: "Charlie" },
-	])
-
-	await db.post.createMany([
-		{ author_id: 1, text: "Oil price rising." },
-		{ author_id: 1, text: "Is communism dead yet?" },
-		{ author_id: 2, text: "Latest COVID news." },
-		{ author_id: 1, text: "Good news from China." },
-		{ author_id: 2, text: "COVID vs Flu?" },
-		{ author_id: 2, text: "This is draft...", is_draft: true },
-	])
-
 	assert.deepEqual(
 		await client.request(
 			gql`

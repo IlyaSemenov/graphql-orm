@@ -106,7 +106,7 @@ const db = await create_db({
 	like: LikeTable,
 })
 
-await db.$adapter.query(`
+await db.$query`
 	create table "user" (
 		id serial primary key,
 		name varchar(100) not null
@@ -127,7 +127,7 @@ await db.$adapter.query(`
 		user_id integer not null,
 		comment_id integer not null
 	);
-`)
+`
 
 const schema = gql`
 	type User {

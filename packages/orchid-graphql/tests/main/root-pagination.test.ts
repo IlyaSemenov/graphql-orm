@@ -17,12 +17,12 @@ const db = await create_db({
 	user: UserTable,
 })
 
-await db.$adapter.query(`
+await db.$query`
 	create table "user" (
 		id serial primary key,
 		name varchar(100) not null
 	);
-`)
+`
 
 const schema = gql`
 	type User {

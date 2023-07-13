@@ -48,7 +48,7 @@ const db = await create_db({
 	book: BookTable,
 })
 
-await db.$adapter.query(`
+await db.$query`
 	create table "author" (
 		id serial primary key,
 		name varchar(100) not null,
@@ -62,7 +62,7 @@ await db.$adapter.query(`
 		author_id integer not null,
 		book_id integer not null
 	);
-`)
+`
 
 const schema = gql`
 	type Author {

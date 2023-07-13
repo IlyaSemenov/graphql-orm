@@ -31,12 +31,12 @@ const db = orchidORM(
 	}
 )
 
-await db.$adapter.query(`
+await db.$query`
 	create table post (
 		id serial primary key,
 		text text not null
 	);
-`)
+`
 
 // Define GraphQL schema
 
