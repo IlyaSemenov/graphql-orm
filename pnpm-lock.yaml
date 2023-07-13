@@ -141,14 +141,14 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-orm:
-        specifier: ~1.12.0
-        version: 1.12.0(typescript@5.0.4)
+        specifier: ~1.13.4
+        version: 1.13.4(typescript@5.0.4)
       pg:
         specifier: ~8.11.0
         version: 8.11.0
       pqb:
-        specifier: ~0.14.0
-        version: 0.14.0
+        specifier: ~0.16.1
+        version: 0.16.1
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3977,19 +3977,19 @@ packages:
       word-wrap: 1.2.3
     dev: true
 
-  /orchid-core@0.6.0:
-    resolution: {integrity: sha512-VqEX1flyo0KJL6k1clFo2ZQy/AH7Q1sfFVZkSUpsDqi2sXRwFcvIjVo06HclUg0wX1yW1ctn9dnyguQC95UrSA==}
+  /orchid-core@0.8.0:
+    resolution: {integrity: sha512-WWUHRhaQjRZrVNVfHynkwk6T8Uj2O4P1LsiLEI5DwaMc0nv6L3GaX2RvWYnEqkJXfdb2enjEbkAWU7dTCm0fOQ==}
     dev: true
 
-  /orchid-orm@1.12.0(typescript@5.0.4):
-    resolution: {integrity: sha512-x8nhN2q0jAxxtt56PUi92Hj/dB1UUcI4yPXy+Y/6KQx65tkUMo0+JwHra/3HIlgLcX3vB1qnYkQzc1uzAsV0JQ==}
+  /orchid-orm@1.13.4(typescript@5.0.4):
+    resolution: {integrity: sha512-k+kWqt7oieoGPuVRh3UGyb1vXK5W1eCOjyTfpTP8xELFuFNZbwF8f+vOQONLtbYzMLM2jMMNcGugC82IPtp2uA==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.6.0
-      pqb: 0.14.0
+      orchid-core: 0.8.0
+      pqb: 0.16.1
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4330,10 +4330,10 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.14.0:
-    resolution: {integrity: sha512-gL6jtePK70FwLPJ/bWxLdBZJsaWXpXu7nfryQV2pESj6ok9J6xPlWaeaDD7UM0ZGBrwmvuy1CUhnW6mPopaEOA==}
+  /pqb@0.16.1:
+    resolution: {integrity: sha512-1ymQP1jeY9DzaPRrm+4BJxrkMHLRAWDHedTvwthx2TgQyXXzfJuJYTYxHSlbvG4kXAvf/hlKOT6zXxPMPliOqg==}
     dependencies:
-      orchid-core: 0.6.0
+      orchid-core: 0.8.0
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native
