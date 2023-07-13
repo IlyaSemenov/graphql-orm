@@ -2,7 +2,13 @@ import gql from "graphql-tag"
 import * as r from "orchid-graphql"
 import { expect, test } from "vitest"
 
-import { BaseTable, create_client, create_db, Resolvers } from "../setup"
+import {
+	BaseTable,
+	create_client,
+	create_db,
+	ResolverContext,
+	Resolvers,
+} from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
@@ -35,7 +41,7 @@ const schema = gql`
 	}
 `
 
-const graph = r.graph({
+const graph = r.graph<ResolverContext>({
 	User: r.table(db.user, {
 		modify(query, { context }) {
 			const { user_id } = context
