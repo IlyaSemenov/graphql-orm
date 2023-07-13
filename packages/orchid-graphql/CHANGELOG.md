@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.3.1
+
+### Patch Changes
+
+- 0dc6aa8: Allow pqb 0.16 in peer deps.
+
 ## 1.3.0
 
 ### Minor Changes
