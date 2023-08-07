@@ -1,7 +1,7 @@
 {
   "name": "orchid-graphql",
   "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/IlyaSemenov/orchid-graphql"
