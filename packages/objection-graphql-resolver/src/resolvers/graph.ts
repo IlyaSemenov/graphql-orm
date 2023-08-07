@@ -29,7 +29,7 @@ class ObjectionGraphResolver<Context> extends GraphResolver<
 
 	resolve<Query extends AnyQueryBuilder>(
 		query: Query,
-		options: GraphResolveOptions
+		options: GraphResolveOptions<Context>
 	): Query {
 		return super.resolve(query, options) as Query
 	}
@@ -37,7 +37,7 @@ class ObjectionGraphResolver<Context> extends GraphResolver<
 	resolvePage<M extends Model, Query extends QueryBuilder<M, M[]>>(
 		query: Query,
 		paginator: Paginator<ObjectionOrm, Context>,
-		options: GraphResolveOptions
+		options: GraphResolveOptions<Context>
 	) {
 		return super.resolvePage(query, paginator, options) as QueryBuilder<M, any> // FIXME: infer paginator page type
 	}

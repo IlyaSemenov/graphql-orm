@@ -11,16 +11,17 @@ export type GraphResolverOptions<Orm extends OrmAdapter, Context> = Pick<
 	"allowAllFields" | "allowAllFilters"
 >
 
-export interface GraphResolveOptions {
+export interface GraphResolveOptions<Context> {
 	info: GraphQLResolveInfo
-	context: any
+	context: Context
 	filters?: FiltersDef
 }
 
-export interface GraphResolveContext<Context> {
+export type GraphResolveContext<Context> = Omit<
+	GraphResolveOptions<Context>,
+	"info"
+> & {
 	tree: ResolveTree
-	filters?: FiltersDef
-	context: Context
 }
 
 export class GraphResolver<Orm extends OrmAdapter, Context> {
@@ -32,19 +33,19 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 
 	resolve(
 		query: Orm["Query"],
-		{ info, context, filters }: GraphResolveOptions
+		{ info, ...context }: GraphResolveOptions<Context>
 	) {
 		const tree = this._get_resolve_tree(info)
-		return this._resolve_type(query, { tree, filters, context })
+		return this._resolve_type(query, { ...context, tree })
 	}
 
 	resolvePage(
 		query: Orm["Query"],
 		paginator: Paginator<Orm, Context>,
-		{ info, context, filters }: GraphResolveOptions
+		{ info, ...context }: GraphResolveOptions<Context>
 	) {
 		const tree = this._get_resolve_tree(info)
-		return this._resolve_page(query, paginator, { tree, filters, context })
+		return this._resolve_page(query, paginator, { ...context, tree })
 	}
 
 	_get_resolve_tree(info: GraphQLResolveInfo) {
