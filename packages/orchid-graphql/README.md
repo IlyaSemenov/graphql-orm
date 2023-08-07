@@ -234,7 +234,7 @@ const resolvers = {
       return await graph.resolvePage(
         db.post,
         r.cursor({ take: 10, fields: ["-id"] }),
-        { ctx, info }
+        { context, info }
       )
     },
   },

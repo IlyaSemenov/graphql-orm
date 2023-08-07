@@ -218,7 +218,7 @@ const resolvers = {
   Query: {
     posts: async (parent, args, context, info) => {
       return graph.resolvePage(
-        Post.query(),
+        PostModel.query(),
         r.cursor({ take: 10, fields: ["-id"] }),
         { context, info }
       )
@@ -394,7 +394,7 @@ const resolvers = {
     posts: (parent, args, context, info) => {
       return graph.resolve(
         // Root query (required)
-        Post.query(),
+        PostModel.query(),
         // Options (required)
         {
           // Resolver context
@@ -409,7 +409,7 @@ const resolvers = {
     posts_page: (parent, args, context, info) => {
       return graph.resolvePage(
         // Root query (required)
-        Post.query(),
+        PostModel.query(),
         // Paginator (required)
         r.cursor({ fields: ["-id"], take: 10 }),
         // Options (required) - see graph.resolve
