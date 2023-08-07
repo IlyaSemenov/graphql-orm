@@ -89,6 +89,7 @@ export const orm: ObjectionOrm = {
 			return query.where(field, op, value)
 		}
 	},
+
 	where_raw(query, expression, bindings) {
 		return query.where(raw(expression.replace(/\$/g, ":"), bindings))
 	},
