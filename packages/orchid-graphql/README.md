@@ -405,4 +405,13 @@ const resolvers = {
     },
   },
 }
+
+graph.resolve(db.user.find(1), {
+  // As comes from Apollo
+  context,
+  // As comes from Apollo
+  info,
+  // If resolving subfield
+  path: ["subfield"],
+})
 ```

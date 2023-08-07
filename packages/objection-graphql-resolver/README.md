@@ -422,4 +422,13 @@ const resolvers = {
     },
   },
 }
+
+graph.resolve(PostModel.query().findById(1), {
+  // As comes from Apollo
+  context,
+  // As comes from Apollo
+  info,
+  // If resolving subfield
+  path: ["subfield"],
+})
 ```

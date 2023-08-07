@@ -15,6 +15,8 @@ export interface GraphResolveOptions<Context> {
 	info: GraphQLResolveInfo
 	context: Context
 	filters?: FiltersDef
+	/** Subfield path if not resolving root query, e.g.: ['user'] */
+	path?: string[]
 }
 
 export type GraphResolveContext<Context> = Omit<
@@ -53,7 +55,15 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 	}
 
 	_resolve_type(query: Orm["Query"], context: GraphResolveContext<Context>) {
-		const { tree } = context
+		let { tree } = context
+		// Dive into subtree if requested.
+		if (context.path) {
+			for (const field of context.path) {
+				const type = Object.keys(tree.fieldsByTypeName)[0]
+				tree = tree.fieldsByTypeName[type][field]
+				// TODO: raise exception if not found.
+			}
+		}
 		const type = Object.keys(tree.fieldsByTypeName)[0]
 		const type_resolver = this.type_resolvers[type]
 		if (!type_resolver) {
@@ -64,6 +74,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 			graph: this as any,
 			tree,
 			type,
+			path: undefined,
 		})
 	}
 
@@ -72,14 +83,11 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		paginator: Paginator<Orm, Context>,
 		context: GraphResolveContext<Context>
 	) {
-		let { tree } = context
-		// Skip page subtree(s)
-		for (const field of paginator.path) {
-			const type = Object.keys(tree.fieldsByTypeName)[0]
-			tree = tree.fieldsByTypeName[type][field]
-			// TODO: raise exception if not found
+		if (context.path) {
+			// TODO: handle non-empty context.path
+			throw new Error("Paginating under non-root path not yet supported.")
 		}
-		query = this._resolve_type(query, { ...context, tree })
+		query = this._resolve_type(query, { ...context, path: paginator.path })
 		return paginator.paginate(query, {
 			...context,
 			graph: this as any,
