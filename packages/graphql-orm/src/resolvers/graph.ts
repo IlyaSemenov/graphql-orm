@@ -61,7 +61,15 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 			for (const field of context.path) {
 				const type = Object.keys(tree.fieldsByTypeName)[0]
 				tree = tree.fieldsByTypeName[type][field]
-				// TODO: raise exception if not found.
+				if (!tree) {
+					// This graphql field was never requested, ignore.
+					// This happens when a user resolves a graph for a root subfield which was not requested by the client (and is thus not present in the tree).
+					//
+					// FIXME: this break typings contract. We are supposed to return a query.
+					// However, if we advertise to optionally return undefined, this result won't be accepted by upstream graphql tooling types.
+					// This is the least evil I see for now.
+					return undefined
+				}
 			}
 		}
 		const type = Object.keys(tree.fieldsByTypeName)[0]

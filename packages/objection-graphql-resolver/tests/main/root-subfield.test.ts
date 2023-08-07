@@ -1,28 +1,16 @@
 import gql from "graphql-tag"
-import * as r from "orchid-graphql"
+import { Model } from "objection"
+import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { BaseTable, create_client, create_db, Resolvers } from "../setup"
+import { Resolvers, setup } from "../setup"
 
-class UserTable extends BaseTable {
-	readonly table = "user"
+class UserModel extends Model {
+	static tableName = "user"
 
-	columns = this.setColumns((t) => ({
-		id: t.identity().primaryKey(),
-		name: t.string(1, 100),
-	}))
+	id?: number
+	name?: string
 }
-
-const db = await create_db({
-	user: UserTable,
-})
-
-await db.$query`
-	create table "user" (
-		id serial primary key,
-		name varchar(100) not null
-	);
-`
 
 const schema = gql`
 	type User {
@@ -45,14 +33,14 @@ const schema = gql`
 `
 
 const graph = r.graph({
-	User: r.table(db.user),
+	User: r.model(UserModel),
 })
 
 const resolvers: Resolvers = {
 	Query: {},
 	Mutation: {
 		async login(_parent, args, context, info) {
-			const user = await graph.resolve(db.user.find(args.id), {
+			const user = await graph.resolve(UserModel.query().findById(args.id), {
 				context,
 				info,
 				path: ["user"],
@@ -63,10 +51,15 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const { client, knex } = await setup({ typeDefs: schema, resolvers })
+
+await knex.schema.createTable("user", function (table) {
+	table.increments("id").notNullable().primary()
+	table.string("name").notNullable()
+})
 
 test("root query sub-field", async () => {
-	await db.user.create({ name: "Alice" })
+	await UserModel.query().insert({ name: "Alice" })
 
 	assert.deepEqual(
 		await client.request(gql`
