@@ -1,5 +1,15 @@
 # orchid-graphql
 
+## 1.4.0
+
+### Minor Changes
+
+- 49ea582: Support resolving non-root GraphQL fields (#27).
+
+### Patch Changes
+
+- b10f1d2: Make GraphResolveOptions a <Context> generic.
+
 ## 1.3.1
 
 ### Patch Changes
