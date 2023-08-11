@@ -141,14 +141,14 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-orm:
-        specifier: ~1.13.4
-        version: 1.13.4(typescript@5.0.4)
+        specifier: ~1.16.1
+        version: 1.16.1(typescript@5.0.4)
       pg:
         specifier: ~8.11.0
         version: 8.11.0
       pqb:
-        specifier: ~0.16.1
-        version: 0.16.1
+        specifier: ~0.17.9
+        version: 0.17.9
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3977,19 +3977,19 @@ packages:
       word-wrap: 1.2.3
     dev: true
 
-  /orchid-core@0.8.0:
-    resolution: {integrity: sha512-WWUHRhaQjRZrVNVfHynkwk6T8Uj2O4P1LsiLEI5DwaMc0nv6L3GaX2RvWYnEqkJXfdb2enjEbkAWU7dTCm0fOQ==}
+  /orchid-core@0.10.1:
+    resolution: {integrity: sha512-g3KsnXozMxD3th9Pv9OApAB/bF1wOV6aGykwCwSYGTHMNP31KBGHbCLIuUCJuUS+8RN1S82y/UgoaEBPqafpEQ==}
     dev: true
 
-  /orchid-orm@1.13.4(typescript@5.0.4):
-    resolution: {integrity: sha512-k+kWqt7oieoGPuVRh3UGyb1vXK5W1eCOjyTfpTP8xELFuFNZbwF8f+vOQONLtbYzMLM2jMMNcGugC82IPtp2uA==}
+  /orchid-orm@1.16.1(typescript@5.0.4):
+    resolution: {integrity: sha512-5FDQdaRHicJ/JrvpDs350W+FBEoFNnUKx9IBNRFu/uJXtTLCdACrExqkdhq1YdG3tu9J+iGdhP1/5q4+qOD0PA==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.8.0
-      pqb: 0.16.1
+      orchid-core: 0.10.1
+      pqb: 0.17.9
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4330,10 +4330,11 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.16.1:
-    resolution: {integrity: sha512-1ymQP1jeY9DzaPRrm+4BJxrkMHLRAWDHedTvwthx2TgQyXXzfJuJYTYxHSlbvG4kXAvf/hlKOT6zXxPMPliOqg==}
+  /pqb@0.17.9:
+    resolution: {integrity: sha512-A/a5T3/wOoO1i7EwiIteOeiCm0TFrvLTN+vRrtA7euxHz5gnzoaA9/sTLCAAusb/vj6WcZ6EOoK5rdQjUXifNQ==}
     dependencies:
-      orchid-core: 0.8.0
+      '@types/pg': 8.10.1
+      orchid-core: 0.10.1
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native

@@ -32,7 +32,7 @@
   "peerDependencies": {
     "graphql": "^16",
     "orchid-orm": "^1.12.0",
-    "pqb": ">=0.14 <0.17"
+    "pqb": ">=0.14 <0.18"
   },
   "devDependencies": {
     "@apollo/server": "~4.7.1",
@@ -42,9 +42,9 @@
     "graphql-orm": "workspace:*",
     "graphql-request": "~6.0.0",
     "graphql-tag": "^2.12.6",
-    "orchid-orm": "~1.13.4",
+    "orchid-orm": "~1.16.1",
     "pg": "~8.11.0",
-    "pqb": "~0.16.1",
+    "pqb": "~0.17.9",
     "tsup": "~6.7.0",
     "typescript": "~5.0.4",
     "vite": "~4.3.8",
