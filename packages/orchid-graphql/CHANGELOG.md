@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.4.2
+
+### Patch Changes
+
+- 93c3113: Allow pqb 0.17, fix devDependencies.
+
 ## 1.4.1
 
 ### Patch Changes
