@@ -1,6 +1,10 @@
 import { FiltersDef } from "../filters/filters"
 import { OrmAdapter } from "../orm/orm"
-import { FieldResolver, FieldResolverOptions } from "./field"
+import {
+	FieldResolver,
+	FieldResolverOptions,
+	parse_field_options,
+} from "./field"
 import { TableResolveModifier } from "./table"
 
 export interface RelationResolverOptions<Orm extends OrmAdapter, Context>
@@ -12,7 +16,7 @@ export interface RelationResolverOptions<Orm extends OrmAdapter, Context>
 export function defineRelationResolver<Orm extends OrmAdapter, Context>(
 	options: RelationResolverOptions<Orm, Context> = {}
 ): FieldResolver<Orm, Context> {
-	const { tableField, filters, modify } = options
+	const { tableField, filters, modify } = parse_field_options(options)
 
 	return function resolve(query, context) {
 		const { graph, field } = context

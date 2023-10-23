@@ -310,7 +310,7 @@ const graph = r.graph(
           // Custom field resolver
           text2: r.field({
             // Model (database) field, if different from GraphQL field
-            tableField: "text",
+            modelField: "text",
           }),
           preview2: r.field({
             // Modify query
@@ -362,7 +362,7 @@ const graph = r.graph(
             ),
             {
               // All r.relation() options, such as:
-              tableField: "comments",
+              modelField: "comments",
             }
           ),
         },

@@ -114,13 +114,13 @@ const graph = r.graph({
 			posts: r.page(r.cursor({ take: 2 })),
 			// TODO: test the fields below
 			posts_page: r.page(r.cursor({ take: 2 }), {
-				tableField: "posts",
+				modelField: "posts",
 			}),
 			posts_by_one: r.page(r.cursor({ take: 1 }), {
-				tableField: "posts",
+				modelField: "posts",
 			}),
 			all_posts: "posts",
-			all_posts_verbose: r.relation({ tableField: "posts" }),
+			all_posts_verbose: r.relation({ modelField: "posts" }),
 		},
 	}),
 	Section: r.model(SectionModel, {
