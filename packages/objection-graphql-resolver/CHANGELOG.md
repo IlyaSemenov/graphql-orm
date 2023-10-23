@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.2.2
+
+### Patch Changes
+
+- 2f28c2b: Support `modelField` in addition to `tableField` as per docs (fix #33).
+
 ## 7.2.1
 
 ### Patch Changes

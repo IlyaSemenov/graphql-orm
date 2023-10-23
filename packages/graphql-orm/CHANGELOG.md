@@ -1,5 +1,11 @@
 # graphql-orm
 
+## 1.3.2
+
+### Patch Changes
+
+- 2f28c2b: Support `modelField` in addition to `tableField` as per docs (fix #33).
+
 ## 1.3.1
 
 ### Patch Changes
