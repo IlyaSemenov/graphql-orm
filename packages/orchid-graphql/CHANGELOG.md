@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.4.4
+
+### Patch Changes
+
+- 0e6c235: Update to work with pqb 0.21
+
 ## 1.4.3
 
 ### Patch Changes
