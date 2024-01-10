@@ -138,11 +138,11 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-orm:
-        specifier: ~1.17.2
-        version: 1.17.2(typescript@5.0.4)
+        specifier: ~1.19.0
+        version: 1.19.0(typescript@5.0.4)
       pqb:
-        specifier: ~0.18.2
-        version: 0.18.2
+        specifier: ~0.21.0
+        version: 0.21.0
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3971,19 +3971,18 @@ packages:
       word-wrap: 1.2.3
     dev: true
 
-  /orchid-core@0.10.2:
-    resolution: {integrity: sha512-pi+JP2vi2qIBA2woOE0guccP4NTchuj11vKBxdZi2SUCszUoQaSiJwWfkvRduIYs2AAyWRGV8WYY7a+DRVzYdg==}
+  /orchid-core@0.10.17:
+    resolution: {integrity: sha512-+2OYlX9OTKevYN900YiPXWeOneo0Z+E0W8AS4A2cwe7wqSeYXJcgt+y3BGgWou1d3OJcC0tglQabwx0fuY3SMg==}
     dev: true
 
-  /orchid-orm@1.17.2(typescript@5.0.4):
-    resolution: {integrity: sha512-cvwlXzgRShr5X16BCQZ/WJNa+W4Sy2m2KiZgWEqDoX05qHqhCi794BxhBvonTdJP8DnszsG9vDhmkh7kfbtrEQ==}
-    hasBin: true
+  /orchid-orm@1.19.0(typescript@5.0.4):
+    resolution: {integrity: sha512-NddKH6eoM9GndH0IHIjDOVTncn3mcHQKFTnyXcFm4R8OMP/h+HgDDucXde7h35HHvClDc0goVuJSD/13Y11M1A==}
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.10.2
-      pqb: 0.18.2
+      orchid-core: 0.10.17
+      pqb: 0.21.0
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4324,11 +4323,11 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.18.2:
-    resolution: {integrity: sha512-UCO2whoS/X1cKJe7pRfUtHNusjZfuC+l5MYZfdEp3EV04fA2nN8mxkUHKQBOYBxS4QOtj1M2FCOh+RpzbQ4b1g==}
+  /pqb@0.21.0:
+    resolution: {integrity: sha512-dd/QMdY/diVnbtFvS0eP9PNHb3Sk8DnOMKL23oDshjahobexgWUDeUVBu4DBsJC4dDGsOQ6WAEvQiEA/qvuGJw==}
     dependencies:
       '@types/pg': 8.10.1
-      orchid-core: 0.10.2
+      orchid-core: 0.10.17
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native
