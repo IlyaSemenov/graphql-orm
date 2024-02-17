@@ -1,5 +1,6 @@
 import gql from "graphql-tag"
 import * as r from "orchid-graphql"
+import { _queryWhere } from "pqb"
 import { assert, test } from "vitest"
 
 import { BaseTable, create_client, create_db, Resolvers } from "../setup"
@@ -61,7 +62,7 @@ const graph = r.graph({
 			favorite_for_user(query, user_id: number) {
 				return query.beforeQuery(async (query) => {
 					const tag = await db.user.find(user_id).get("favorite_tag")
-					query._where({ tag })
+					_queryWhere(query, [{ tag }])
 				})
 			},
 		},
