@@ -1,5 +1,5 @@
 import { OrmAdapter } from "graphql-orm"
-import { DbTable } from "orchid-orm"
+import { DbTable, raw } from "orchid-orm"
 import type { Query } from "pqb"
 
 export type OrchidOrm = OrmAdapter<
@@ -59,7 +59,7 @@ export const orm: OrchidOrm = {
 	},
 
 	where_raw(query, expression, bindings) {
-		return query.where(query.sql({ raw: expression }).values(bindings))
+		return query.where(raw({ raw: expression, values: bindings }))
 	},
 
 	// Order & Limit

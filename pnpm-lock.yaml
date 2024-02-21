@@ -138,11 +138,11 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-orm:
-        specifier: ~1.21.6
-        version: 1.21.6(typescript@5.0.4)
+        specifier: ~1.23.0
+        version: 1.23.0(typescript@5.0.4)
       pqb:
-        specifier: ~0.23.5
-        version: 0.23.5
+        specifier: ~0.25.0
+        version: 0.25.0
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -3996,18 +3996,18 @@ packages:
       word-wrap: 1.2.3
     dev: true
 
-  /orchid-core@0.11.2:
-    resolution: {integrity: sha512-uQ/U4zFi2lea1RwzrzdemBZvChM0zPZGepxlEjA1Qa/qLvOoe7nZtwmEIr7v2mN3n91248Ky80JZPnBFGRv7IQ==}
+  /orchid-core@0.12.0:
+    resolution: {integrity: sha512-uzWNEvHfyEi3ERHLeIzxyzfnGcnWus/zQ+uiDvLy4Ok/nLe1Mpw55gEIyUw4T+r4AD7wYLSvjVLBe5duYoIUyw==}
     dev: true
 
-  /orchid-orm@1.21.6(typescript@5.0.4):
-    resolution: {integrity: sha512-j2aHlEl1U2MQI4yM5PxQcpi5ZnHZAKOjAjX9FYYZl43Rj74r8a2W3o1xe6xxU0yP10LAEaJZNH0ZAWrcVKc9dQ==}
+  /orchid-orm@1.23.0(typescript@5.0.4):
+    resolution: {integrity: sha512-bxedNbcZ+2zzCc5J5pTNglQ9Utp6oIGfQgqwjUDVjDZAxRE1mc58uZw8dJAa3IR6MJUhXHOgWe77X12FDRKMOw==}
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.11.2
-      pqb: 0.23.5
+      orchid-core: 0.12.0
+      pqb: 0.25.0
       prompts: 2.4.2
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -4348,11 +4348,11 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.23.5:
-    resolution: {integrity: sha512-gpn55pZwd9bfsfqJbC46Rn3ULTK5BA+8EuDa1TcWVSwuko4sY9lVLs5pVttsGcW3T7jYrsxkzDZRjE54NVxPYA==}
+  /pqb@0.25.0:
+    resolution: {integrity: sha512-985Q8dA7UqsQytbhC8TW4ct3qHFmeaFbaT3kdkpRpAx9kdpgqh/Oq0xdWF4RBCs9N+0Q9Z7TM3IklRdU41BBAQ==}
     dependencies:
       '@types/pg': 8.10.1
-      orchid-core: 0.11.2
+      orchid-core: 0.12.0
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native
