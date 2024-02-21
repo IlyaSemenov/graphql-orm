@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.4.5
+
+### Patch Changes
+
+- 4b34b55: Compatibility with latest Orchid (1.23).
+
 ## 1.4.4
 
 ### Patch Changes
