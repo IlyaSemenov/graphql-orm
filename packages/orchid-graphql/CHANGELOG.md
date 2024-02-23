@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.5.0
+
+### Minor Changes
+
+- 262aa3e: Inline graphql-parse-resolve-info to prevent false peer dependency error in dependent packages.
+
 ## 1.4.5
 
 ### Patch Changes

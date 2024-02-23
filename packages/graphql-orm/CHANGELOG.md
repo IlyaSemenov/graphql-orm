@@ -1,5 +1,11 @@
 # graphql-orm
 
+## 1.4.0
+
+### Minor Changes
+
+- 262aa3e: Inline graphql-parse-resolve-info to prevent false peer dependency error in dependent packages.
+
 ## 1.3.2
 
 ### Patch Changes
