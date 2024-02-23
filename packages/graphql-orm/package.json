@@ -13,7 +13,6 @@
     "graphql": "^16"
   },
   "devDependencies": {
-    "@types/node": "~20.2.5",
     "tsconfig-vite-node": "^1.1.0"
   }
 }
