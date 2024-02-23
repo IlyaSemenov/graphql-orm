@@ -8,5 +8,9 @@
 	},
 	"editor.formatOnSave": true,
 	"eslint.experimental.useFlatConfig": true,
-	"eslint.validate": ["javascript", "typescript"]
+	"eslint.validate": ["javascript", "typescript"],
+	"search.exclude": {
+		"**/node_modules": true,
+		"packages/*/dist": true
+	}
 }
