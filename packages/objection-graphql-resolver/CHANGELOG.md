@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.3.0
+
+### Minor Changes
+
+- 262aa3e: Inline graphql-parse-resolve-info to prevent false peer dependency error in dependent packages.
+
 ## 7.2.2
 
 ### Patch Changes
