@@ -1,9 +1,12 @@
 import type { GraphQLResolveInfo } from "graphql"
-import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
 
 import { FiltersDef } from "../filters/filters"
 import { OrmAdapter } from "../orm/orm"
 import { Paginator } from "../paginators/base"
+import {
+	parseResolveInfo,
+	type ResolveTree,
+} from "../utils/graphql-parse-resolve-info"
 import type { TableResolver, TableResolverOptions } from "./table"
 
 export type GraphResolverOptions<Orm extends OrmAdapter, Context> = Pick<

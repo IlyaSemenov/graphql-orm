@@ -26,9 +26,6 @@
     "test": "vitest run",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
-    "graphql-parse-resolve-info": "^4.12.0"
-  },
   "peerDependencies": {
     "graphql": "^16",
     "objection": "^2 || ^3"
