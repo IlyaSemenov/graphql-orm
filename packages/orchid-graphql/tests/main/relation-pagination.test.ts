@@ -271,7 +271,7 @@ test("relation pagination", async () => {
 		  "user": {
 		    "name": "Alice",
 		    "posts_page": {
-		      "cursor": "[\\"2\\"]",
+		      "cursor": "["2"]",
 		      "nodes": [
 		        {
 		          "text": "Oil price rising.",
@@ -315,14 +315,14 @@ test("double nested pagination", async () => {
 		  "user": {
 		    "name": "Alice",
 		    "posts_page": {
-		      "cursor": "[\\"2\\"]",
+		      "cursor": "["2"]",
 		      "nodes": [
 		        {
 		          "author": {
 		            "name": "Alice",
 		          },
 		          "comments_page": {
-		            "cursor": "[\\"2\\"]",
+		            "cursor": "["2"]",
 		            "nodes": [
 		              {
 		                "text": "I am so good.",
@@ -411,14 +411,14 @@ test("double and triple nested pagination", async () => {
 		    },
 		    "name": "Alice",
 		    "posts_page": {
-		      "cursor": "[\\"2\\"]",
+		      "cursor": "["2"]",
 		      "nodes": [
 		        {
 		          "author": {
 		            "name": "Alice",
 		          },
 		          "comments_page": {
-		            "cursor": "[\\"2\\"]",
+		            "cursor": "["2"]",
 		            "nodes": [
 		              {
 		                "likes_page": {

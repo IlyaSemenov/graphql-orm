@@ -14,7 +14,6 @@
   },
   "devDependencies": {
     "@types/node": "~20.2.5",
-    "tsconfig-vite-node": "^1.1.0",
-    "typescript": "~5.0.4"
+    "tsconfig-vite-node": "^1.1.0"
   }
 }

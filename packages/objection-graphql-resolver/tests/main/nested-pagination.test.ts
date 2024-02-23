@@ -208,7 +208,7 @@ test("nested pagination", async () => {
 		  "user": {
 		    "name": "Alice",
 		    "posts": {
-		      "cursor": "[\\"2\\"]",
+		      "cursor": "["2"]",
 		      "nodes": [
 		        {
 		          "id": 1,
@@ -270,7 +270,7 @@ test("nested pagination", async () => {
 		    "id": 1,
 		    "name": "Alice",
 		    "posts": {
-		      "cursor": "[\\"2\\"]",
+		      "cursor": "["2"]",
 		      "nodes": [
 		        {
 		          "author": {
@@ -280,7 +280,7 @@ test("nested pagination", async () => {
 		          "section": {
 		            "name": "News",
 		            "posts": {
-		              "cursor": "[\\"2\\"]",
+		              "cursor": "["2"]",
 		              "nodes": [
 		                {
 		                  "author": {
@@ -313,7 +313,7 @@ test("nested pagination", async () => {
 		          "section": {
 		            "name": "Editorial",
 		            "posts": {
-		              "cursor": "[\\"2\\"]",
+		              "cursor": "["2"]",
 		              "nodes": [
 		                {
 		                  "author": {
@@ -374,7 +374,7 @@ test("nested pagination", async () => {
 		  "user": {
 		    "name": "Bob",
 		    "posts": {
-		      "cursor": "[\\"4\\"]",
+		      "cursor": "["4"]",
 		      "nodes": [
 		        {
 		          "author": {
