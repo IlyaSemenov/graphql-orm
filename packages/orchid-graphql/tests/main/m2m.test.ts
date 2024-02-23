@@ -110,20 +110,18 @@ test("m2m", async () => {
 	])
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					books {
+		await client.request(gql`
+			{
+				books {
+					id
+					title
+					authors {
 						id
-						title
-						authors {
-							id
-							name
-						}
+						name
 					}
 				}
-			`
-		),
+			}
+		`),
 		{
 			books: [
 				{ id: 1, title: "1984", authors: [{ id: 1, name: "George Orwell" }] },
@@ -141,6 +139,6 @@ test("m2m", async () => {
 					],
 				},
 			],
-		}
+		},
 	)
 })

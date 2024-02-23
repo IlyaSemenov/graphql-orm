@@ -20,7 +20,7 @@ class PostModel extends Model {
 		favorite_for_user(query: QueryBuilder<PostModel>, user_id: number) {
 			query.runBefore(async function () {
 				const { favorite_tag } = await UserModel.query(
-					this.context().transaction
+					this.context().transaction,
 				)
 					.findById(user_id)
 					.throwIfNotFound()
@@ -86,17 +86,15 @@ test("filter with async modifier", async () => {
 	])
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					posts(filter: { favorite_for_user: 2 }) {
-						text
-					}
+		await client.request(gql`
+			{
+				posts(filter: { favorite_for_user: 2 }) {
+					text
 				}
-			`
-		),
+			}
+		`),
 		{
 			posts: [{ text: "Elon Musk marries again." }],
-		}
+		},
 	)
 })

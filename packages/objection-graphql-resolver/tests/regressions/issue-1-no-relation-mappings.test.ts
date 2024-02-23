@@ -45,17 +45,15 @@ test("allow model without relationMappings", async () => {
 	await CModel.query().insert({ id: "foo" })
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					all_c {
-						id
-					}
+		await client.request(gql`
+			{
+				all_c {
+					id
 				}
-			`
-		),
+			}
+		`),
 		{
 			all_c: [{ id: "foo" }],
-		}
+		},
 	)
 })

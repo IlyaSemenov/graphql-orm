@@ -152,22 +152,20 @@ test("filter relation", async () => {
 				authors: [{ id: 1 }, { id: 2 }, { id: 3 }],
 			},
 		],
-		{ relate: true }
+		{ relate: true },
 	)
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					books {
-						title
-						authors(country: "USA") {
-							name
-						}
+		await client.request(gql`
+			{
+				books {
+					title
+					authors(country: "USA") {
+						name
 					}
 				}
-			`
-		),
+			}
+		`),
 		{
 			books: [
 				{ title: "1984", authors: [] },
@@ -177,6 +175,6 @@ test("filter relation", async () => {
 					authors: [{ name: "Bill Gates" }, { name: "Mark Twain" }],
 				},
 			],
-		}
+		},
 	)
 })

@@ -14,7 +14,7 @@ export interface RelationResolverOptions<Orm extends OrmAdapter, Context>
 }
 
 export function defineRelationResolver<Orm extends OrmAdapter, Context>(
-	options: RelationResolverOptions<Orm, Context> = {}
+	options: RelationResolverOptions<Orm, Context> = {},
 ): FieldResolver<Orm, Context> {
 	const { tableField, filters, modify } = parse_field_options(options)
 

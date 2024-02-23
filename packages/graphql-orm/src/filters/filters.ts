@@ -18,12 +18,12 @@ interface ApplyFiltersOptions<Orm extends OrmAdapter, Context> {
 export type ApplyFiltersModifier<Orm extends OrmAdapter, Context> = (
 	query: Orm["Query"],
 	value: any,
-	context: TableResolveContext<Orm, Context>
+	context: TableResolveContext<Orm, Context>,
 ) => Orm["Query"]
 
 export function apply_filters<Orm extends OrmAdapter, Context>(
 	query: Orm["Query"],
-	{ filters, modifiers, context }: ApplyFiltersOptions<Orm, Context>
+	{ filters, modifiers, context }: ApplyFiltersOptions<Orm, Context>,
 ): Orm["Query"] {
 	if (!filters) {
 		return query

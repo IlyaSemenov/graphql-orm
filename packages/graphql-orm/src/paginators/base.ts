@@ -6,7 +6,7 @@ export interface Paginator<Orm extends OrmAdapter, Context> {
 	readonly path: string[]
 	paginate(
 		query: Orm["Query"],
-		context: PaginateContext<Orm, Context>
+		context: PaginateContext<Orm, Context>,
 	): Orm["QueryTransform"]
 }
 

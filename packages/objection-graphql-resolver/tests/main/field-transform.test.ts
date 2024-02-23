@@ -64,21 +64,19 @@ test("field transform", async () => {
 	await UserModel.query().insert({ name: "Alice", password: "secret" })
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						id
-						name
-						password
-					}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					id
+					name
+					password
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { id: 1, name: "Alice", password: null },
 		},
-		"reject password to public"
+		"reject password to public",
 	)
 
 	assert.deepEqual(
@@ -93,12 +91,12 @@ test("field transform", async () => {
 				}
 			`,
 			undefined,
-			{ user_id: "2" }
+			{ user_id: "2" },
 		),
 		{
 			user: { id: 1, name: "Alice", password: null },
 		},
-		"reject password to other users"
+		"reject password to other users",
 	)
 
 	assert.deepEqual(
@@ -113,11 +111,11 @@ test("field transform", async () => {
 				}
 			`,
 			undefined,
-			{ user_id: "1" }
+			{ user_id: "1" },
 		),
 		{
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
-		"return own password to user"
+		"return own password to user",
 	)
 })

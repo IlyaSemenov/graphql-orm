@@ -39,14 +39,14 @@ const resolvers: Resolvers = {
 			return graph.resolvePage(
 				UserModel.query(),
 				r.cursor({ fields: ["name", "-id"], take: 2 }),
-				{ context, info }
+				{ context, info },
 			)
 		},
 		reverse_users(_parent, _args, context, info) {
 			return graph.resolvePage(
 				UserModel.query(),
 				r.cursor({ fields: ["-name", "-id"], take: 2 }),
-				{ context, info }
+				{ context, info },
 			)
 		},
 	},
@@ -71,7 +71,7 @@ test("root pagination", async () => {
 		name: string,
 		response: any,
 		users: any[],
-		must_have_cursor: boolean
+		must_have_cursor: boolean,
 	) {
 		const { cursor, nodes } = response.users
 		if (must_have_cursor) {
@@ -96,7 +96,7 @@ test("root pagination", async () => {
 			}
 		`),
 		[{ name: "Alice" }, { name: "Bob" }],
-		true
+		true,
 	)
 
 	const take_1_cursor = test_users(
@@ -112,7 +112,7 @@ test("root pagination", async () => {
 			}
 		`),
 		[{ name: "Alice" }],
-		true
+		true,
 	)
 
 	const take_2_more_after_1_cursor = test_users(
@@ -131,13 +131,13 @@ test("root pagination", async () => {
 			`,
 			{
 				cursor: take_1_cursor,
-			}
+			},
 		),
 		[
 			{ name: "Bob", id: 3 },
 			{ name: "Charlie", id: 4 },
 		],
-		true
+		true,
 	)
 
 	test_users(
@@ -156,10 +156,10 @@ test("root pagination", async () => {
 			`,
 			{
 				cursor: take_2_more_after_1_cursor,
-			}
+			},
 		),
 		[{ name: "Charlie", id: 2 }],
-		false
+		false,
 	)
 
 	test_users(
@@ -181,7 +181,7 @@ test("root pagination", async () => {
 			{ name: "Charlie", id: 4 },
 			{ name: "Charlie", id: 2 },
 		],
-		false
+		false,
 	)
 
 	test_users(
@@ -202,6 +202,6 @@ test("root pagination", async () => {
 			{ name: "Charlie" },
 			{ name: "Charlie" },
 		],
-		false
+		false,
 	)
 })

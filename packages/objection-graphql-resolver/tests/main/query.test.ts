@@ -54,66 +54,58 @@ test("access fields", async () => {
 	])
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						id
-						name
-					}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					id
+					name
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { id: 1, name: "Alice" },
 		},
-		"fetch object"
+		"fetch object",
 	)
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 2) {
-						name
-					}
+		await client.request(gql`
+			{
+				user(id: 2) {
+					name
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { name: "Bob" },
 		},
-		"fetch object"
+		"fetch object",
 	)
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 9562876) {
-						id
-						name
-					}
+		await client.request(gql`
+			{
+				user(id: 9562876) {
+					id
+					name
 				}
-			`
-		),
+			}
+		`),
 		{ user: null },
-		"fetch missing object"
+		"fetch missing object",
 	)
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					users {
-						name
-					}
+		await client.request(gql`
+			{
+				users {
+					name
 				}
-			`
-		),
+			}
+		`),
 		{
 			users: [{ name: "Alice" }, { name: "Bob" }, { name: "Charlie" }],
 		},
-		"fetch objects"
+		"fetch objects",
 	)
 })

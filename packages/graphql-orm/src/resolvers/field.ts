@@ -13,13 +13,13 @@ export interface FieldResolverOptions<Orm extends OrmAdapter, Context> {
 	transform?(
 		value: any,
 		instance: any,
-		context: FieldResolveContext<Orm, Context>
+		context: FieldResolveContext<Orm, Context>,
 	): any
 }
 
 export type FieldResolveModifier<Orm extends OrmAdapter, Context> = (
 	query: Orm["Query"],
-	context: FieldResolveContext<Orm, Context>
+	context: FieldResolveContext<Orm, Context>,
 ) => Orm["Query"]
 
 export interface FieldResolveContext<Orm extends OrmAdapter, Context>
@@ -31,23 +31,23 @@ export interface FieldResolveContext<Orm extends OrmAdapter, Context>
 // That is a coincidence for now.
 export type FieldResolver<
 	Orm extends OrmAdapter,
-	Context
+	Context,
 > = FieldResolveModifier<Orm, Context>
 
 export function parse_field_options<
-	O extends Pick<FieldResolverOptions<any, any>, "modelField" | "tableField">
+	O extends Pick<FieldResolverOptions<any, any>, "modelField" | "tableField">,
 >(options: O): Omit<O, "modelField"> {
 	const { tableField, modelField } = options
 	if (tableField && modelField) {
 		throw new Error(
-			`Both tableField and modelField are defined. Use only one of them.`
+			`Both tableField and modelField are defined. Use only one of them.`,
 		)
 	}
 	return { ...options, tableField: tableField || modelField }
 }
 
 export function defineFieldResolver<Orm extends OrmAdapter, Context>(
-	options: FieldResolverOptions<Orm, Context> = {}
+	options: FieldResolverOptions<Orm, Context> = {},
 ): FieldResolver<Orm, Context> {
 	const { tableField, modify, transform } = parse_field_options(options)
 

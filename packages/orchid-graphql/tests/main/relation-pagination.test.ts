@@ -213,7 +213,7 @@ const graph = r.graph(
 		}),
 		Like: r.table(db.like),
 	},
-	{ allowAllFields: true }
+	{ allowAllFields: true },
 )
 
 const resolvers: Resolvers = {
@@ -253,21 +253,19 @@ await db.like.create({ comment_id: 1, user_id: 2 })
 
 test("relation pagination", async () => {
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						name
-						posts_page {
-							nodes {
-								text
-							}
-							cursor
+		await client.request(gql`
+			{
+				user(id: 1) {
+					name
+					posts_page {
+						nodes {
+							text
 						}
+						cursor
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "user": {
@@ -290,30 +288,28 @@ test("relation pagination", async () => {
 
 test("double nested pagination", async () => {
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						name
-						posts_page {
-							nodes {
-								text
-								author {
-									name
-								}
-								comments_page {
-									nodes {
-										text
-									}
-									cursor
-								}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					name
+					posts_page {
+						nodes {
+							text
+							author {
+								name
 							}
-							cursor
+							comments_page {
+								nodes {
+									text
+								}
+								cursor
+							}
 						}
+						cursor
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "user": {
@@ -357,46 +353,44 @@ test("double nested pagination", async () => {
 
 test("double and triple nested pagination", async () => {
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						name
-						comments_page {
-							nodes {
-								text
-								likes_page {
-									nodes {
-										id
-									}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					name
+					comments_page {
+						nodes {
+							text
+							likes_page {
+								nodes {
+									id
 								}
 							}
-							cursor
 						}
-						posts_page {
-							nodes {
-								text
-								author {
-									name
-								}
-								comments_page {
-									nodes {
-										text
-										likes_page {
-											nodes {
-												id
-											}
+						cursor
+					}
+					posts_page {
+						nodes {
+							text
+							author {
+								name
+							}
+							comments_page {
+								nodes {
+									text
+									likes_page {
+										nodes {
+											id
 										}
 									}
-									cursor
 								}
+								cursor
 							}
-							cursor
 						}
+						cursor
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "user": {

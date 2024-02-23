@@ -190,23 +190,21 @@ test("filter expenses", async () => {
 	])
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				query {
-					companies {
-						offices {
-							staffMembers {
-								name
-								expenses(filter: { status: "pending" }) {
-									id
-									status
-								}
+		await client.request(gql`
+			query {
+				companies {
+					offices {
+						staffMembers {
+							name
+							expenses(filter: { status: "pending" }) {
+								id
+								status
 							}
 						}
 					}
 				}
-			`
-		),
+			}
+		`),
 		{
 			companies: [
 				{
@@ -222,6 +220,6 @@ test("filter expenses", async () => {
 					],
 				},
 			],
-		}
+		},
 	)
 })

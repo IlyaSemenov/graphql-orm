@@ -23,7 +23,7 @@ export type SimpleFieldResolver<Orm extends OrmAdapter, Context> =
 
 export type TableResolveModifier<Orm extends OrmAdapter, Context> = (
 	query: Orm["Query"],
-	context: TableResolveContext<Orm, Context>
+	context: TableResolveContext<Orm, Context>,
 ) => Orm["Query"]
 
 export interface TableResolveContext<Orm extends OrmAdapter, Context>
@@ -44,7 +44,7 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 	constructor(
 		readonly orm: Orm,
 		readonly table: Orm["Table"],
-		readonly options: TableResolverOptions<Orm, Context> = {}
+		readonly options: TableResolverOptions<Orm, Context> = {},
 	) {
 		this.relations = new Set(orm.get_table_relations(table))
 		this.virtual_fields = new Set(orm.get_table_virtual_fields(table))
@@ -61,13 +61,13 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 					typeof r0 === "function"
 						? r0
 						: r0 === true
-						? this._get_default_field_resolver(field)
-						: typeof r0 === "string"
-						? this._get_default_field_resolver(field, r0)
-						: undefined
+							? this._get_default_field_resolver(field)
+							: typeof r0 === "string"
+								? this._get_default_field_resolver(field, r0)
+								: undefined
 				if (r === undefined) {
 					throw new Error(
-						`Field resolver must be a function, string, or true; found ${typeof r0}.`
+						`Field resolver must be a function, string, or true; found ${typeof r0}.`,
 					)
 				}
 				resolvers[field] = r
@@ -86,7 +86,7 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 
 		if (query_table !== table_table) {
 			throw new Error(
-				`Mismatching query table for type ${type}: expected ${table_table}, received ${query_table}.`
+				`Mismatching query table for type ${type}: expected ${table_table}, received ${query_table}.`,
 			)
 		}
 
@@ -97,7 +97,7 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 
 		if (!allow_all_fields && !this.table_field_resolvers) {
 			throw new Error(
-				`Resolver for type ${type} must either allow all fields or specify options.fields.`
+				`Resolver for type ${type} must either allow all fields or specify options.fields.`,
 			)
 		}
 
@@ -147,7 +147,7 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 	 */
 	_get_default_field_resolver(
 		field: string,
-		tableField?: string
+		tableField?: string,
 	): FieldResolver<Orm, Context> {
 		const table_field_lookup = tableField || field
 		if (

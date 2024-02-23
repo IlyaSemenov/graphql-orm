@@ -75,8 +75,8 @@ test("table modify", async () => {
 				}
 			`,
 			undefined,
-			{ user_id: "2" }
-		)
+			{ user_id: "2" },
+		),
 	).toMatchInlineSnapshot(`
 		{
 		  "users": [

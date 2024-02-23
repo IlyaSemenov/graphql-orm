@@ -182,29 +182,27 @@ test("nested pagination", async () => {
 			{ author_id: 2, section_id: 1, text: "More good news!" },
 			{ author_id: 1, section_id: 3, text: "COVID vs Flu?" },
 		],
-		{ relate: true }
+		{ relate: true },
 	)
 
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						name
-						posts {
-							nodes {
-								id
-								text
-								section {
-									name
-								}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					name
+					posts {
+						nodes {
+							id
+							text
+							section {
+								name
 							}
-							cursor
 						}
+						cursor
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "user": {
@@ -233,41 +231,39 @@ test("nested pagination", async () => {
 	`)
 
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						id
-						name
-						posts {
-							nodes {
-								id
-								text
-								author {
-									name
-								}
-								section {
-									name
-									posts {
-										nodes {
-											text
-											author {
-												name
-											}
-											section {
-												name
-											}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					id
+					name
+					posts {
+						nodes {
+							id
+							text
+							author {
+								name
+							}
+							section {
+								name
+								posts {
+									nodes {
+										text
+										author {
+											name
 										}
-										cursor
+										section {
+											name
+										}
 									}
+									cursor
 								}
 							}
-							cursor
 						}
+						cursor
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "user": {
@@ -349,32 +345,30 @@ test("nested pagination", async () => {
 	`)
 
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 2) {
-						name
-						posts {
-							nodes {
-								text
-								author {
-									name
-									posts {
-										nodes {
-											text
-											author {
-												name
-											}
+		await client.request(gql`
+			{
+				user(id: 2) {
+					name
+					posts {
+						nodes {
+							text
+							author {
+								name
+								posts {
+									nodes {
+										text
+										author {
+											name
 										}
 									}
 								}
 							}
-							cursor
 						}
+						cursor
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "user": {

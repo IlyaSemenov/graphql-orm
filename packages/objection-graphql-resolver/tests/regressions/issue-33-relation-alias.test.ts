@@ -64,7 +64,7 @@ const graph = r.graph(
 	},
 	{
 		allowAllFields: true,
-	}
+	},
 )
 
 const resolvers: Resolvers = {
@@ -103,24 +103,22 @@ test("filters", async () => {
 			},
 			{ text: "Is communism dead yet?", comments: [{ text: "[redacted]" }] },
 		],
-		{ relate: true }
+		{ relate: true },
 	)
 
 	expect(
-		await client.request(
-			gql`
-				{
-					post(id: 1) {
+		await client.request(gql`
+			{
+				post(id: 1) {
+					id
+					text
+					all_comments {
 						id
 						text
-						all_comments {
-							id
-							text
-						}
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "post": {

@@ -14,7 +14,7 @@ export async function create_db<T extends TableClasses>(tables: T) {
 			databaseURL: process.env.DATABASE_URL,
 			log: !process.env.CI,
 		},
-		tables
+		tables,
 	)
 	await testTransaction.start(db)
 

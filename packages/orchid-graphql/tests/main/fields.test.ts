@@ -50,7 +50,7 @@ const default_graph1 = r.graph(
 	{
 		User: r.table(db.user),
 	},
-	{ allowAllFields: false }
+	{ allowAllFields: false },
 )
 
 const secure_graph = r.graph({
@@ -81,7 +81,7 @@ const graph2 = r.graph(
 			},
 		}),
 	},
-	{ allowAllFields: true }
+	{ allowAllFields: true },
 )
 
 const resolvers: Resolvers = {
@@ -119,103 +119,91 @@ test("table resolver fields access", async () => {
 	await db.user.create({ name: "Alice", password: "secret" })
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user: default_user(id: 1) {
-						id
-						name
-						password
-					}
+		await client.request(gql`
+			{
+				user: default_user(id: 1) {
+					id
+					name
+					password
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
-		"default user"
+		"default user",
 	)
 
 	await expect(
-		client.request(
-			gql`
-				{
-					user: default_user1(id: 1) {
-						id
-						name
-						password
-					}
+		client.request(gql`
+			{
+				user: default_user1(id: 1) {
+					id
+					name
+					password
 				}
-			`
-		)
+			}
+		`),
 	).rejects.toThrow(
-		"Resolver for type User must either allow all fields or specify options.fields."
+		"Resolver for type User must either allow all fields or specify options.fields.",
 	)
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user: secure_user(id: 1) {
-						id
-						name
-					}
+		await client.request(gql`
+			{
+				user: secure_user(id: 1) {
+					id
+					name
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { id: 1, name: "Alice" },
 		},
-		"secure user without password"
+		"secure user without password",
 	)
 
 	await expect(
-		client.request(
-			gql`
-				{
-					user: secure_user(id: 1) {
-						id
-						name
-						password
-					}
+		client.request(gql`
+			{
+				user: secure_user(id: 1) {
+					id
+					name
+					password
 				}
-			`
-		)
+			}
+		`),
 	).rejects.toThrow("No field resolver defined for field User.password")
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user: user1(id: 1) {
-						id
-						name
-						password
-					}
+		await client.request(gql`
+			{
+				user: user1(id: 1) {
+					id
+					name
+					password
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
-		"table-level allowAllFields"
+		"table-level allowAllFields",
 	)
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user: user2(id: 1) {
-						id
-						name
-						password
-					}
+		await client.request(gql`
+			{
+				user: user2(id: 1) {
+					id
+					name
+					password
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { id: 1, name: "Alice", password: "secret" },
 		},
-		"graph-level allowAllFields"
+		"graph-level allowAllFields",
 	)
 })

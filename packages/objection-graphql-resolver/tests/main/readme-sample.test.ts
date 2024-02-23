@@ -63,19 +63,17 @@ test("readme demo sample", async () => {
 				}
 			}
 		`,
-		{ text: "Hello, world!" }
+		{ text: "Hello, world!" },
 	)
 
-	const { posts } = await client.request<any>(
-		gql`
-			query {
-				posts {
-					id
-					text
-				}
+	const { posts } = await client.request<any>(gql`
+		query {
+			posts {
+				id
+				text
 			}
-		`
-	)
+		}
+	`)
 
 	assert.deepEqual(posts, [{ id: 1, text: "Hello, world!" }])
 })

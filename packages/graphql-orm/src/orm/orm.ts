@@ -24,7 +24,7 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 	get_table_virtual_fields(table: Table): string[]
 
 	get_table_modifiers(
-		table: Table
+		table: Table,
 	): Record<string, OrmModifier<this>> | undefined
 
 	/** ORM query -> db table */
@@ -40,7 +40,7 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 			relation: string
 			as: string
 			modify: (subquery: Query) => Query
-		}
+		},
 	): Query
 
 	// Find
@@ -50,7 +50,7 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 	where_raw(
 		query: Query,
 		expression: string,
-		bindings: Record<string, any>
+		bindings: Record<string, any>,
 	): Query
 
 	// Order & Limit
@@ -67,13 +67,13 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 
 	modify_subquery_pagination(
 		subquery: Query,
-		context: Record<string, any>
+		context: Record<string, any>,
 	): Query
 
 	finish_query_pagination(
 		query: Query,
 		field: string,
-		context: Record<string, any>
+		context: Record<string, any>,
 	): Query
 
 	// Misc

@@ -5,7 +5,7 @@ import { RelationResolverOptions } from "./relation"
 
 export function definePageResolver<Orm extends OrmAdapter, Context>(
 	paginator: Paginator<Orm, Context>,
-	options: RelationResolverOptions<Orm, Context> = {}
+	options: RelationResolverOptions<Orm, Context> = {},
 ): FieldResolver<Orm, Context> {
 	const { tableField, modify } = parse_field_options(options)
 
@@ -22,7 +22,7 @@ export function definePageResolver<Orm extends OrmAdapter, Context>(
 				subquery = graph._resolve_page(subquery, paginator, context)
 				subquery = graph.orm.modify_subquery_pagination(
 					subquery,
-					pagination_context
+					pagination_context,
 				)
 				return modify ? modify(subquery, context) : subquery
 			},

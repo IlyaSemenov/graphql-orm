@@ -97,17 +97,15 @@ test("filter with async modifier", async () => {
 	])
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					posts(filter: { favorite_for_user: 2 }) {
-						text
-					}
+		await client.request(gql`
+			{
+				posts(filter: { favorite_for_user: 2 }) {
+					text
 				}
-			`
-		),
+			}
+		`),
 		{
 			posts: [{ text: "Elon Musk marries again." }],
-		}
+		},
 	)
 })

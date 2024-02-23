@@ -83,7 +83,7 @@ const graph = r.graph(
 	},
 	{
 		allowAllFields: true,
-	}
+	},
 )
 
 const resolvers: Resolvers = {
@@ -116,20 +116,18 @@ test("filters", async () => {
 	])
 
 	expect(
-		await client.request(
-			gql`
-				{
-					posts {
+		await client.request(gql`
+			{
+				posts {
+					id
+					text
+					author {
 						id
-						text
-						author {
-							id
-							name
-						}
+						name
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "posts": [
@@ -162,24 +160,22 @@ test("filters", async () => {
 	`)
 
 	expect(
-		await client.request(
-			gql`
-				{
-					posts {
+		await client.request(gql`
+			{
+				posts {
+					id
+					text
+					author {
 						id
-						text
-						author {
+						name
+						posts {
 							id
-							name
-							posts {
-								id
-								text
-							}
+							text
 						}
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toMatchInlineSnapshot(`
 		{
 		  "posts": [
@@ -238,16 +234,14 @@ test("filters", async () => {
 	`)
 
 	expect(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						posts {
-							id
-						}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					posts {
+						id
 					}
 				}
-			`
-		)
+			}
+		`),
 	).toStrictEqual({ user: { posts: [{ id: 1 }, { id: 2 }] } })
 })

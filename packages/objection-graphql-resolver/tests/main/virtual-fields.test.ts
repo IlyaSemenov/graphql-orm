@@ -67,48 +67,42 @@ test("virtual fields", async () => {
 	await UserModel.query().insert({ name: "Alice" })
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						url
-					}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					url
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { url: "/user/1" },
 		},
-		"fetch guarded virtual field"
+		"fetch guarded virtual field",
 	)
 
 	await expect(
-		client.request(
-			gql`
-				{
-					user(id: 1) {
-						upper_name
-					}
+		client.request(gql`
+			{
+				user(id: 1) {
+					upper_name
 				}
-			`
-		),
-		"break on fetching naive virtual field"
+			}
+		`),
+		"break on fetching naive virtual field",
 	).rejects.toThrow()
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						name
-						upper_name
-					}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					name
+					upper_name
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { name: "Alice", upper_name: "ALICE" },
 		},
-		"fetch naive virtual field with manual ref"
+		"fetch naive virtual field with manual ref",
 	)
 })

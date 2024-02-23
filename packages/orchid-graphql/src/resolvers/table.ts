@@ -5,7 +5,7 @@ import { OrchidOrm, orm } from "../orm/orm"
 
 export function defineTableResolver<Context = unknown>(
 	table: DbTable<any>,
-	options: TableResolverOptions<OrchidOrm, Context> = {}
+	options: TableResolverOptions<OrchidOrm, Context> = {},
 ) {
 	return new TableResolver(orm, table, options)
 }

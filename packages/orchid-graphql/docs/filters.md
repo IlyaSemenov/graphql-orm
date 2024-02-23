@@ -65,7 +65,7 @@ const graph = r.graph(
   {
     // enable filters on all relations
     allowAllFilters: true,
-  }
+  },
 )
 ```
 

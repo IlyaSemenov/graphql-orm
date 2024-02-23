@@ -45,7 +45,7 @@ export const orm: ObjectionOrm = {
 		return modifiers
 			? Object.entries(modifiers).reduce<
 					Record<string, OrmModifier<ObjectionOrm>>
-			  >((modifiers, [field, modifier]) => {
+				>((modifiers, [field, modifier]) => {
 					// Objection modifiers return void, convert them to return query
 					if (typeof modifier === "function") {
 						modifiers[field] = (query, ...args) => {
@@ -54,7 +54,7 @@ export const orm: ObjectionOrm = {
 						}
 					}
 					return modifiers
-			  }, {})
+				}, {})
 			: undefined
 	},
 
@@ -80,7 +80,7 @@ export const orm: ObjectionOrm = {
 		op = op
 			? { equals: "=", exact: "=", lt: "<", lte: "<=", gt: ">", gte: ">=" }[
 					op
-			  ] || op
+				] || op
 			: "="
 		if (op === "=" && value === null) {
 			// TODO: test if this is actually needed
@@ -149,8 +149,8 @@ export const orm: ObjectionOrm = {
 			query.select(
 				field_ref(
 					query,
-					typeof id_column === "string" ? id_column : id_column[0]
-				)
+					typeof id_column === "string" ? id_column : id_column[0],
+				),
 			)
 		}
 		return query

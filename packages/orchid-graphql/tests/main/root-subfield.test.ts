@@ -79,7 +79,7 @@ test("root query sub-field", async () => {
 				}
 			}
 		`),
-		{ login: { token: "xyzzy", user: { name: "Alice" } } }
+		{ login: { token: "xyzzy", user: { name: "Alice" } } },
 	)
 
 	// Regression: should not crash when diving to non-requested subfield
@@ -91,6 +91,6 @@ test("root query sub-field", async () => {
 				}
 			}
 		`),
-		{ login: { token: "xyzzy" } }
+		{ login: { token: "xyzzy" } },
 	)
 })

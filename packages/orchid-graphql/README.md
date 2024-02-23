@@ -58,7 +58,7 @@ const db = orchidORM(
   },
   {
     post: PostTable,
-  }
+  },
 )
 
 await db.$query`
@@ -132,19 +132,17 @@ await client.request(
       }
     }
   `,
-  { text: "Hello, world!" }
+  { text: "Hello, world!" },
 )
 
-const { posts } = await client.request(
-  gql`
-    query {
-      posts {
-        id
-        text
-      }
+const { posts } = await client.request(gql`
+  query {
+    posts {
+      id
+      text
     }
-  `
-)
+  }
+`)
 
 console.log(posts)
 ```
@@ -234,7 +232,7 @@ const resolvers = {
       return await graph.resolvePage(
         db.post,
         r.cursor({ take: 10, fields: ["-id"] }),
-        { context, info }
+        { context, info },
       )
     },
   },
@@ -307,7 +305,7 @@ const graph = r.graph(
               // Current instance
               post,
               // Field resolve context: graph, tree, type, field, filters, context
-              context
+              context,
             ) {
               if (preview.length < 100) {
                 return preview
@@ -341,12 +339,12 @@ const graph = r.graph(
                 fields: ["name", "-id"],
                 // How many object to take per page
                 take: 10,
-              }
+              },
             ),
             {
               // All r.relation() options, such as:
               tableField: "comments",
-            }
+            },
           ),
         },
         // Modify all queries to this table
@@ -354,13 +352,13 @@ const graph = r.graph(
           // ORM (sub)query
           query,
           // Table resolve context: graph, tree, type, filters, context
-          context
+          context,
         ) => query.where(context.tree.args).order({ id: "DESC" }),
         // Allow all fields (`fields` will be used for overrides)
         allowAllFields: true,
         // Allow filters in all relations
         allowAllFilters: true,
-      }
+      },
     ),
   },
   // Graph options
@@ -369,7 +367,7 @@ const graph = r.graph(
     allowAllFields: true,
     // Allow filters in all relations of all tables
     allowAllFilters: true,
-  }
+  },
 )
 
 const resolvers = {
@@ -386,7 +384,7 @@ const resolvers = {
           info,
           // Enable filters
           filters: true,
-        }
+        },
       )
     },
     posts_page: async (parent, args, context, info) => {
@@ -400,7 +398,7 @@ const resolvers = {
           context,
           info,
           filters: true,
-        }
+        },
       )
     },
   },

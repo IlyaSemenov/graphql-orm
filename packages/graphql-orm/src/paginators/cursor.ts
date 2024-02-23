@@ -2,7 +2,7 @@ import { OrmAdapter } from "../orm/orm"
 import { PaginateContext, Paginator } from "./base"
 
 export function defineCursorPaginator(
-	options: Partial<CursorPaginatorOptions> = {}
+	options: Partial<CursorPaginatorOptions> = {},
 ) {
 	return new CursorPaginator(options)
 }
@@ -85,11 +85,11 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 				const value = instance[field.name]
 				if (value === undefined) {
 					throw new Error(
-						`Unable to create cursor: undefined field ${field.name}`
+						`Unable to create cursor: undefined field ${field.name}`,
 					)
 				}
 				return String(value)
-			})
+			}),
 		)
 	}
 

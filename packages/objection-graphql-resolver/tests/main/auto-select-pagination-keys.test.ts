@@ -40,7 +40,7 @@ const resolvers: Resolvers = {
 			graph.resolvePage(
 				BookModel.query(),
 				r.cursor({ fields: ["author", "id"], take: 1 }),
-				{ context, info }
+				{ context, info },
 			),
 	},
 }
@@ -60,22 +60,20 @@ test("auto select pagination key", async () => {
 	])
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					books {
-						nodes {
-							title
-						}
+		await client.request(gql`
+			{
+				books {
+					nodes {
+						title
 					}
 				}
-			`
-		),
+			}
+		`),
 		{
 			books: {
 				nodes: [{ title: "1984" }],
 			},
 		},
-		"pagination works without selecting author explicitly"
+		"pagination works without selecting author explicitly",
 	)
 })

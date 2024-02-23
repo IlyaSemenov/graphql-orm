@@ -28,7 +28,7 @@ const db = orchidORM(
 	},
 	{
 		post: PostTable,
-	}
+	},
 )
 
 await db.$query`

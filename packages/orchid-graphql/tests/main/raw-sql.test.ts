@@ -66,17 +66,15 @@ test("raw sql", async () => {
 	await db.user.create({ name: "Alice" })
 
 	assert.deepEqual(
-		await client.request(
-			gql`
-				{
-					user(id: 1) {
-						upper_name
-					}
+		await client.request(gql`
+			{
+				user(id: 1) {
+					upper_name
 				}
-			`
-		),
+			}
+		`),
 		{
 			user: { upper_name: "ALICE" },
-		}
+		},
 	)
 })

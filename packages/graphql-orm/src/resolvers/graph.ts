@@ -30,12 +30,12 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 	constructor(
 		readonly orm: Orm,
 		readonly type_resolvers: Record<string, TableResolver<Orm, Context>>,
-		readonly options: GraphResolverOptions<Orm, Context> = {}
+		readonly options: GraphResolverOptions<Orm, Context> = {},
 	) {}
 
 	resolve(
 		query: Orm["Query"],
-		{ info, ...context }: GraphResolveOptions<Context>
+		{ info, ...context }: GraphResolveOptions<Context>,
 	) {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_type(query, { ...context, tree })
@@ -44,7 +44,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 	resolvePage(
 		query: Orm["Query"],
 		paginator: Paginator<Orm, Context>,
-		{ info, ...context }: GraphResolveOptions<Context>
+		{ info, ...context }: GraphResolveOptions<Context>,
 	) {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_page(query, paginator, { ...context, tree })
@@ -89,7 +89,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 	_resolve_page(
 		query: Orm["Query"],
 		paginator: Paginator<Orm, Context>,
-		context: GraphResolveContext<Context>
+		context: GraphResolveContext<Context>,
 	) {
 		if (context.path) {
 			// TODO: handle non-empty context.path
