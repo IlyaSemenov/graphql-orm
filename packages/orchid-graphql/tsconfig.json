@@ -1,7 +1,6 @@
 {
-	"extends": "@tsconfig/node18/tsconfig.json",
+	"extends": "tsconfig-vite-node/tsconfig.json",
 	"compilerOptions": {
-		"module": "ESNext",
 		"paths": {
 			"orchid-graphql": ["./src"],
 			"graphql-orm": ["../graphql-orm/src"]

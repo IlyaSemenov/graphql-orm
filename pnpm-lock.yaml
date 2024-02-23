@@ -51,12 +51,12 @@ importers:
         specifier: ^4.12.0
         version: 4.12.0(graphql@16.6.0)
     devDependencies:
-      '@tsconfig/node18':
-        specifier: ~2.0.1
-        version: 2.0.1
       '@types/node':
         specifier: ~20.2.5
         version: 20.2.5
+      tsconfig-vite-node:
+        specifier: ^1.1.0
+        version: 1.1.0
       typescript:
         specifier: ~5.0.4
         version: 5.0.4
@@ -70,9 +70,6 @@ importers:
       '@apollo/server':
         specifier: ~4.7.1
         version: 4.7.1(graphql@16.6.0)
-      '@tsconfig/node14':
-        specifier: ~1.0.3
-        version: 1.0.3
       graphql:
         specifier: ~16.6.0
         version: 16.6.0
@@ -94,6 +91,9 @@ importers:
       tar:
         specifier: ~6.1.15
         version: 6.1.15
+      tsconfig-vite-node:
+        specifier: ^1.1.0
+        version: 1.1.0
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -122,9 +122,6 @@ importers:
       '@apollo/server':
         specifier: ~4.7.1
         version: 4.7.1(graphql@16.6.0)
-      '@tsconfig/node18':
-        specifier: ~2.0.1
-        version: 2.0.1
       graphql:
         specifier: ~16.6.0
         version: 16.6.0
@@ -143,6 +140,9 @@ importers:
       pqb:
         specifier: ~0.25.0
         version: 0.25.0
+      tsconfig-vite-node:
+        specifier: ^1.1.0
+        version: 1.1.0
       tsup:
         specifier: ~6.7.0
         version: 6.7.0(typescript@5.0.4)
@@ -1023,14 +1023,6 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
-
-  /@tsconfig/node14@1.0.3:
-    resolution: {integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==}
-    dev: true
-
-  /@tsconfig/node18@2.0.1:
-    resolution: {integrity: sha512-UqdfvuJK0SArA2CxhKWwwAWfnVSXiYe63bVpMutc27vpngCntGUZQETO24pEJ46zU6XM+7SpqYoMgcO3bM11Ew==}
-    dev: true
 
   /@types/body-parser@1.19.2:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
@@ -5198,6 +5190,10 @@ packages:
         optional: true
     dependencies:
       typescript: 5.0.4
+    dev: true
+
+  /tsconfig-vite-node@1.1.0:
+    resolution: {integrity: sha512-2W9JNCBSvdp88FPbJDbGJ/114brrgcX8Rph14w4h0OPHMSyMZu1K5vaaR4T8nctuFLUR6KivamGMZxkanTgrAw==}
     dev: true
 
   /tslib@1.14.1:

@@ -1,7 +1,9 @@
 {
-	"extends": "@tsconfig/node14/tsconfig.json",
+	"extends": "tsconfig-vite-node/tsconfig.json",
 	"compilerOptions": {
-		"module": "ESNext",
+		// Using "target": "ESNext" (default coming from tsconfig-vite-node) breaks sqlite.
+		// tests/main/m2m.test.ts: SQLITE_CONSTRAINT: NOT NULL constraint failed
+		"target": "ES2021",
 		"paths": {
 			"graphql-orm": ["../graphql-orm/src"],
 			"objection-graphql-resolver": ["./src"]

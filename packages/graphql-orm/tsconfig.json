@@ -1,6 +1,3 @@
 {
-	"extends": "@tsconfig/node18/tsconfig.json",
-	"compilerOptions": {
-		"module": "ESNext"
-	}
+	"extends": "tsconfig-vite-node/tsconfig.json"
 }
