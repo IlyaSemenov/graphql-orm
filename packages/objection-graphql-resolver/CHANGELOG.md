@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.3.1
+
+### Patch Changes
+
+- 05d7316: Revert inlining graphql-parse-resolve-info, bump its version instead.
+
 ## 7.3.0
 
 ### Minor Changes

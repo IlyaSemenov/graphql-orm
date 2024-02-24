@@ -1,5 +1,11 @@
 # graphql-orm
 
+## 1.4.1
+
+### Patch Changes
+
+- 05d7316: Revert inlining graphql-parse-resolve-info, bump its version instead.
+
 ## 1.4.0
 
 ### Minor Changes
