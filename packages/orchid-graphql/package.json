@@ -26,6 +26,9 @@
     "test": "vitest run",
     "prepublishOnly": "pnpm build"
   },
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.13.0"
+  },
   "peerDependencies": {
     "graphql": "^16",
     "orchid-orm": "^1.12.0",

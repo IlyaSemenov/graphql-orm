@@ -6,11 +6,13 @@
   "author": "Ilya Semenov",
   "license": "MIT",
   "type": "module",
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.13.0"
+  },
   "peerDependencies": {
     "graphql": "^16"
   },
   "devDependencies": {
-    "@types/node": "^20.11.20",
     "tsconfig-vite-node": "^1.1.0"
   }
 }
