@@ -87,6 +87,7 @@ const graph = r.graph({
 					if (typeof args.country === "string" || args.country === null) {
 						authors.where("country", args.country)
 					}
+					return authors
 				},
 			}),
 		},

@@ -9,7 +9,7 @@ class UserTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		name: t.string(1, 100),
+		name: t.text(),
 	}))
 }
 

@@ -10,8 +10,8 @@ class UserTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		name: t.string(1, 100),
-		favorite_tag: t.string(1, 100).nullable(),
+		name: t.text(),
+		favorite_tag: t.text().nullable(),
 	}))
 }
 
@@ -20,8 +20,8 @@ class PostTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		text: t.text(1, 10000),
-		tag: t.text(1, 100).nullable(),
+		text: t.text(),
+		tag: t.text().nullable(),
 	}))
 }
 

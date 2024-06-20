@@ -9,8 +9,8 @@ class AuthorTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		name: t.string(1, 100),
-		country: t.string(1, 100).nullable(),
+		name: t.text(),
+		country: t.text().nullable(),
 	}))
 
 	relations = {
@@ -18,7 +18,7 @@ class AuthorTable extends BaseTable {
 			primaryKey: "id",
 			foreignKey: "author_id",
 			associationPrimaryKey: "id",
-			associationForeignKey: "book_id",
+			associationForeignKey: "book_id" as any, // FIXME - for tsc
 			joinTable: "author_book_rel",
 		}),
 	}
@@ -29,7 +29,7 @@ class BookTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		title: t.text(1, 200),
+		title: t.text(),
 	}))
 
 	relations = {
@@ -37,7 +37,7 @@ class BookTable extends BaseTable {
 			primaryKey: "id",
 			foreignKey: "book_id",
 			associationPrimaryKey: "id",
-			associationForeignKey: "author_id",
+			associationForeignKey: "author_id" as any, // FIXME - for tsc
 			joinTable: "author_book_rel",
 		}),
 	}

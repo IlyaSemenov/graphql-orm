@@ -9,7 +9,7 @@ class UserTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		name: t.string(1, 100),
+		name: t.text(),
 	}))
 
 	relations = {
@@ -33,7 +33,7 @@ class PostTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		text: t.text(1, 10000),
+		text: t.text(),
 		author_id: t.integer(),
 	}))
 
@@ -55,7 +55,7 @@ class CommentTable extends BaseTable {
 
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		text: t.string(1, 1000),
+		text: t.text(),
 		user_id: t.integer(),
 		post_id: t.integer(),
 	}))
