@@ -3,8 +3,6 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 import simpleImportSort from "eslint-plugin-simple-import-sort"
 import tseslint from "typescript-eslint"
 
-tseslint.config
-
 export default tseslint.config(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
