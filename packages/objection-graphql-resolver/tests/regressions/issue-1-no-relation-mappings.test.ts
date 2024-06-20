@@ -5,7 +5,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class CModel extends Model {
   static tableName = "c"
@@ -14,14 +15,13 @@ class CModel extends Model {
   // no relationMappings defined on purpose
 }
 
-const schema = gql`
-  type C {
-    id: ID!
-  }
+const schema = gql`type C {
+  id: ID!
+}
 
-  type Query {
-    all_c: [C!]!
-  }
+type Query {
+  all_c: [C!]!
+}
 `
 
 const graph = r.graph({
@@ -45,13 +45,12 @@ test("allow model without relationMappings", async () => {
   await CModel.query().insert({ id: "foo" })
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        all_c {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  all_c {
+    id
+  }
+}
+`),
     {
       all_c: [{ id: "foo" }],
     },

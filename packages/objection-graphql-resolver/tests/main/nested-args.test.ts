@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class AuthorModel extends Model {
   static tableName = "author"
@@ -56,23 +57,22 @@ class BookModel extends Model {
   authors?: AuthorModel[]
 }
 
-const schema = gql`
-  type Author {
-    id: Int!
-    name: String!
-    country: String
-    books: [Book!]!
-  }
+const schema = gql`type Author {
+  id: Int!
+  name: String!
+  country: String
+  books: [Book!]!
+}
 
-  type Book {
-    id: Int!
-    title: String!
-    authors(country: String): [Author!]!
-  }
+type Book {
+  id: Int!
+  title: String!
+  authors(country: String): [Author!]!
+}
 
-  type Query {
-    books: [Book!]!
-  }
+type Query {
+  books: [Book!]!
+}
 `
 
 const graph = r.graph({
@@ -156,16 +156,15 @@ test("filter relation", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        books {
-          title
-          authors(country: "USA") {
-            name
-          }
-        }
-      }
-    `),
+    await client.request(gql`{
+  books {
+    title
+    authors(country: "USA") {
+      name
+    }
+  }
+}
+`),
     {
       books: [
         { title: "1984", authors: [] },

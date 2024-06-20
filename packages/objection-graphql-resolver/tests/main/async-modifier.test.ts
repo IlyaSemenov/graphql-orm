@@ -1,9 +1,11 @@
 import gql from "graphql-tag"
-import { Model, QueryBuilder } from "objection"
+import type { QueryBuilder } from "objection"
+import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -35,17 +37,16 @@ class PostModel extends Model {
   tag?: string
 }
 
-const schema = gql`
-  scalar Filter
+const schema = gql`scalar Filter
 
-  type Post {
-    id: Int!
-    text: String!
-  }
+type Post {
+  id: Int!
+  text: String!
+}
 
-  type Query {
-    posts(filter: Filter): [Post!]!
-  }
+type Query {
+  posts(filter: Filter): [Post!]!
+}
 `
 
 const graph = r.graph({
@@ -86,13 +87,12 @@ test("filter with async modifier", async () => {
   ])
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { favorite_for_user: 2 }) {
-          text
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { favorite_for_user: 2 }) {
+    text
+  }
+}
+`),
     {
       posts: [{ text: "Elon Musk marries again." }],
     },

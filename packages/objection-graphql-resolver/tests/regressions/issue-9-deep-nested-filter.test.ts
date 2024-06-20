@@ -5,7 +5,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class CompanyModel extends Model {
   static tableName = "company"
@@ -78,36 +79,35 @@ class ExpenseModel extends Model {
   status?: "pending" | "complete"
 }
 
-const schema = gql`
-  type Company {
-    id: Int!
-    name: String!
-    offices: [Office!]!
-  }
+const schema = gql`type Company {
+  id: Int!
+  name: String!
+  offices: [Office!]!
+}
 
-  type Office {
-    id: Int!
-    name: String!
-    staffMembers: [Staff!]!
-  }
+type Office {
+  id: Int!
+  name: String!
+  staffMembers: [Staff!]!
+}
 
-  type Staff {
-    id: Int!
-    name: String!
-    expenses(filter: Filter): [Expense!]!
-  }
+type Staff {
+  id: Int!
+  name: String!
+  expenses(filter: Filter): [Expense!]!
+}
 
-  type Expense {
-    id: Int!
-    amount: Float!
-    status: String!
-  }
+type Expense {
+  id: Int!
+  amount: Float!
+  status: String!
+}
 
-  type Query {
-    companies: [Company!]!
-  }
+type Query {
+  companies: [Company!]!
+}
 
-  scalar Filter
+scalar Filter
 `
 
 const graph = r.graph({
@@ -190,21 +190,20 @@ test("filter expenses", async () => {
   ])
 
   assert.deepEqual(
-    await client.request(gql`
-      query {
-        companies {
-          offices {
-            staffMembers {
-              name
-              expenses(filter: { status: "pending" }) {
-                id
-                status
-              }
-            }
-          }
+    await client.request(gql`query {
+  companies {
+    offices {
+      staffMembers {
+        name
+        expenses(filter: { status: "pending" }) {
+          id
+          status
         }
       }
-    `),
+    }
+  }
+}
+`),
     {
       companies: [
         {

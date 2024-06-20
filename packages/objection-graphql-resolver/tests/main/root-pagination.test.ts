@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -12,21 +13,20 @@ class UserModel extends Model {
   name?: string
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+}
 
-  type UserPage {
-    nodes: [User!]!
-    cursor: ID
-  }
+type UserPage {
+  nodes: [User!]!
+  cursor: ID
+}
 
-  type Query {
-    users(cursor: ID, take: Int): UserPage!
-    reverse_users(cursor: ID, take: Int): UserPage!
-  }
+type Query {
+  users(cursor: ID, take: Int): UserPage!
+  reverse_users(cursor: ID, take: Int): UserPage!
+}
 `
 
 const graph = r.graph({
@@ -54,7 +54,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
   table.increments("id").notNullable().primary()
   table.string("name").notNullable()
 })
@@ -85,32 +85,30 @@ test("root pagination", async () => {
 
   test_users(
     "without args",
-    await client.request(gql`
-      {
-        users {
-          nodes {
-            name
-          }
-          cursor
-        }
-      }
-    `),
+    await client.request(gql`{
+  users {
+    nodes {
+      name
+    }
+    cursor
+  }
+}
+`),
     [{ name: "Alice" }, { name: "Bob" }],
     true,
   )
 
   const take_1_cursor = test_users(
     "take 1",
-    await client.request(gql`
-      {
-        users(take: 1) {
-          nodes {
-            name
-          }
-          cursor
-        }
-      }
-    `),
+    await client.request(gql`{
+  users(take: 1) {
+    nodes {
+      name
+    }
+    cursor
+  }
+}
+`),
     [{ name: "Alice" }],
     true,
   )
@@ -118,17 +116,16 @@ test("root pagination", async () => {
   const take_2_more_after_1_cursor = test_users(
     "take 2 more after 1",
     await client.request(
-      gql`
-        query more_sections($cursor: ID) {
-          users(cursor: $cursor, take: 2) {
-            nodes {
-              id
-              name
-            }
-            cursor
-          }
-        }
-      `,
+      gql`query more_sections($cursor: ID) {
+  users(cursor: $cursor, take: 2) {
+    nodes {
+      id
+      name
+    }
+    cursor
+  }
+}
+`,
       {
         cursor: take_1_cursor,
       },
@@ -143,17 +140,16 @@ test("root pagination", async () => {
   test_users(
     "take the rest",
     await client.request(
-      gql`
-        query more_sections($cursor: ID) {
-          users(cursor: $cursor) {
-            nodes {
-              id
-              name
-            }
-            cursor
-          }
-        }
-      `,
+      gql`query more_sections($cursor: ID) {
+  users(cursor: $cursor) {
+    nodes {
+      id
+      name
+    }
+    cursor
+  }
+}
+`,
       {
         cursor: take_2_more_after_1_cursor,
       },
@@ -164,17 +160,16 @@ test("root pagination", async () => {
 
   test_users(
     "take 4",
-    await client.request(gql`
-      {
-        users(take: 4) {
-          nodes {
-            id
-            name
-          }
-          cursor
-        }
-      }
-    `),
+    await client.request(gql`{
+  users(take: 4) {
+    nodes {
+      id
+      name
+    }
+    cursor
+  }
+}
+`),
     [
       { name: "Alice", id: 1 },
       { name: "Bob", id: 3 },
@@ -186,16 +181,15 @@ test("root pagination", async () => {
 
   test_users(
     "take 100",
-    await client.request(gql`
-      {
-        users(take: 100) {
-          nodes {
-            name
-          }
-          cursor
-        }
-      }
-    `),
+    await client.request(gql`{
+  users(take: 100) {
+    nodes {
+      name
+    }
+    cursor
+  }
+}
+`),
     [
       { name: "Alice" },
       { name: "Bob" },

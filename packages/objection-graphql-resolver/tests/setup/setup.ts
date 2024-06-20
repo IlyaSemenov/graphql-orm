@@ -1,4 +1,4 @@
-import { ServerConfig } from "./apollo"
+import type { ServerConfig } from "./apollo"
 import { create_client } from "./client"
 import { setup_db } from "./db"
 

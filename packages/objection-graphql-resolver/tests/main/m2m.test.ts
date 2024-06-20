@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class AuthorModel extends Model {
   static tableName = "author"
@@ -55,22 +56,21 @@ class BookModel extends Model {
   authors?: AuthorModel[]
 }
 
-const schema = gql`
-  type Author {
-    id: Int!
-    name: String!
-    books: [Book!]!
-  }
+const schema = gql`type Author {
+  id: Int!
+  name: String!
+  books: [Book!]!
+}
 
-  type Book {
-    id: Int!
-    title: String!
-    authors: [Author!]!
-  }
+type Book {
+  id: Int!
+  title: String!
+  authors: [Author!]!
+}
 
-  type Query {
-    books: [Book!]!
-  }
+type Query {
+  books: [Book!]!
+}
 `
 
 const graph = r.graph({
@@ -117,12 +117,12 @@ test("m2m", async () => {
       {
         id: 1,
         title: "1984",
-        authors: [{ "#id": "George Orwell", name: "George Orwell" }],
+        authors: [{ "#id": "George Orwell", "name": "George Orwell" }],
       },
       {
         id: 2,
         title: "Tom Sawyer",
-        authors: [{ "#id": "Mark Twain", name: "Mark Twain" }],
+        authors: [{ "#id": "Mark Twain", "name": "Mark Twain" }],
       },
       {
         id: 3,
@@ -134,18 +134,17 @@ test("m2m", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        books {
-          id
-          title
-          authors {
-            id
-            name
-          }
-        }
-      }
-    `),
+    await client.request(gql`{
+  books {
+    id
+    title
+    authors {
+      id
+      name
+    }
+  }
+}
+`),
     {
       books: [
         { id: 1, title: "1984", authors: [{ id: 1, name: "George Orwell" }] },

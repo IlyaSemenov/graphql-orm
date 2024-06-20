@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -12,16 +13,15 @@ class UserModel extends Model {
   name?: string
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+}
 
-  type Query {
-    user(id: Int!): User
-    users: [User!]!
-  }
+type Query {
+  user(id: Int!): User
+  users: [User!]!
+}
 `
 
 const graph = r.graph({
@@ -41,7 +41,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
   table.increments("id").notNullable().primary()
   table.string("name").notNullable()
 })
@@ -54,14 +54,13 @@ test("access fields", async () => {
   ])
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 1) {
-          id
-          name
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 1) {
+    id
+    name
+  }
+}
+`),
     {
       user: { id: 1, name: "Alice" },
     },
@@ -69,13 +68,12 @@ test("access fields", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 2) {
-          name
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 2) {
+    name
+  }
+}
+`),
     {
       user: { name: "Bob" },
     },
@@ -83,26 +81,24 @@ test("access fields", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 9562876) {
-          id
-          name
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 9562876) {
+    id
+    name
+  }
+}
+`),
     { user: null },
     "fetch missing object",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        users {
-          name
-        }
-      }
-    `),
+    await client.request(gql`{
+  users {
+    name
+  }
+}
+`),
     {
       users: [{ name: "Alice" }, { name: "Bob" }, { name: "Charlie" }],
     },

@@ -1,9 +1,11 @@
 import gql from "graphql-tag"
-import { Model, QueryBuilder, ref } from "objection"
+import type { QueryBuilder } from "objection"
+import { Model, ref } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, beforeAll, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -49,32 +51,31 @@ class PostModel extends Model {
   author?: UserModel
 }
 
-const schema = gql`
-  scalar Filter
+const schema = gql`scalar Filter
 
-  type User {
-    id: Int!
-    name: String!
-    posts(filter: Filter!): [Post!]!
-    non_filterable_posts(filter: Filter!): [Post!]!
-  }
+type User {
+  id: Int!
+  name: String!
+  posts(filter: Filter!): [Post!]!
+  non_filterable_posts(filter: Filter!): [Post!]!
+}
 
-  type Post {
-    id: Int!
-    text: String!
-    author: User!
-  }
+type Post {
+  id: Int!
+  text: String!
+  author: User!
+}
 
-  type Query {
-    user(id: Int!): User
-    posts(filter: Filter): [Post!]!
-    non_filterable_posts(filter: Filter): [Post!]!
+type Query {
+  user(id: Int!): User
+  posts(filter: Filter): [Post!]!
+  non_filterable_posts(filter: Filter): [Post!]!
 
-    # test allowAllFilters
-    users1(filter: Filter): [User!]!
-    users2(filter: Filter): [User!]!
-    users3(filter: Filter): [User!]!
-  }
+  # test allowAllFilters
+  users1(filter: Filter): [User!]!
+  users2(filter: Filter): [User!]!
+  users3(filter: Filter): [User!]!
+}
 `
 
 const graph1 = r.graph({
@@ -172,13 +173,12 @@ beforeAll(async () => {
 
 test("filters", async () => {
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { author_id: 1 }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { author_id: 1 }) {
+    id
+  }
+}
+`),
     {
       posts: [{ id: 1 }, { id: 2 }, { id: 4 }],
     },
@@ -186,99 +186,91 @@ test("filters", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { id__in: [3, 5] }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { id__in: [3, 5] }) {
+    id
+  }
+}
+`),
     { posts: [{ id: 3 }, { id: 5 }] },
     "filter by id__in",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { id__lt: 3 }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { id__lt: 3 }) {
+    id
+  }
+}
+`),
     { posts: [{ id: 1 }, { id: 2 }] },
     "filter by id__lt",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { id__lte: 3 }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { id__lte: 3 }) {
+    id
+  }
+}
+`),
     { posts: [{ id: 1 }, { id: 2 }, { id: 3 }] },
     "filter by id__lte",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { id__gt: 4 }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { id__gt: 4 }) {
+    id
+  }
+}
+`),
     { posts: [{ id: 5 }, { id: 6 }] },
     "filter by id__gt",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { id__gte: 4 }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { id__gte: 4 }) {
+    id
+  }
+}
+`),
     { posts: [{ id: 4 }, { id: 5 }, { id: 6 }] },
     "filter by id__gte",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { text__like: "%COVID%" }) {
-          text
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { text__like: "%COVID%" }) {
+    text
+  }
+}
+`),
     { posts: [{ text: "Latest COVID news." }, { text: "COVID vs Flu?" }] },
     "filter by text__like",
   )
 
   assert.deepEqual(
     (
-      await client.request<any>(gql`
-        {
-          posts(filter: { published: true }) {
-            text
-          }
-        }
-      `)
+      await client.request<any>(gql`{
+  posts(filter: { published: true }) {
+    text
+  }
+}
+`)
     ).posts.length,
     5,
     "filter by modifier",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        posts(filter: { search: "news" }) {
-          text
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts(filter: { search: "news" }) {
+    text
+  }
+}
+`),
     {
       posts: [
         { text: "Latest COVID news." },
@@ -290,28 +282,26 @@ test("filters", async () => {
 
   assert.deepEqual(
     (
-      await client.request<any>(gql`
-        {
-          posts: non_filterable_posts(filter: { search: "news" }) {
-            id
-          }
-        }
-      `)
+      await client.request<any>(gql`{
+  posts: non_filterable_posts(filter: { search: "news" }) {
+    id
+  }
+}
+`)
     ).posts.length,
     6,
     "ignore filter in non-filterable root query",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 1) {
-          posts(filter: { search: "news" }) {
-            text
-          }
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 1) {
+    posts(filter: { search: "news" }) {
+      text
+    }
+  }
+}
+`),
     {
       user: {
         posts: [{ text: "Good news from China." }],
@@ -322,15 +312,14 @@ test("filters", async () => {
 
   assert.deepEqual(
     (
-      await client.request<any>(gql`
-        {
-          user(id: 1) {
-            posts: non_filterable_posts(filter: { search: "news" }) {
-              text
-            }
-          }
-        }
-      `)
+      await client.request<any>(gql`{
+  user(id: 1) {
+    posts: non_filterable_posts(filter: { search: "news" }) {
+      text
+    }
+  }
+}
+`)
     ).user.posts.length,
     3,
     "ignore filter in non-filterable relation",
@@ -339,13 +328,12 @@ test("filters", async () => {
 
 test("allowAllFilters", async () => {
   assert.deepEqual(
-    await client.request(gql`
-      {
-        users: users1(filter: { name__like: "%ob" }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  users: users1(filter: { name__like: "%ob" }) {
+    id
+  }
+}
+`),
     {
       users: [{ id: 1 }, { id: 2 }, { id: 3 }],
     },
@@ -353,13 +341,12 @@ test("allowAllFilters", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        users: users2(filter: { name__like: "%ob" }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  users: users2(filter: { name__like: "%ob" }) {
+    id
+  }
+}
+`),
     {
       users: [{ id: 2 }],
     },
@@ -367,13 +354,12 @@ test("allowAllFilters", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        users: users3(filter: { name__like: "%ob" }) {
-          id
-        }
-      }
-    `),
+    await client.request(gql`{
+  users: users3(filter: { name__like: "%ob" }) {
+    id
+  }
+}
+`),
     {
       users: [{ id: 2 }],
     },

@@ -1,5 +1,6 @@
-import { OrmAdapter } from "../orm/orm"
-import { PaginateContext, Paginator } from "./base"
+import type { OrmAdapter } from "../orm/orm"
+
+import type { PaginateContext, Paginator } from "./base"
 
 export function defineCursorPaginator(
   options: Partial<CursorPaginatorOptions> = {},
@@ -23,8 +24,7 @@ export interface CursorPaginatorPage<M> {
 }
 
 class CursorPaginator<Orm extends OrmAdapter, Context>
-  implements Paginator<Orm, Context>
-{
+implements Paginator<Orm, Context> {
   readonly path = ["nodes"]
   readonly options: CursorPaginatorOptions
 

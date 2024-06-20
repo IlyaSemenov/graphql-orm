@@ -1,4 +1,4 @@
-import { OrmAdapter } from "../orm/orm"
+import type { OrmAdapter } from "../orm/orm"
 
 export function run_after_query<Orm extends OrmAdapter>(
   orm: Orm,

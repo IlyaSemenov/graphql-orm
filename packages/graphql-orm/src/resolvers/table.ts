@@ -1,7 +1,10 @@
-import { apply_filters, ApplyFiltersModifier } from "../filters/filters"
-import { OrmAdapter } from "../orm/orm"
+import type { ApplyFiltersModifier } from "../filters/filters"
+import { apply_filters } from "../filters/filters"
+import type { OrmAdapter } from "../orm/orm"
 import { run_after_query } from "../utils/run-after"
-import { defineFieldResolver, FieldResolver } from "./field"
+
+import type { FieldResolver } from "./field"
+import { defineFieldResolver } from "./field"
 import type { GraphResolveContext, GraphResolver } from "./graph"
 import { defineRelationResolver } from "./relation"
 
@@ -57,8 +60,8 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
         Record<string, FieldResolver<Orm, Context>>
       >((resolvers, field) => {
         const r0 = fields[field]
-        const r: FieldResolver<Orm, Context> | undefined =
-          typeof r0 === "function"
+        const r: FieldResolver<Orm, Context> | undefined
+          = typeof r0 === "function"
             ? r0
             : r0 === true
               ? this._get_default_field_resolver(field)
@@ -90,10 +93,10 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
       )
     }
 
-    const allow_all_fields =
-      this.options.allowAllFields ??
-      graph.options.allowAllFields ??
-      !this.options.fields
+    const allow_all_fields
+      = this.options.allowAllFields
+      ?? graph.options.allowAllFields
+      ?? !this.options.fields
 
     if (!allow_all_fields && !this.table_field_resolvers) {
       throw new Error(
@@ -107,9 +110,9 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 
     for (const subtree of Object.values(tree.fieldsByTypeName[type])) {
       const field = subtree.name
-      const r: FieldResolver<Orm, Context> | undefined =
-        this.table_field_resolvers?.[field] ||
-        (allow_all_fields ? this._get_default_field_resolver(field) : undefined)
+      const r: FieldResolver<Orm, Context> | undefined
+        = this.table_field_resolvers?.[field]
+        || (allow_all_fields ? this._get_default_field_resolver(field) : undefined)
       if (!r) {
         throw new Error(`No field resolver defined for field ${type}.${field}.`)
       }
@@ -118,8 +121,8 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
       }
     }
 
-    const allow_all_filters =
-      this.options.allowAllFilters ?? graph.options.allowAllFilters
+    const allow_all_filters
+      = this.options.allowAllFilters ?? graph.options.allowAllFilters
 
     const effective_filters = allow_all_filters ? true : filters
 
@@ -151,11 +154,11 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
   ): FieldResolver<Orm, Context> {
     const table_field_lookup = tableField || field
     if (
-      this.options.modifiers?.[table_field_lookup] ||
-      this.virtual_fields.has(table_field_lookup)
+      this.options.modifiers?.[table_field_lookup]
+      || this.virtual_fields.has(table_field_lookup)
     ) {
       // Keep query as is.
-      return (query) => query
+      return query => query
     } else if (this.relations.has(table_field_lookup)) {
       // TODO: pre-create and cache
       return defineRelationResolver({ tableField })

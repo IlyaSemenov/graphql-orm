@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -42,24 +43,23 @@ class PostModel extends Model {
   author?: UserModel
 }
 
-const schema = gql`
-  scalar Filter
+const schema = gql`scalar Filter
 
-  type User {
-    id: Int!
-    name: String!
-    posts: [Post!]!
-  }
+type User {
+  id: Int!
+  name: String!
+  posts: [Post!]!
+}
 
-  type Post {
-    id: Int!
-    text: String!
-    author: User!
-  }
+type Post {
+  id: Int!
+  text: String!
+  author: User!
+}
 
-  type Query {
-    posts: [Post!]!
-  }
+type Query {
+  posts: [Post!]!
+}
 `
 
 const graph = r.graph(
@@ -110,18 +110,17 @@ test("filters", async () => {
   )
 
   expect(
-    await client.request(gql`
-      {
-        posts {
-          id
-          text
-          author {
-            id
-            name
-          }
-        }
-      }
-    `),
+    await client.request(gql`{
+  posts {
+    id
+    text
+    author {
+      id
+      name
+    }
+  }
+}
+`),
   ).toMatchInlineSnapshot(`
     {
       "posts": [
@@ -154,22 +153,21 @@ test("filters", async () => {
   `)
 
   expect(
-    await client.request(gql`
-      {
-        posts {
-          id
-          text
-          author {
-            id
-            name
-            posts {
-              id
-              text
-            }
-          }
-        }
+    await client.request(gql`{
+  posts {
+    id
+    text
+    author {
+      id
+      name
+      posts {
+        id
+        text
       }
-    `),
+    }
+  }
+}
+`),
   ).toMatchInlineSnapshot(`
     {
       "posts": [

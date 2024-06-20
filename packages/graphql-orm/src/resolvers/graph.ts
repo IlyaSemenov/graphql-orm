@@ -1,9 +1,11 @@
 import type { GraphQLResolveInfo } from "graphql"
-import { parseResolveInfo, ResolveTree } from "graphql-parse-resolve-info"
+import type { ResolveTree } from "graphql-parse-resolve-info"
+import { parseResolveInfo } from "graphql-parse-resolve-info"
 
-import { FiltersDef } from "../filters/filters"
-import { OrmAdapter } from "../orm/orm"
-import { Paginator } from "../paginators/base"
+import type { FiltersDef } from "../filters/filters"
+import type { OrmAdapter } from "../orm/orm"
+import type { Paginator } from "../paginators/base"
+
 import type { TableResolver, TableResolverOptions } from "./table"
 
 export type GraphResolverOptions<Orm extends OrmAdapter, Context> = Pick<

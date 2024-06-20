@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -67,43 +68,42 @@ class PostModel extends Model {
   section?: SectionModel
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-    posts(cursor: String, take: Int): PostPage!
-    posts_page(cursor: String, take: Int): PostPage!
-    posts_by_one(cursor: String, take: Int): PostPage!
-    all_posts: [Post!]!
-    all_posts_verbose: [Post!]!
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+  posts(cursor: String, take: Int): PostPage!
+  posts_page(cursor: String, take: Int): PostPage!
+  posts_by_one(cursor: String, take: Int): PostPage!
+  all_posts: [Post!]!
+  all_posts_verbose: [Post!]!
+}
 
-  type Section {
-    id: Int!
-    name: String!
-    posts(cursor: String, take: Int): PostPage!
-  }
+type Section {
+  id: Int!
+  name: String!
+  posts(cursor: String, take: Int): PostPage!
+}
 
-  type SectionPage {
-    nodes: [Section!]!
-    cursor: ID
-  }
+type SectionPage {
+  nodes: [Section!]!
+  cursor: ID
+}
 
-  type Post {
-    id: Int!
-    text: String!
-    author: User!
-    section: Section!
-  }
+type Post {
+  id: Int!
+  text: String!
+  author: User!
+  section: Section!
+}
 
-  type PostPage {
-    nodes: [Post!]!
-    cursor: ID
-  }
+type PostPage {
+  nodes: [Post!]!
+  cursor: ID
+}
 
-  type Query {
-    user(id: Int!): User
-  }
+type Query {
+  user(id: Int!): User
+}
 `
 
 const graph = r.graph({
@@ -186,23 +186,22 @@ test("nested pagination", async () => {
   )
 
   expect(
-    await client.request(gql`
-      {
-        user(id: 1) {
+    await client.request(gql`{
+  user(id: 1) {
+    name
+    posts {
+      nodes {
+        id
+        text
+        section {
           name
-          posts {
-            nodes {
-              id
-              text
-              section {
-                name
-              }
-            }
-            cursor
-          }
         }
       }
-    `),
+      cursor
+    }
+  }
+}
+`),
   ).toMatchInlineSnapshot(`
     {
       "user": {
@@ -231,39 +230,38 @@ test("nested pagination", async () => {
   `)
 
   expect(
-    await client.request(gql`
-      {
-        user(id: 1) {
-          id
+    await client.request(gql`{
+  user(id: 1) {
+    id
+    name
+    posts {
+      nodes {
+        id
+        text
+        author {
+          name
+        }
+        section {
           name
           posts {
             nodes {
-              id
               text
               author {
                 name
               }
               section {
                 name
-                posts {
-                  nodes {
-                    text
-                    author {
-                      name
-                    }
-                    section {
-                      name
-                    }
-                  }
-                  cursor
-                }
               }
             }
             cursor
           }
         }
       }
-    `),
+      cursor
+    }
+  }
+}
+`),
   ).toMatchInlineSnapshot(`
     {
       "user": {
@@ -345,30 +343,29 @@ test("nested pagination", async () => {
   `)
 
   expect(
-    await client.request(gql`
-      {
-        user(id: 2) {
+    await client.request(gql`{
+  user(id: 2) {
+    name
+    posts {
+      nodes {
+        text
+        author {
           name
           posts {
             nodes {
               text
               author {
                 name
-                posts {
-                  nodes {
-                    text
-                    author {
-                      name
-                    }
-                  }
-                }
               }
             }
-            cursor
           }
         }
       }
-    `),
+      cursor
+    }
+  }
+}
+`),
   ).toMatchInlineSnapshot(`
     {
       "user": {

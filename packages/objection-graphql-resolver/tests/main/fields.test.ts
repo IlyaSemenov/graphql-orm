@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -13,20 +14,19 @@ class UserModel extends Model {
   password?: string
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-    password: String!
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+  password: String!
+}
 
-  type Query {
-    default_user(id: Int!): User
-    default_user1(id: Int!): User
-    secure_user(id: Int!): User
-    user1(id: Int!): User
-    user2(id: Int!): User
-  }
+type Query {
+  default_user(id: Int!): User
+  default_user1(id: Int!): User
+  secure_user(id: Int!): User
+  user1(id: Int!): User
+  user2(id: Int!): User
+}
 `
 
 const default_graph = r.graph({
@@ -102,7 +102,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
   table.increments("id").notNullable().primary()
   table.string("name").notNullable()
   table.string("password").notNullable()
@@ -112,15 +112,14 @@ test("model resolver fields access", async () => {
   await UserModel.query().insertGraph([{ name: "Alice", password: "secret" }])
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user: default_user(id: 1) {
-          id
-          name
-          password
-        }
-      }
-    `),
+    await client.request(gql`{
+  user: default_user(id: 1) {
+    id
+    name
+    password
+  }
+}
+`),
     {
       user: { id: 1, name: "Alice", password: "secret" },
     },
@@ -128,28 +127,26 @@ test("model resolver fields access", async () => {
   )
 
   await expect(
-    client.request(gql`
-      {
-        user: default_user1(id: 1) {
-          id
-          name
-          password
-        }
-      }
-    `),
+    client.request(gql`{
+  user: default_user1(id: 1) {
+    id
+    name
+    password
+  }
+}
+`),
   ).rejects.toThrow(
     "Resolver for type User must either allow all fields or specify options.fields.",
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user: secure_user(id: 1) {
-          id
-          name
-        }
-      }
-    `),
+    await client.request(gql`{
+  user: secure_user(id: 1) {
+    id
+    name
+  }
+}
+`),
     {
       user: { id: 1, name: "Alice" },
     },
@@ -157,27 +154,25 @@ test("model resolver fields access", async () => {
   )
 
   await expect(
-    client.request(gql`
-      {
-        user: secure_user(id: 1) {
-          id
-          name
-          password
-        }
-      }
-    `),
+    client.request(gql`{
+  user: secure_user(id: 1) {
+    id
+    name
+    password
+  }
+}
+`),
   ).rejects.toThrow("No field resolver defined for field User.password")
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user: user1(id: 1) {
-          id
-          name
-          password
-        }
-      }
-    `),
+    await client.request(gql`{
+  user: user1(id: 1) {
+    id
+    name
+    password
+  }
+}
+`),
     {
       user: { id: 1, name: "Alice", password: "secret" },
     },
@@ -185,15 +180,14 @@ test("model resolver fields access", async () => {
   )
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user: user2(id: 1) {
-          id
-          name
-          password
-        }
-      }
-    `),
+    await client.request(gql`{
+  user: user2(id: 1) {
+    id
+    name
+    password
+  }
+}
+`),
     {
       user: { id: 1, name: "Alice", password: "secret" },
     },

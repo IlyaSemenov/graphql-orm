@@ -3,7 +3,8 @@ import { Model, ref } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -22,17 +23,16 @@ class UserModel extends Model {
   }
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-    url: String!
-    upper_name: String!
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+  url: String!
+  upper_name: String!
+}
 
-  type Query {
-    user(id: Int!): User
-  }
+type Query {
+  user(id: Int!): User
+}
 `
 
 const graph = r.graph({
@@ -41,7 +41,7 @@ const graph = r.graph({
       id: true,
       name: true,
       // Guarded
-      url: (query) => query.select(ref("user.id")),
+      url: query => query.select(ref("user.id")),
       // Naive
       upper_name: true,
     },
@@ -58,7 +58,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
   table.increments("id").notNullable().primary()
   table.string("name").notNullable()
 })
@@ -67,13 +67,12 @@ test("virtual fields", async () => {
   await UserModel.query().insert({ name: "Alice" })
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 1) {
-          url
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 1) {
+    url
+  }
+}
+`),
     {
       user: { url: "/user/1" },
     },
@@ -81,25 +80,23 @@ test("virtual fields", async () => {
   )
 
   await expect(
-    client.request(gql`
-      {
-        user(id: 1) {
-          upper_name
-        }
-      }
-    `),
+    client.request(gql`{
+  user(id: 1) {
+    upper_name
+  }
+}
+`),
     "break on fetching naive virtual field",
   ).rejects.toThrow()
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 1) {
-          name
-          upper_name
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 1) {
+    name
+    upper_name
+  }
+}
+`),
     {
       user: { name: "Alice", upper_name: "ALICE" },
     },

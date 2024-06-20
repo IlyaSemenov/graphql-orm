@@ -1,4 +1,4 @@
-import { GetPageFn } from "../paginators/base"
+import type { GetPageFn } from "../paginators/base"
 
 export type OrmModifier<Orm extends OrmAdapter> = (
   query: Orm["Query"],
@@ -32,7 +32,7 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 
   // Select
 
-  select_field(query: Query, opts: { field: string; as: string }): Query
+  select_field(query: Query, opts: { field: string, as: string }): Query
 
   select_relation(
     query: Query,

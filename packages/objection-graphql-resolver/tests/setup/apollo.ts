@@ -1,4 +1,5 @@
-import { ApolloServer, ApolloServerOptions } from "@apollo/server"
+import type { ApolloServerOptions } from "@apollo/server"
+import { ApolloServer } from "@apollo/server"
 import { startStandaloneServer } from "@apollo/server/standalone"
 import { afterAll } from "vitest"
 

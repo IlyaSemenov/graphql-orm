@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class BookModel extends Model {
   static tableName = "book"
@@ -13,21 +14,20 @@ class BookModel extends Model {
   author?: string
 }
 
-const schema = gql`
-  type Book {
-    id: Int!
-    title: String!
-    author: String!
-  }
+const schema = gql`type Book {
+  id: Int!
+  title: String!
+  author: String!
+}
 
-  type BookPage {
-    nodes: [Book!]!
-    cursor: String
-  }
+type BookPage {
+  nodes: [Book!]!
+  cursor: String
+}
 
-  type Query {
-    books: BookPage!
-  }
+type Query {
+  books: BookPage!
+}
 `
 
 const graph = r.graph({
@@ -60,15 +60,14 @@ test("auto select pagination key", async () => {
   ])
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        books {
-          nodes {
-            title
-          }
-        }
-      }
-    `),
+    await client.request(gql`{
+  books {
+    nodes {
+      title
+    }
+  }
+}
+`),
     {
       books: {
         nodes: [{ title: "1984" }],

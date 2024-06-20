@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class PostModel extends Model {
   static tableName = "post"
@@ -31,23 +32,22 @@ class CommentModel extends Model {
   post_id?: number
 }
 
-const schema = gql`
-  scalar Filter
+const schema = gql`scalar Filter
 
-  type Post {
-    id: Int!
-    text: String!
-    all_comments: [Comment!]!
-  }
+type Post {
+  id: Int!
+  text: String!
+  all_comments: [Comment!]!
+}
 
-  type Comment {
-    id: Int!
-    text: String!
-  }
+type Comment {
+  id: Int!
+  text: String!
+}
 
-  type Query {
-    post(id: ID!): Post!
-  }
+type Query {
+  post(id: ID!): Post!
+}
 `
 
 const graph = r.graph(
@@ -107,18 +107,17 @@ test("filters", async () => {
   )
 
   expect(
-    await client.request(gql`
-      {
-        post(id: 1) {
-          id
-          text
-          all_comments {
-            id
-            text
-          }
-        }
-      }
-    `),
+    await client.request(gql`{
+  post(id: 1) {
+    id
+    text
+    all_comments {
+      id
+      text
+    }
+  }
+}
+`),
   ).toMatchInlineSnapshot(`
     {
       "post": {

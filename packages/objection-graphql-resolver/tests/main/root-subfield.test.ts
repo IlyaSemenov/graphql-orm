@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -12,24 +13,23 @@ class UserModel extends Model {
   name?: string
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+}
 
-  type Query {
-    user(id: Int!): User
-  }
+type Query {
+  user(id: Int!): User
+}
 
-  type Mutation {
-    login(id: Int!): LoginResult!
-  }
+type Mutation {
+  login(id: Int!): LoginResult!
+}
 
-  type LoginResult {
-    token: String!
-    user: User!
-  }
+type LoginResult {
+  token: String!
+  user: User!
+}
 `
 
 const graph = r.graph({
@@ -53,7 +53,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
   table.increments("id").notNullable().primary()
   table.string("name").notNullable()
 })
@@ -62,28 +62,26 @@ test("root query sub-field", async () => {
   await UserModel.query().insert({ name: "Alice" })
 
   assert.deepEqual(
-    await client.request(gql`
-      mutation {
-        login(id: 1) {
-          token
-          user {
-            name
-          }
-        }
-      }
-    `),
+    await client.request(gql`mutation {
+  login(id: 1) {
+    token
+    user {
+      name
+    }
+  }
+}
+`),
     { login: { token: "xyzzy", user: { name: "Alice" } } },
   )
 
   // Regression: should not crash when diving to non-requested subfield
   assert.deepEqual(
-    await client.request(gql`
-      mutation {
-        login(id: 1) {
-          token
-        }
-      }
-    `),
+    await client.request(gql`mutation {
+  login(id: 1) {
+    token
+  }
+}
+`),
     { login: { token: "xyzzy" } },
   )
 })

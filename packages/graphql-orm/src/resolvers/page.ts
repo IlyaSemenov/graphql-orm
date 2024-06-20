@@ -1,7 +1,9 @@
-import { OrmAdapter } from "../orm/orm"
-import { Paginator } from "../paginators/base"
-import { FieldResolver, parse_field_options } from "./field"
-import { RelationResolverOptions } from "./relation"
+import type { OrmAdapter } from "../orm/orm"
+import type { Paginator } from "../paginators/base"
+
+import type { FieldResolver } from "./field"
+import { parse_field_options } from "./field"
+import type { RelationResolverOptions } from "./relation"
 
 export function definePageResolver<Orm extends OrmAdapter, Context>(
   paginator: Paginator<Orm, Context>,

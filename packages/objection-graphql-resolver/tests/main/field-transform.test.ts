@@ -3,7 +3,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
   static tableName = "user"
@@ -13,17 +14,16 @@ class UserModel extends Model {
   password?: string
 }
 
-const schema = gql`
-  type User {
-    id: Int!
-    name: String!
-    # empty if not allowed
-    password: String
-  }
+const schema = gql`type User {
+  id: Int!
+  name: String!
+  # empty if not allowed
+  password: String
+}
 
-  type Query {
-    user(id: Int!): User
-  }
+type Query {
+  user(id: Int!): User
+}
 `
 
 const graph = r.graph<{ user_id: string }>({
@@ -54,7 +54,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
   table.increments("id").notNullable().primary()
   table.string("name").notNullable()
   table.string("password").notNullable()
@@ -64,15 +64,14 @@ test("field transform", async () => {
   await UserModel.query().insert({ name: "Alice", password: "secret" })
 
   assert.deepEqual(
-    await client.request(gql`
-      {
-        user(id: 1) {
-          id
-          name
-          password
-        }
-      }
-    `),
+    await client.request(gql`{
+  user(id: 1) {
+    id
+    name
+    password
+  }
+}
+`),
     {
       user: { id: 1, name: "Alice", password: null },
     },
@@ -81,15 +80,14 @@ test("field transform", async () => {
 
   assert.deepEqual(
     await client.request(
-      gql`
-        {
-          user(id: 1) {
-            id
-            name
-            password
-          }
-        }
-      `,
+      gql`{
+  user(id: 1) {
+    id
+    name
+    password
+  }
+}
+`,
       undefined,
       { user_id: "2" },
     ),
@@ -101,15 +99,14 @@ test("field transform", async () => {
 
   assert.deepEqual(
     await client.request(
-      gql`
-        {
-          user(id: 1) {
-            id
-            name
-            password
-          }
-        }
-      `,
+      gql`{
+  user(id: 1) {
+    id
+    name
+    password
+  }
+}
+`,
       undefined,
       { user_id: "1" },
     ),

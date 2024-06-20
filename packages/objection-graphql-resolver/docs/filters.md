@@ -106,7 +106,7 @@ Define modifiers on a model class:
 ```ts
 class PostModel extends Model {
   static modifiers = {
-    public: (query) => query.whereNull("delete_time"),
+    public: query => query.whereNull("delete_time"),
     search: (query, term) => query.where("text", "ilike", `%${term}%`),
   }
 }

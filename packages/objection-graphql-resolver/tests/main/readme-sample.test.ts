@@ -5,7 +5,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class PostModel extends Model {
   static tableName = "post"
@@ -14,19 +15,18 @@ class PostModel extends Model {
   text?: string
 }
 
-const typeDefs = gql`
-  type Post {
-    id: Int!
-    text: String!
-  }
+const typeDefs = gql`type Post {
+  id: Int!
+  text: String!
+}
 
-  type Mutation {
-    create_post(text: String!): Post!
-  }
+type Mutation {
+  create_post(text: String!): Post!
+}
 
-  type Query {
-    posts: [Post!]!
-  }
+type Query {
+  posts: [Post!]!
+}
 `
 
 const graph = r.graph({
@@ -56,24 +56,22 @@ await knex.schema.createTable("post", (post) => {
 
 test("readme demo sample", async () => {
   await client.request(
-    gql`
-      mutation create_post($text: String!) {
-        new_post: create_post(text: $text) {
-          id
-        }
-      }
-    `,
+    gql`mutation create_post($text: String!) {
+  new_post: create_post(text: $text) {
+    id
+  }
+}
+`,
     { text: "Hello, world!" },
   )
 
-  const { posts } = await client.request<any>(gql`
-    query {
-      posts {
-        id
-        text
-      }
-    }
-  `)
+  const { posts } = await client.request<any>(gql`query {
+  posts {
+    id
+    text
+  }
+}
+`)
 
   assert.deepEqual(posts, [{ id: 1, text: "Hello, world!" }])
 })
