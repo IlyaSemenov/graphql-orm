@@ -6,20 +6,20 @@ Example:
 
 ```gql
 type User {
-	id: ID!
-	name: String!
-	posts: [Post!]!
+  id: ID!
+  name: String!
+  posts: [Post!]!
 }
 
 type Post {
-	id: ID!
-	text: String!
-	author: User
+  id: ID!
+  text: String!
+  author: User
 }
 
 type Query {
-	user(id: ID!): User!
-	posts: [Post!]!
+  user(id: ID!): User!
+  posts: [Post!]!
 }
 
 query posts_with_author {
@@ -32,8 +32,8 @@ query posts_with_author {
   }
 }
 
-query user_with_posts {
-  user(id: ID!) {
+query user_with_posts($id: ID!) {
+  user(id: $id) {
     name
     posts {
       id

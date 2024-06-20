@@ -158,8 +158,8 @@ query posts_with_author {
   }
 }
 
-query user_with_posts {
-  user(id: ID!) {
+query user_with_posts($id: ID!) {
+  user(id: $id) {
     name
     # will use withGraphFetched("posts") if requested
     posts {
