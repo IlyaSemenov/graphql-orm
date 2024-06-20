@@ -17,7 +17,7 @@ class PostTable extends BaseTable {
 	readonly table = "post"
 	columns = this.setColumns((t) => ({
 		id: t.identity().primaryKey(),
-		text: t.text(0, 5000),
+		text: t.text(),
 	}))
 }
 
