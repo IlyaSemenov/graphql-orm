@@ -42,11 +42,11 @@
     "objection": "^3.0.1",
     "sqlite3": "^5.1.6",
     "tar": "^6.1.15",
-    "tsconfig-vite-node": "^1.1.0",
-    "tsup": "^8.0.2",
-    "vite": "^5.1.4",
-    "vite-node": "^1.3.1",
-    "vite-tsconfig-paths": "^4.3.1",
-    "vitest": "^1.3.1"
+    "tsconfig-vite-node": "^1.1.2",
+    "tsup": "^8.1.0",
+    "vite": "^5.3.1",
+    "vite-node": "^1.6.0",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0"
   }
 }
