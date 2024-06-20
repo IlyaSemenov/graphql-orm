@@ -125,9 +125,6 @@ importers:
       orchid-orm:
         specifier: ^1.23.0
         version: 1.23.0(typescript@5.4.5)
-      pqb:
-        specifier: ^0.25.0
-        version: 0.25.0
       tsconfig-vite-node:
         specifier: ^1.1.2
         version: 1.1.2

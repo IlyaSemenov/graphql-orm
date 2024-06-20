@@ -1,6 +1,6 @@
 import { OrmAdapter } from "graphql-orm"
+import type { Query } from "orchid-orm"
 import { DbTable, raw } from "orchid-orm"
-import type { Query } from "pqb"
 
 export type OrchidOrm = OrmAdapter<
 	DbTable<any>,
