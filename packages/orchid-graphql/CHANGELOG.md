@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.5.2
+
+### Patch Changes
+
+- 91c309d: Remove dependency on `pqb`.
+
 ## 1.5.1
 
 ### Patch Changes
