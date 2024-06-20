@@ -1,16 +1,16 @@
 {
-	"[json][jsonc][markdown]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "explicit",
-		"source.organizeImports": "never"
-	},
-	"editor.formatOnSave": true,
-	"eslint.experimental.useFlatConfig": true,
-	"eslint.validate": ["javascript", "typescript"],
-	"search.exclude": {
-		"**/node_modules": true,
-		"packages/*/dist": true
-	}
+  "[json][jsonc][markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "editor.formatOnSave": true,
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.validate": ["javascript", "typescript"],
+  "search.exclude": {
+    "**/node_modules": true,
+    "packages/*/dist": true
+  }
 }

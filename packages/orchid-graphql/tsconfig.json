@@ -1,9 +1,9 @@
 {
-	"extends": "tsconfig-vite-node/tsconfig.json",
-	"compilerOptions": {
-		"paths": {
-			"orchid-graphql": ["./src"],
-			"graphql-orm": ["../graphql-orm/src"]
-		}
-	}
+  "extends": "tsconfig-vite-node/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "orchid-graphql": ["./src"],
+      "graphql-orm": ["../graphql-orm/src"]
+    }
+  }
 }

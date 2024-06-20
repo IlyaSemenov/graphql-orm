@@ -3,101 +3,101 @@ import { DbTable, raw } from "orchid-orm"
 import type { Query } from "pqb"
 
 export type OrchidOrm = OrmAdapter<
-	DbTable<any>,
-	Query,
-	// TODO: Type as QueryTransform once it's published.
-	Pick<Promise<any>, "then" | "catch">
+  DbTable<any>,
+  Query,
+  // TODO: Type as QueryTransform once it's published.
+  Pick<Promise<any>, "then" | "catch">
 >
 
 export const orm: OrchidOrm = {
-	Table: undefined as unknown as OrchidOrm["Table"],
-	Query: undefined as unknown as OrchidOrm["Query"],
-	QueryTransform: undefined as unknown as OrchidOrm["QueryTransform"],
+  Table: undefined as unknown as OrchidOrm["Table"],
+  Query: undefined as unknown as OrchidOrm["Query"],
+  QueryTransform: undefined as unknown as OrchidOrm["QueryTransform"],
 
-	// Reflection
+  // Reflection
 
-	get_table_table(table) {
-		return table.table
-	},
+  get_table_table(table) {
+    return table.table
+  },
 
-	get_table_relations(table) {
-		return Object.keys(table.relations)
-	},
+  get_table_relations(table) {
+    return Object.keys(table.relations)
+  },
 
-	get_table_virtual_fields() {
-		// Not supported by Orchid.
-		return []
-	},
+  get_table_virtual_fields() {
+    // Not supported by Orchid.
+    return []
+  },
 
-	get_table_modifiers() {
-		return undefined
-	},
+  get_table_modifiers() {
+    return undefined
+  },
 
-	get_query_table(query) {
-		if (!query.table) {
-			throw new Error("Query must have table.")
-		}
-		return query.table
-	},
+  get_query_table(query) {
+    if (!query.table) {
+      throw new Error("Query must have table.")
+    }
+    return query.table
+  },
 
-	// Select
+  // Select
 
-	select_field(query, { field, as }) {
-		return query.select({ [as]: field })
-	},
+  select_field(query, { field, as }) {
+    return query.select({ [as]: field })
+  },
 
-	select_relation(query, { relation, as, modify }) {
-		return query.select({
-			[as]: (q) => modify((q as any)[relation]),
-		})
-	},
+  select_relation(query, { relation, as, modify }) {
+    return query.select({
+      [as]: (q) => modify((q as any)[relation]),
+    })
+  },
 
-	// Find
+  // Find
 
-	where(query, field, op, value) {
-		return query.where({ [field]: op ? { [op]: value } : value })
-	},
+  where(query, field, op, value) {
+    return query.where({ [field]: op ? { [op]: value } : value })
+  },
 
-	where_raw(query, expression, bindings) {
-		return query.where(raw({ raw: expression, values: bindings }))
-	},
+  where_raw(query, expression, bindings) {
+    return query.where(raw({ raw: expression, values: bindings }))
+  },
 
-	// Order & Limit
+  // Order & Limit
 
-	reset_query_order(query) {
-		return query.clear("order")
-	},
+  reset_query_order(query) {
+    return query.clear("order")
+  },
 
-	add_query_order(query, field, desc) {
-		return query.order({ [field]: desc ? "DESC" : "ASC" })
-	},
+  add_query_order(query, field, desc) {
+    return query.order({ [field]: desc ? "DESC" : "ASC" })
+  },
 
-	set_query_limit(query, limit) {
-		return query.limit(limit)
-	},
+  set_query_limit(query, limit) {
+    return query.limit(limit)
+  },
 
-	// Pagination helpers
+  // Pagination helpers
 
-	set_query_page_result(query, get_page) {
-		return query.transform((nodes) => get_page(nodes as any))
-	},
+  set_query_page_result(query, get_page) {
+    return query.transform((nodes) => get_page(nodes as any))
+  },
 
-	modify_subquery_pagination(subquery) {
-		return subquery
-	},
+  modify_subquery_pagination(subquery) {
+    return subquery
+  },
 
-	finish_query_pagination(query) {
-		return query
-	},
+  finish_query_pagination(query) {
+    return query
+  },
 
-	// Misc
+  // Misc
 
-	run_after_query(query, fn) {
-		return query.afterQuery((data) => fn(data))
-	},
+  run_after_query(query, fn) {
+    return query.afterQuery((data) => fn(data))
+  },
 
-	prevent_select_all(query) {
-		// Not needed in Orchid
-		return query
-	},
+  prevent_select_all(query) {
+    // Not needed in Orchid
+    return query
+  },
 }
