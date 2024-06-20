@@ -15,11 +15,13 @@ class AuthorTable extends BaseTable {
 
 	relations = {
 		books: this.hasAndBelongsToMany(() => BookTable, {
-			primaryKey: "id",
-			foreignKey: "author_id",
-			associationPrimaryKey: "id",
-			associationForeignKey: "book_id" as any, // FIXME - for tsc
-			joinTable: "author_book_rel",
+			columns: ["id"],
+			references: ["author_id"],
+			through: {
+				table: "author_book_rel",
+				columns: ["book_id"],
+				references: ["id"],
+			},
 		}),
 	}
 }
@@ -34,11 +36,13 @@ class BookTable extends BaseTable {
 
 	relations = {
 		authors: this.hasAndBelongsToMany(() => AuthorTable, {
-			primaryKey: "id",
-			foreignKey: "book_id",
-			associationPrimaryKey: "id",
-			associationForeignKey: "author_id" as any, // FIXME - for tsc
-			joinTable: "author_book_rel",
+			columns: ["id"],
+			references: ["book_id"],
+			through: {
+				table: "author_book_rel",
+				columns: ["author_id"],
+				references: ["id"],
+			},
 		}),
 	}
 }
