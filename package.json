@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint --fix . && prettier --write '**/*.{json,md}'",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "~2.27.1",
