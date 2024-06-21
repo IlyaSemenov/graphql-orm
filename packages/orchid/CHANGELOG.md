@@ -1,5 +1,12 @@
 # orchid-graphql
 
+## 1.6.0
+
+### Minor Changes
+
+- d527653: Type graph resolve result as `Promise<T>` instead of `Query`.
+- d527653: Return `Promise<undefined>` instead of `undefined` for non-requested fields.
+
 ## 1.5.2
 
 ### Patch Changes
