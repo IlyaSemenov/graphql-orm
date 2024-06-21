@@ -33,10 +33,10 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		readonly options: GraphResolverOptions<Orm, Context> = {},
 	) {}
 
-	resolve(
+	resolve<T>(
 		query: Orm["Query"],
 		{ info, ...context }: GraphResolveOptions<Context>,
-	) {
+	): Promise<T> {
 		const tree = this._get_resolve_tree(info)
 		return this._resolve_type(query, { ...context, tree })
 	}

@@ -30,8 +30,8 @@ class ObjectionGraphResolver<Context> extends GraphResolver<
 	resolve<Query extends AnyQueryBuilder>(
 		query: Query,
 		options: GraphResolveOptions<Context>,
-	): Query {
-		return super.resolve(query, options) as Query
+	): Promise<Query["ResultType"]> {
+		return super.resolve(query, options)
 	}
 
 	resolvePage<M extends Model, Query extends QueryBuilder<M, M[]>>(
