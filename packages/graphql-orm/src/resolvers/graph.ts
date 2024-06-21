@@ -54,7 +54,10 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		return parseResolveInfo(info) as ResolveTree
 	}
 
-	_resolve_type(query: Orm["Query"], context: GraphResolveContext<Context>) {
+	_resolve_type(
+		query: Orm["Query"],
+		context: GraphResolveContext<Context>,
+	): Orm["Query"] {
 		let { tree } = context
 		// Dive into subtree if requested.
 		if (context.path) {
@@ -66,9 +69,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 					// This happens when a user resolves a graph for a root subfield which was not requested by the client (and is thus not present in the tree).
 					//
 					// FIXME: this break typings contract. We are supposed to return a query.
-					// However, if we advertise to optionally return undefined, this result won't be accepted by upstream graphql tooling types.
-					// This is the least evil I see for now.
-					return undefined
+					return Promise.resolve()
 				}
 			}
 		}
