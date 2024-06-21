@@ -79,7 +79,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		}
 		return type_resolver.resolve(query, {
 			...context,
-			graph: this as any,
+			graph: this,
 			tree,
 			type,
 			path: undefined,
@@ -98,7 +98,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		query = this._resolve_type(query, { ...context, path: paginator.path })
 		return paginator.paginate(query, {
 			...context,
-			graph: this as any,
+			graph: this,
 		})
 	}
 }
