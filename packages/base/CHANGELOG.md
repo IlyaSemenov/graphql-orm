@@ -1,5 +1,15 @@
 # graphql-orm
 
+## 1.5.0
+
+### Minor Changes
+
+- f3f5f31: Type graph resolve result as `Promise<T>` instead of `Query`.
+
+### Patch Changes
+
+- e802bea: Return `Promise<undefined>` instead of `undefined` for non-requested fields.
+
 ## 1.4.1
 
 ### Patch Changes
