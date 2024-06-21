@@ -39,7 +39,7 @@ importers:
         specifier: ^8.0.0-alpha.10
         version: 8.0.0-alpha.30(eslint@9.5.0)(typescript@5.4.5)
 
-  packages/graphql-orm:
+  packages/base:
     dependencies:
       graphql:
         specifier: ^16
@@ -52,7 +52,7 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2
 
-  packages/objection-graphql-resolver:
+  packages/objection:
     dependencies:
       graphql-parse-resolve-info:
         specifier: ^4.13.0
@@ -101,7 +101,7 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0
 
-  packages/orchid-graphql:
+  packages/orchid:
     dependencies:
       graphql-parse-resolve-info:
         specifier: ^4.13.0
@@ -115,7 +115,7 @@ importers:
         version: 16.6.0
       graphql-orm:
         specifier: workspace:*
-        version: link:../graphql-orm
+        version: link:../base
       graphql-request:
         specifier: ^6.0.0
         version: 6.0.0(graphql@16.6.0)

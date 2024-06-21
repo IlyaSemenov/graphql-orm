@@ -5,8 +5,8 @@
 		// tests/main/m2m.test.ts: SQLITE_CONSTRAINT: NOT NULL constraint failed
 		"target": "ES2021",
 		"paths": {
-			"graphql-orm": ["../graphql-orm/src"],
-			"objection-graphql-resolver": ["./src"]
+			"objection-graphql-resolver": ["./src"],
+			"graphql-orm": ["../base/src"]
 		}
 	}
 }

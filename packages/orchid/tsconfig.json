@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"paths": {
 			"orchid-graphql": ["./src"],
-			"graphql-orm": ["../graphql-orm/src"]
+			"graphql-orm": ["../base/src"]
 		}
 	}
 }
