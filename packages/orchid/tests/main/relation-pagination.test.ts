@@ -14,16 +14,16 @@ class UserTable extends BaseTable {
 
 	relations = {
 		posts: this.hasMany(() => PostTable, {
-			primaryKey: "id",
-			foreignKey: "author_id",
+			columns: ["id"],
+			references: ["author_id"],
 		}),
 		comments: this.hasMany(() => CommentTable, {
-			primaryKey: "id",
-			foreignKey: "user_id",
+			columns: ["id"],
+			references: ["user_id"],
 		}),
 		likes: this.hasMany(() => LikeTable, {
-			primaryKey: "id",
-			foreignKey: "user_id",
+			columns: ["id"],
+			references: ["user_id"],
 		}),
 	}
 }
@@ -40,12 +40,12 @@ class PostTable extends BaseTable {
 	relations = {
 		author: this.belongsTo(() => UserTable, {
 			required: true,
-			primaryKey: "id",
-			foreignKey: "author_id",
+			columns: ["author_id"],
+			references: ["id"],
 		}),
 		comments: this.hasMany(() => CommentTable, {
-			primaryKey: "id",
-			foreignKey: "post_id",
+			columns: ["id"],
+			references: ["post_id"],
 		}),
 	}
 }
@@ -63,16 +63,16 @@ class CommentTable extends BaseTable {
 	relations = {
 		user: this.belongsTo(() => UserTable, {
 			required: true,
-			primaryKey: "id",
-			foreignKey: "user_id",
+			columns: ["user_id"],
+			references: ["id"],
 		}),
 		post: this.belongsTo(() => PostTable, {
-			primaryKey: "id",
-			foreignKey: "post_id",
+			columns: ["post_id"],
+			references: ["id"],
 		}),
 		likes: this.hasMany(() => LikeTable, {
-			primaryKey: "id",
-			foreignKey: "comment_id",
+			columns: ["id"],
+			references: ["comment_id"],
 		}),
 	}
 }
@@ -89,12 +89,12 @@ class LikeTable extends BaseTable {
 	relations = {
 		user: this.belongsTo(() => UserTable, {
 			required: true,
-			primaryKey: "id",
-			foreignKey: "user_id",
+			columns: ["user_id"],
+			references: ["id"],
 		}),
 		comment: this.belongsTo(() => CommentTable, {
-			primaryKey: "id",
-			foreignKey: "comment_id",
+			columns: ["comment_id"],
+			references: ["id"],
 		}),
 	}
 }

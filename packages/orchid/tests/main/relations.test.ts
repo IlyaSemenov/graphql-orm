@@ -14,8 +14,8 @@ class UserTable extends BaseTable {
 
 	relations = {
 		posts: this.hasMany(() => PostTable, {
-			primaryKey: "id",
-			foreignKey: "author_id",
+			columns: ["id"],
+			references: ["author_id"],
 		}),
 	}
 }
@@ -32,8 +32,8 @@ class PostTable extends BaseTable {
 	relations = {
 		author: this.belongsTo(() => UserTable, {
 			required: true,
-			primaryKey: "id",
-			foreignKey: "author_id",
+			columns: ["author_id"],
+			references: ["id"],
 		}),
 	}
 }

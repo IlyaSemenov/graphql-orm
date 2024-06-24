@@ -14,8 +14,8 @@ class UserTable extends BaseTable {
 
 	relations = {
 		posts: this.hasMany(() => PostTable, {
-			primaryKey: "id",
-			foreignKey: "author_id",
+			columns: ["id"],
+			references: ["author_id"],
 		}),
 	}
 }
@@ -29,14 +29,6 @@ class PostTable extends BaseTable {
 		author_id: t.integer(),
 		is_draft: t.boolean().default(false),
 	}))
-
-	relations = {
-		author: this.belongsTo(() => UserTable, {
-			required: true,
-			primaryKey: "id",
-			foreignKey: "author_id",
-		}),
-	}
 }
 
 const db = await create_db({
@@ -70,7 +62,6 @@ const schema = gql`
 	type Post {
 		id: Int!
 		text: String!
-		author: User!
 	}
 
 	type Query {
