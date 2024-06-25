@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.7.0
+
+### Minor Changes
+
+- 85f1e5b: Basic type check for `graph.resolve()` query argument. Use latest orchid-orm types.
+
 ## 1.6.0
 
 ### Minor Changes
