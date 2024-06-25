@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "vite-node --watch playground/readme.sample.ts",
     "build": "tsup",
-    "test": "vitest run && tsc --noEmit",
+    "test": "vitest run && tsc --noEmit && tstyche",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
@@ -31,7 +31,7 @@
   },
   "peerDependencies": {
     "graphql": "^16",
-    "orchid-orm": "^1.22.0"
+    "orchid-orm": "^1.31.5"
   },
   "devDependencies": {
     "@apollo/server": "^4.7.1",
@@ -39,8 +39,9 @@
     "graphql-orm": "workspace:*",
     "graphql-request": "^6.0.0",
     "graphql-tag": "^2.12.6",
-    "orchid-orm": "^1.30.0",
+    "orchid-orm": "^1.31.5",
     "tsconfig-vite-node": "^1.1.2",
+    "tstyche": "^2.0.0",
     "tsup": "^8.1.0",
     "vite": "^5.3.1",
     "vite-node": "^1.6.0",

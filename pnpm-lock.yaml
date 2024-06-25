@@ -123,11 +123,14 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.6.0)
       orchid-orm:
-        specifier: ^1.30.0
-        version: 1.30.0(typescript@5.4.5)
+        specifier: ^1.31.5
+        version: 1.31.5(typescript@5.4.5)
       tsconfig-vite-node:
         specifier: ^1.1.2
         version: 1.1.2
+      tstyche:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.4.5)
       tsup:
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.4.5)
@@ -4097,20 +4100,20 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /orchid-core@0.17.0:
-    resolution: {integrity: sha512-7/iIlyALjNXI43x8e8enQN/hwo02BfkoQdYbXADksc5cFQTd6DKI/BG9LdPUb43ZtZzbj75rtGdtmtA70DBEMg==}
+  /orchid-core@0.18.2:
+    resolution: {integrity: sha512-FP9lT/1nbSOxn7cE3inEthwS4fxVhTcpaXpi/LjpWIut+p00V3Edzc2h8JZQRLeW+IGLBlf+pNof/2gAuGFG/g==}
     dev: true
 
-  /orchid-orm@1.30.0(typescript@5.4.5):
-    resolution: {integrity: sha512-s2vT2gEaEzYbeIvXB0H0mtqYisVAgxRPZNpSN+mwG9ZpML3LvJnaZSTEiGSirSB7bbIJoee4UtU/kUymt9dNDg==}
+  /orchid-orm@1.31.5(typescript@5.4.5):
+    resolution: {integrity: sha512-iIb1Vybf5nlbt1KRIuLf7wJFOJwttjXLBkvgvd6oQFlHI1dJLk3Qi9GaSZFnQ26+S0I1jwnJ3SSn6LkWcbU2Xg==}
     peerDependencies:
       typescript: '*'
     dependencies:
       inflection: 2.0.1
-      orchid-core: 0.17.0
-      pqb: 0.34.0
+      orchid-core: 0.18.2
+      pqb: 0.35.5
       prompts: 2.4.2
-      rake-db: 2.21.0
+      rake-db: 2.21.6
       typescript: 5.4.5
     transitivePeerDependencies:
       - pg-native
@@ -4452,11 +4455,11 @@ packages:
     resolution: {integrity: sha512-VdlZoocy5lCP0c/t66xAfclglEapXPCIVhqqJRncYpvbCgImF0w67aPKfbqUMr72tO2k5q0TdTZwCLjPTI6C9g==}
     dev: true
 
-  /pqb@0.34.0:
-    resolution: {integrity: sha512-/DOrlWseOO3umFhBvNskaGux4gvtu3eHTRNuCe5q67r4PpC7cnm2SxS6GGZBGVHe8BlBruJTF+LT2kpDGCkRMQ==}
+  /pqb@0.35.5:
+    resolution: {integrity: sha512-gpAF/T93xozw0EdoErzNOkV0bZi6PT6OwuoM55jI8DknEwiNkyft5wYpWt2rRcQdPLteQfsfcaMbu0TtAZN62A==}
     dependencies:
       '@types/pg': 8.10.1
-      orchid-core: 0.17.0
+      orchid-core: 0.18.2
       pg: 8.11.0
     transitivePeerDependencies:
       - pg-native
@@ -4567,11 +4570,11 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /rake-db@2.21.0:
-    resolution: {integrity: sha512-YNKJjhXhBVCKS6F6pGIKAkID44M5wy4lS61DUf02MW3MpKbUNTB48boX2hXuENKZRLGK/ETiXw8iqCl3TKeuwg==}
+  /rake-db@2.21.6:
+    resolution: {integrity: sha512-MhPxpPq7y5kbh+Z9xEN1qxGmJmRKBTpdwt5O92tPFBfbhf76LW8TXXjN/nP9TZa/kwi7p9cN1W1Vk57BdzSzNQ==}
     dependencies:
-      orchid-core: 0.17.0
-      pqb: 0.34.0
+      orchid-core: 0.18.2
+      pqb: 0.35.5
       prompts: 2.4.2
     transitivePeerDependencies:
       - pg-native
@@ -5342,6 +5345,19 @@ packages:
 
   /tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
+
+  /tstyche@2.0.0(typescript@5.4.5):
+    resolution: {integrity: sha512-1LUCZEmMLRL7P0qDNtjx8oEEpU4qVUNggpsitl3XSGyuorbSNfees+EmMDC0VZ9FuClD0Far262U9oAT6Vz83Q==}
+    engines: {node: '>=16.14'}
+    hasBin: true
+    peerDependencies:
+      typescript: 4.x || 5.x
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.4.5
+    dev: true
 
   /tsup@8.1.0(typescript@5.4.5):
     resolution: {integrity: sha512-UFdfCAXukax+U6KzeTNO2kAARHcWxmKsnvSPXUcfA1D+kU05XDccCrkffCQpFaWDsZfV0jMyTsxU39VfCp6EOg==}

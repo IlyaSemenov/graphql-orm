@@ -1,9 +1,9 @@
 import { OrmAdapter } from "graphql-orm"
-import type { Query } from "orchid-orm"
-import { DbTable, raw } from "orchid-orm"
+import type { Query, Table } from "orchid-orm"
+import { raw } from "orchid-orm"
 
 export type OrchidOrm = OrmAdapter<
-	DbTable<any>,
+	Table,
 	Query,
 	// TODO: Type as QueryTransform once it's published.
 	Pick<Promise<any>, "then" | "catch">
@@ -17,7 +17,7 @@ export const orm: OrchidOrm = {
 	// Reflection
 
 	get_table_table(table) {
-		return table.table
+		return table.table!
 	},
 
 	get_table_relations(table) {
@@ -47,9 +47,10 @@ export const orm: OrchidOrm = {
 	},
 
 	select_relation(query, { relation, as, modify }) {
+		// as any casts needed in orchid-orm 1.31+
 		return query.select({
-			[as]: (q) => modify((q as any)[relation]),
-		})
+			[as]: (q: any) => modify(q[relation]),
+		} as any)
 	},
 
 	// Find
