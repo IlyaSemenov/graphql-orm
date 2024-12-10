@@ -111,12 +111,12 @@ const graph = r.graph({
 		fields: {
 			id: true,
 			name: true,
-			posts: r.page(r.cursor({ take: 2 })),
+			posts: r.page(r.cursor({ fields: ["id"], take: 2 })),
 			// TODO: test the fields below
-			posts_page: r.page(r.cursor({ take: 2 }), {
+			posts_page: r.page(r.cursor({ fields: ["id"], take: 2 }), {
 				modelField: "posts",
 			}),
-			posts_by_one: r.page(r.cursor({ take: 1 }), {
+			posts_by_one: r.page(r.cursor({ fields: ["id"], take: 1 }), {
 				modelField: "posts",
 			}),
 			all_posts: "posts",
@@ -127,7 +127,7 @@ const graph = r.graph({
 		fields: {
 			id: true,
 			name: true,
-			posts: r.page(r.cursor({ take: 2 }), {
+			posts: r.page(r.cursor({ fields: ["id"], take: 2 }), {
 				filters: true,
 			}),
 		},
@@ -208,7 +208,7 @@ test("nested pagination", async () => {
 		  "user": {
 		    "name": "Alice",
 		    "posts": {
-		      "cursor": "["2"]",
+		      "cursor": "Mg",
 		      "nodes": [
 		        {
 		          "id": 1,
@@ -270,7 +270,7 @@ test("nested pagination", async () => {
 		    "id": 1,
 		    "name": "Alice",
 		    "posts": {
-		      "cursor": "["2"]",
+		      "cursor": "Mg",
 		      "nodes": [
 		        {
 		          "author": {
@@ -280,7 +280,7 @@ test("nested pagination", async () => {
 		          "section": {
 		            "name": "News",
 		            "posts": {
-		              "cursor": "["2"]",
+		              "cursor": "Mg",
 		              "nodes": [
 		                {
 		                  "author": {
@@ -313,7 +313,7 @@ test("nested pagination", async () => {
 		          "section": {
 		            "name": "Editorial",
 		            "posts": {
-		              "cursor": "["2"]",
+		              "cursor": "Mg",
 		              "nodes": [
 		                {
 		                  "author": {
@@ -374,7 +374,7 @@ test("nested pagination", async () => {
 		  "user": {
 		    "name": "Bob",
 		    "posts": {
-		      "cursor": "["4"]",
+		      "cursor": "NA",
 		      "nodes": [
 		        {
 		          "author": {

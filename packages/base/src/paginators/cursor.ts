@@ -1,4 +1,6 @@
-import { OrmAdapter } from "../orm/orm"
+import { Buffer } from "node:buffer"
+
+import { OrmAdapter, SortOrder } from "../orm/orm"
 import { PaginateContext, Paginator } from "./base"
 
 export function defineCursorPaginator(
@@ -8,8 +10,8 @@ export function defineCursorPaginator(
 }
 
 export interface CursorPaginatorOptions {
-	fields: string[]
-	take: number
+	fields?: string[]
+	take?: number
 }
 
 export interface CursorPaginatorArgs {
@@ -26,20 +28,17 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 	implements Paginator<Orm, Context>
 {
 	readonly path = ["nodes"]
-	readonly options: CursorPaginatorOptions
 
-	readonly fields: Array<{
+	readonly pageSize: number
+
+	readonly fields?: Array<{
 		name: string
 		desc: boolean
 	}>
 
-	constructor(options: Partial<CursorPaginatorOptions> = {}) {
-		this.options = {
-			fields: ["id"],
-			take: 10,
-			...options,
-		}
-		this.fields = this.options.fields.map((field) => {
+	constructor(options: CursorPaginatorOptions = {}) {
+		this.pageSize = options.take ?? 10
+		this.fields = options.fields?.map((field) => {
 			if (field.startsWith("-")) {
 				return { name: field.slice(1), desc: true }
 			} else {
@@ -52,63 +51,92 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 		const { orm } = context.graph
 		const { args } = context.tree
 
-		const take = (args.take as number | undefined) ?? this.options.take
+		const pageSize = (args.take as number | undefined) ?? this.pageSize
 		const cursor = args.cursor as string | undefined
 
-		// Set query order
-		query = orm.reset_query_order(query)
-		for (const field of this.fields) {
-			// TODO: prevent potential name clash with aliases like .as(`_${table_ref}_order_key_0`)
-			query = orm.select_field(query, { field: field.name, as: field.name })
-			query = orm.add_query_order(query, field.name, field.desc)
+		const table = orm.get_query_table(query)
+
+		const orderFields = (
+			this.fields
+				? this.fields.map<SortOrder>((f) => ({
+						field: f.name,
+						dir: f.desc ? "DESC" : "ASC",
+					}))
+				: orm.get_query_order(query)
+		).map((o) => ({ ...o, alias: "_order_" + o.field }))
+
+		if (this.fields) {
+			query = orm.reset_query_order(query)
+			for (const { alias, dir } of orderFields) {
+				query = orm.add_query_order(query, { field: alias, dir })
+			}
+		}
+
+		if (!orderFields.length) {
+			throw new Error("Query must be ordered.")
+		}
+
+		for (const { field, alias } of orderFields) {
+			query = orm.select_field(query, { field, as: alias })
 		}
 
 		if (cursor) {
-			const { expression, bindings } = this._parse_cursor(cursor)
-			query = orm.where_raw(query, expression, bindings)
+			const parsedCursor = parseCursor(cursor)
+			// Prepare raw SQL.
+			// For example, for (amount asc, id asc) order, that would be:
+			// (amount, $id) >= ($amount, id)
+			const left: string[] = []
+			const right: string[] = []
+			for (let i = 0; i < orderFields.length; ++i) {
+				const { field, alias, dir } = orderFields[i]
+				const [expressions, placeholders] =
+					dir === "ASC" ? [left, right] : [right, left]
+				expressions.push(`"${table}"."${field}"`)
+				placeholders.push("$" + alias)
+			}
+			const sqlExpr = `(${left.join(",")}) > (${right.join(",")})`
+			const bindings = Object.fromEntries(
+				orderFields.map(({ alias }, i) => [alias, parsedCursor[i]]),
+			)
+			query = orm.where_raw(query, sqlExpr, bindings)
 		}
-		query = orm.set_query_limit(query, take + 1)
+		query = orm.set_query_limit(query, pageSize + 1)
+
+		// TODO add support for reverse cursor, borrow implementation from orchid-pagination.
+		function createNodeCursor(node: any) {
+			return createCursor(
+				orderFields.map(({ field, alias }) => {
+					const value = node[alias]
+					// TODO add support for custom serializer(s).
+					if (value === undefined) {
+						throw new Error(
+							`Unable to create cursor: undefined field ${field} (${alias})`,
+						)
+					}
+					return String(value)
+				}),
+			)
+		}
 
 		return orm.set_query_page_result(query, (nodes) => {
 			let cursor: string | undefined
-			if (nodes.length > take) {
-				cursor = this._create_cursor(nodes[take - 1])
-				nodes = nodes.slice(0, take)
+			if (nodes.length > pageSize) {
+				cursor = createNodeCursor(nodes[pageSize - 1])
+				nodes = nodes.slice(0, pageSize)
 			}
 			return { nodes, cursor }
 		})
 	}
+}
 
-	_create_cursor(instance: any) {
-		return JSON.stringify(
-			this.fields.map((field) => {
-				const value = instance[field.name]
-				if (value === undefined) {
-					throw new Error(
-						`Unable to create cursor: undefined field ${field.name}`,
-					)
-				}
-				return String(value)
-			}),
-		)
-	}
+function createCursor(parts: string[]) {
+	return Buffer.from(parts.map(String).join(String.fromCharCode(0))).toString(
+		"base64url",
+	)
+}
 
-	_parse_cursor(cursor: string) {
-		const values = JSON.parse(cursor)
-		const left: string[] = []
-		const right: string[] = []
-		const bindings: Record<string, any> = {}
-		for (let i = 0; i < this.fields.length; ++i) {
-			const field = this.fields[i]
-			const expressions = field.desc ? right : left
-			const placeholders = field.desc ? left : right
-			expressions.push(`"${field.name}"`)
-			placeholders.push("$" + field.name)
-			bindings[field.name] = values[i]
-		}
-		return {
-			expression: `(${left.join(",")}) > (${right.join(",")})`,
-			bindings,
-		}
-	}
+function parseCursor(cursor: string): string[] {
+	return Buffer.from(cursor, "base64url")
+		.toString()
+		.split(String.fromCharCode(0))
 }

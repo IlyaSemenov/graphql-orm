@@ -14,7 +14,7 @@ The library includes simple `CursorPaginator` implementation which traverses ord
     { "id": 1, "foo": "bar" },
     { "id": 2, "foo": "baz" }
   ],
-  "cursor": "xyzzy"
+  "cursor": "encoded-string-cursor-to-fetch-next-page"
 }
 ```
 
@@ -89,11 +89,10 @@ const graph = r.graph({
     fields: {
       id: true,
       name: true,
-      // If it were posts: true, all posts will be returned.
+      // If it were posts: true, all posts would be returned.
       // Instead, return a page of posts sorted by newest first.
       posts: r.page(r.cursor({ fields: ["-id"], take: 10 })),
-      // Should you want this, it's still possible to pull all posts (non-paginated)
-      // under a different GraphQL field
+      // Pull all posts (non-paginated) under a different GraphQL field.
       all_posts: r.relation({ tableField: "posts" }),
     },
   }),
@@ -107,8 +106,10 @@ const resolvers = {
     },
     posts: async (parent, args, context, info) => {
       return await graph.resolvePage(
-        db.post,
-        r.cursor({ fields: ["-id"], take: 10 }),
+        // Pagination fields can be taken from cursor({ fields })
+        // or from the query itself, like this:
+        db.post.order({ id: "DESC" }),
+        r.cursor({ take: 10 }),
         { context, info },
       )
     },

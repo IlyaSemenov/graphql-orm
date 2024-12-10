@@ -5,6 +5,12 @@ export type OrmModifier<Orm extends OrmAdapter> = (
 	...args: any[]
 ) => Orm["Query"]
 
+export interface SortOrder {
+	field: string
+	dir: "ASC" | "DESC"
+	// TODO: add nulls first/last
+}
+
 export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 	// Types
 
@@ -57,7 +63,9 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 
 	reset_query_order(query: Query): Query
 
-	add_query_order(query: Query, field: string, desc: boolean): Query
+	add_query_order(query: Query, order: SortOrder): Query
+
+	get_query_order(query: Query): SortOrder[]
 
 	set_query_limit(query: Query, limit: number): Query
 

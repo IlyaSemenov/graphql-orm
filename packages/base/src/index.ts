@@ -1,4 +1,4 @@
-export { OrmAdapter, OrmModifier } from "./orm/orm"
+export { OrmAdapter, OrmModifier, SortOrder } from "./orm/orm"
 export { Paginator } from "./paginators/base"
 export { defineCursorPaginator } from "./paginators/cursor"
 export { defineFieldResolver } from "./resolvers/field"

@@ -1,5 +1,5 @@
-import { OrmAdapter } from "graphql-orm"
-import type { Query, Table } from "orchid-orm"
+import { OrmAdapter, SortOrder } from "graphql-orm"
+import type { Query, SelectQueryData, Table } from "orchid-orm"
 import { raw } from "orchid-orm"
 
 export type OrchidOrm = OrmAdapter<
@@ -69,8 +69,29 @@ export const orm: OrchidOrm = {
 		return query.clear("order")
 	},
 
-	add_query_order(query, field, desc) {
-		return query.order({ [field]: desc ? "DESC" : "ASC" })
+	add_query_order(query, { field, dir }) {
+		return query.order({ [field]: dir })
+	},
+
+	get_query_order(query) {
+		return (
+			(query.q as SelectQueryData).order?.flatMap<SortOrder>((orderItem) => {
+				if (typeof orderItem === "string") {
+					return { field: "orderItem", dir: "ASC" }
+				} else if (typeof orderItem === "object") {
+					return Object.entries(orderItem).map<SortOrder>(([field, order]) => {
+						const [dir] = order.split(" ", 1)
+						if (dir === "ASC" || dir === "DESC") {
+							return { field, dir }
+						} else {
+							throw new Error("Unsupported order: " + order)
+						}
+					})
+				} else {
+					throw new TypeError("Unsupported order type: " + orderItem)
+				}
+			}) || []
+		)
 	},
 
 	set_query_limit(query, limit) {

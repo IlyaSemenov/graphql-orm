@@ -184,29 +184,29 @@ const graph = r.graph(
 	{
 		User: r.table(db.user, {
 			fields: {
-				posts_page: r.page(r.cursor({ take: 2 }), {
+				posts_page: r.page(r.cursor({ fields: ["id"], take: 2 }), {
 					tableField: "posts",
 				}),
-				posts_by_one: r.page(r.cursor({ take: 1 }), {
+				posts_by_one: r.page(r.cursor({ fields: ["id"], take: 1 }), {
 					tableField: "posts",
 				}),
 				all_posts: "posts",
 				all_posts_verbose: r.relation({ tableField: "posts" }),
-				comments_page: r.page(r.cursor({ take: 2 }), {
+				comments_page: r.page(r.cursor({ fields: ["id"], take: 2 }), {
 					tableField: "comments",
 				}),
 			},
 		}),
 		Post: r.table(db.post, {
 			fields: {
-				comments_page: r.page(r.cursor({ take: 2 }), {
+				comments_page: r.page(r.cursor({ fields: ["id"], take: 2 }), {
 					tableField: "comments",
 				}),
 			},
 		}),
 		Comment: r.table(db.comment, {
 			fields: {
-				likes_page: r.page(r.cursor({ take: 2 }), {
+				likes_page: r.page(r.cursor({ fields: ["id"], take: 2 }), {
 					tableField: "likes",
 				}),
 			},
@@ -271,7 +271,7 @@ test("relation pagination", async () => {
 		  "user": {
 		    "name": "Alice",
 		    "posts_page": {
-		      "cursor": "["2"]",
+		      "cursor": "Mg",
 		      "nodes": [
 		        {
 		          "text": "Oil price rising.",
@@ -315,14 +315,14 @@ test("double nested pagination", async () => {
 		  "user": {
 		    "name": "Alice",
 		    "posts_page": {
-		      "cursor": "["2"]",
+		      "cursor": "Mg",
 		      "nodes": [
 		        {
 		          "author": {
 		            "name": "Alice",
 		          },
 		          "comments_page": {
-		            "cursor": "["2"]",
+		            "cursor": "Mg",
 		            "nodes": [
 		              {
 		                "text": "I am so good.",
@@ -411,14 +411,14 @@ test("double and triple nested pagination", async () => {
 		    },
 		    "name": "Alice",
 		    "posts_page": {
-		      "cursor": "["2"]",
+		      "cursor": "Mg",
 		      "nodes": [
 		        {
 		          "author": {
 		            "name": "Alice",
 		          },
 		          "comments_page": {
-		            "cursor": "["2"]",
+		            "cursor": "Mg",
 		            "nodes": [
 		              {
 		                "likes_page": {

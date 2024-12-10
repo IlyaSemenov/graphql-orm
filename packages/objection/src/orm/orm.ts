@@ -1,4 +1,9 @@
-import { OrmAdapter, OrmModifier, run_after_query } from "graphql-orm"
+import {
+	OrmAdapter,
+	OrmModifier,
+	run_after_query,
+	SortOrder,
+} from "graphql-orm"
 import { QueryBuilder, raw, ref, RelationMappings } from "objection"
 import { Model } from "objection"
 import { AnyModelConstructor, AnyQueryBuilder, ModelClass } from "objection"
@@ -100,8 +105,19 @@ export const orm: ObjectionOrm = {
 		return query.clearOrder()
 	},
 
-	add_query_order(query, field, desc) {
-		return query.orderBy(field, desc ? "desc" : "asc")
+	add_query_order(query, { field, dir }) {
+		return query.orderBy(field, dir)
+	},
+
+	get_query_order(query) {
+		const sortOrders: SortOrder[] = []
+		;(query as any).forEachOperation(/orderBy/, (op: any) => {
+			if (op.name === "orderBy") {
+				const [field, dir] = op.args
+				sortOrders.push({ field, dir })
+			}
+		})
+		return sortOrders
 	},
 
 	set_query_limit(query, limit) {
