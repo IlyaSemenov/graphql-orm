@@ -1,5 +1,19 @@
 # orchid-graphql
 
+## 1.8.0
+
+### Minor Changes
+
+- 0ca55fb: Refactor cursor pagination:
+
+  - Expect explicit list of fields to sort on.
+  - If not provided, take the list of sort fields from the query itself.
+  - Fix crash on naming clash when e.g. paginating over `id` with subquery also having `id`.
+
+### Patch Changes
+
+- 8d7c54c: Run subquery modify prior to applying pagination.
+
 ## 1.7.0
 
 ### Minor Changes
