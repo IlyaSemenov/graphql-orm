@@ -19,12 +19,13 @@ export function definePageResolver<Orm extends OrmAdapter, Context>(
 			relation: tableField || field,
 			as: field,
 			modify(subquery) {
+				subquery = modify ? modify(subquery, context) : subquery
 				subquery = graph._resolve_page(subquery, paginator, context)
 				subquery = graph.orm.modify_subquery_pagination(
 					subquery,
 					pagination_context,
 				)
-				return modify ? modify(subquery, context) : subquery
+				return subquery
 			},
 		})
 		query = graph.orm.finish_query_pagination(query, field, pagination_context)
