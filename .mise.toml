@@ -2,4 +2,4 @@
 MISE_NODE_COREPACK = 1
 
 [tools]
-node = '18.12'
+node = '22.7'
