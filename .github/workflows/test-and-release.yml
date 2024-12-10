@@ -30,10 +30,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8.15
+      - name: Enable corepack
+        run: corepack enable
 
       - name: Setup node
         uses: actions/setup-node@v4
