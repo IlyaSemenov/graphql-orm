@@ -36,8 +36,8 @@ const schema = gql`
 	}
 
 	type Query {
-		users(cursor: ID, take: Int): UserPage!
-		reverse_users(cursor: ID, take: Int): UserPage!
+		users_by_name(cursor: ID, take: Int): UserPage!
+		users_by_name_reverse(cursor: ID, take: Int): UserPage!
 	}
 `
 
@@ -47,7 +47,7 @@ const graph = r.graph({
 
 const resolvers: Resolvers = {
 	Query: {
-		async users(_parent, _args, context, info) {
+		async users_by_name(_parent, _args, context, info) {
 			return await graph.resolvePage(
 				db.user,
 				r.cursor({ fields: ["name", "-id"], take: 2 }),
@@ -57,7 +57,7 @@ const resolvers: Resolvers = {
 				},
 			)
 		},
-		async reverse_users(_parent, _args, context, info) {
+		async users_by_name_reverse(_parent, _args, context, info) {
 			return await graph.resolvePage(
 				db.user,
 				r.cursor({ fields: ["-name", "-id"], take: 2 }),
@@ -69,35 +69,35 @@ const resolvers: Resolvers = {
 
 const client = await create_client({ typeDefs: schema, resolvers })
 
-test("root pagination", async () => {
-	await db.user.createMany([
-		{ name: "Alice" },
-		{ name: "Charlie" },
-		{ name: "Bob" },
-		{ name: "Charlie" },
-	])
+await db.user.createMany([
+	{ name: "Alice" },
+	{ name: "Charlie" },
+	{ name: "Bob" },
+	{ name: "Charlie" },
+])
 
-	function test_users(
-		name: string,
-		response: any,
-		users: any[],
-		must_have_cursor: boolean,
-	) {
-		const { cursor, nodes } = response.users
-		if (must_have_cursor) {
-			assert.ok(cursor, `${name}: has cursor`)
-		} else {
-			assert.notOk(cursor, `${name}: has no cursor`)
-		}
-		assert.deepEqual(nodes, users, name)
-		return cursor
+function test_users(
+	name: string,
+	response: any,
+	users: any[],
+	must_have_cursor: boolean,
+) {
+	const { cursor, nodes } = response.users
+	if (must_have_cursor) {
+		assert.ok(cursor, `${name}: has cursor`)
+	} else {
+		assert.notOk(cursor, `${name}: has no cursor`)
 	}
+	assert.deepEqual(nodes, users, name)
+	return cursor
+}
 
+test("forward pagination", async () => {
 	test_users(
 		"without args",
 		await client.request(gql`
 			{
-				users {
+				users: users_by_name {
 					nodes {
 						name
 					}
@@ -113,7 +113,7 @@ test("root pagination", async () => {
 		"take 1",
 		await client.request(gql`
 			{
-				users(take: 1) {
+				users: users_by_name(take: 1) {
 					nodes {
 						name
 					}
@@ -130,7 +130,7 @@ test("root pagination", async () => {
 		await client.request(
 			gql`
 				query more_sections($cursor: ID) {
-					users(cursor: $cursor, take: 2) {
+					users: users_by_name(cursor: $cursor, take: 2) {
 						nodes {
 							id
 							name
@@ -155,7 +155,7 @@ test("root pagination", async () => {
 		await client.request(
 			gql`
 				query more_sections($cursor: ID) {
-					users(cursor: $cursor) {
+					users: users_by_name(cursor: $cursor) {
 						nodes {
 							id
 							name
@@ -176,7 +176,7 @@ test("root pagination", async () => {
 		"take 4",
 		await client.request(gql`
 			{
-				users(take: 4) {
+				users: users_by_name(take: 4) {
 					nodes {
 						id
 						name
@@ -198,7 +198,7 @@ test("root pagination", async () => {
 		"take 100",
 		await client.request(gql`
 			{
-				users(take: 100) {
+				users: users_by_name(take: 100) {
 					nodes {
 						name
 					}
@@ -211,6 +211,133 @@ test("root pagination", async () => {
 			{ name: "Bob" },
 			{ name: "Charlie" },
 			{ name: "Charlie" },
+		],
+		false,
+	)
+})
+
+test("reverse pagination", async () => {
+	test_users(
+		"without args",
+		await client.request(gql`
+			{
+				users: users_by_name_reverse {
+					nodes {
+						id
+						name
+					}
+					cursor
+				}
+			}
+		`),
+		[
+			{ name: "Charlie", id: 4 },
+			{ name: "Charlie", id: 2 },
+		],
+		true,
+	)
+
+	const take_1_cursor = test_users(
+		"take 1",
+		await client.request(gql`
+			{
+				users: users_by_name_reverse(take: 1) {
+					nodes {
+						name
+					}
+					cursor
+				}
+			}
+		`),
+		[{ name: "Charlie" }],
+		true,
+	)
+
+	const take_2_more_after_1_cursor = test_users(
+		"take 2 more after 1",
+		await client.request(
+			gql`
+				query more_sections($cursor: ID) {
+					users: users_by_name_reverse(cursor: $cursor, take: 2) {
+						nodes {
+							id
+							name
+						}
+						cursor
+					}
+				}
+			`,
+			{
+				cursor: take_1_cursor,
+			},
+		),
+		[
+			{ name: "Charlie", id: 2 },
+			{ name: "Bob", id: 3 },
+		],
+		true,
+	)
+
+	test_users(
+		"take the rest",
+		await client.request(
+			gql`
+				query more_sections($cursor: ID) {
+					users: users_by_name_reverse(cursor: $cursor) {
+						nodes {
+							name
+						}
+						cursor
+					}
+				}
+			`,
+			{
+				cursor: take_2_more_after_1_cursor,
+			},
+		),
+		[{ name: "Alice" }],
+		false,
+	)
+
+	test_users(
+		"take 4",
+		await client.request(gql`
+			{
+				users: users_by_name_reverse(take: 4) {
+					nodes {
+						id
+						name
+					}
+					cursor
+				}
+			}
+		`),
+		[
+			{ name: "Charlie", id: 4 },
+			{ name: "Charlie", id: 2 },
+			{ name: "Bob", id: 3 },
+			{ name: "Alice", id: 1 },
+		],
+		false,
+	)
+
+	test_users(
+		"take 100",
+		await client.request(gql`
+			{
+				users: users_by_name_reverse(take: 100) {
+					nodes {
+						name
+					}
+					cursor
+				}
+			}
+		`),
+		[
+			{ name: "Charlie" },
+			{ name: "Charlie" },
+			{ name: "Bob" },
+			{ name: "Alice" },
 		],
 		false,
 	)
