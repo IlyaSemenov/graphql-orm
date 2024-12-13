@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.8.1
+
+### Patch Changes
+
+- 555419a: Add proper `exports` section to `package.json`. Allow native ESM import of this module.
+
 ## 1.8.0
 
 ### Minor Changes
