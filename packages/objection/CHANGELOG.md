@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.5.1
+
+### Patch Changes
+
+- 555419a: Add proper `exports` section to `package.json`. Allow native ESM import of this module.
+
 ## 7.5.0
 
 ### Minor Changes
