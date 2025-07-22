@@ -1,5 +1,5 @@
-import type { ApplyFiltersModifier } from "../filters/filters"
-import { apply_filters } from "../filters/filters"
+import type { FilterModifier, FilterValue } from "../filter"
+import { filterQuery } from "../filter"
 import type { OrmAdapter } from "../orm/orm"
 import { run_after_query } from "../utils/run-after"
 
@@ -14,7 +14,7 @@ export interface TableResolverOptions<Orm extends OrmAdapter, Context> {
 	/** allow to filter all table fields without explicitly listing them */
 	allowAllFilters?: boolean
 	fields?: Record<string, SimpleFieldResolver<Orm, Context>>
-	modifiers?: Record<string, ApplyFiltersModifier<Orm, Context>>
+	modifiers?: Record<string, TableFilterModifier<Orm, Context>>
 	modify?: TableResolveModifier<Orm, Context>
 	transform?(instance: any, context: any): void | PromiseLike<void>
 }
@@ -36,11 +36,13 @@ export interface TableResolveContext<Orm extends OrmAdapter, Context>
 	type: string
 }
 
+export type TableFilterModifier<Orm extends OrmAdapter, Context> = FilterModifier<Orm, TableResolveContext<Orm, Context>>
+
 export class TableResolver<Orm extends OrmAdapter, Context> {
 	// Introspection results
 	readonly relations: Set<string>
 	readonly virtual_fields: Set<string>
-	readonly modifiers?: Record<string, ApplyFiltersModifier<Orm, Context>>
+	readonly modifiers?: Record<string, TableFilterModifier<Orm, Context>>
 
 	readonly table_field_resolvers?: Record<string, FieldResolver<Orm, Context>>
 
@@ -121,17 +123,17 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 			}
 		}
 
-		const allow_all_filters
-			= this.options.allowAllFilters ?? graph.options.allowAllFilters
+		const filter = context.tree.args?.filter
+		if (filter) {
+			const allowAllFilters = this.options.allowAllFilters ?? graph.options.allowAllFilters
+			const filterConfig = allowAllFilters ? true : filters
 
-		const effective_filters = allow_all_filters ? true : filters
-
-		if (effective_filters) {
-			query = apply_filters<Orm, Context>(query, {
-				filters: effective_filters,
-				modifiers: this.modifiers,
-				context,
-			})
+			if (filterConfig) {
+				query = filterQuery<Orm, TableResolveContext<Orm, Context>>(context.graph.orm, query, filter as FilterValue, {
+					modifiers: this.modifiers,
+					context,
+				})
+			}
 		}
 
 		if (transform) {

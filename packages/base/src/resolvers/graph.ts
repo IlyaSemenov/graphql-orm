@@ -2,7 +2,7 @@ import type { GraphQLResolveInfo } from "graphql"
 import type { ResolveTree } from "graphql-parse-resolve-info"
 import { parseResolveInfo } from "graphql-parse-resolve-info"
 
-import type { FiltersDef } from "../filters/filters"
+import type { FilterConfig } from "../filter"
 import type { OrmAdapter } from "../orm/orm"
 import type { Paginator } from "../paginators/base"
 
@@ -16,7 +16,7 @@ export type GraphResolverOptions<Orm extends OrmAdapter, Context> = Pick<
 export interface GraphResolveOptions<Context> {
 	info: GraphQLResolveInfo
 	context: Context
-	filters?: FiltersDef
+	filters?: FilterConfig
 	/** Subfield path if not resolving root query, e.g.: ['user'] */
 	path?: string[]
 }

@@ -124,3 +124,25 @@ query get_all_posts {
 ```
 
 Modifier filters take precedence over database field filters.
+
+## Reusing Filters for External Queries
+
+There are cases where you need to apply the same filtering logic across multiple queries—even those not originating from GraphQL. For example, you might want to return a filtered list of objects, and then meta data about that filtered list of objects.
+
+To achieve this, use the `filterQuery` function:
+
+```ts
+import { filterQuery } from "objection-graphql-resolver"
+
+const posts = await filterQuery(
+  // Base query to filter
+  PostModel.query(),
+  // Filter object, e.g. { public: true }
+  filterObject,
+  // Option - not required
+  {
+    modifiers, // Additional model modifiers
+    context, // Pass to modifiers
+  }
+)
+```

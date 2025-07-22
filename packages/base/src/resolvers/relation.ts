@@ -1,4 +1,4 @@
-import type { FiltersDef } from "../filters/filters"
+import type { FilterConfig } from "../filter"
 import type { OrmAdapter } from "../orm/orm"
 
 import type {
@@ -10,7 +10,7 @@ import type { TableResolveModifier } from "./table"
 
 export interface RelationResolverOptions<Orm extends OrmAdapter, Context>
 	extends Omit<FieldResolverOptions<Orm, Context>, "modify"> {
-	filters?: FiltersDef
+	filters?: FilterConfig
 	modify?: TableResolveModifier<Orm, Context>
 }
 

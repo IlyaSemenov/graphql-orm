@@ -126,3 +126,25 @@ query get_all_posts {
 ```
 
 Table filters take precedence over database field filters.
+
+## Reusing Filters for External Queries
+
+There are cases where you need to apply the same filtering logic across multiple queries—even those not originating from GraphQL. For example, you might want to return a filtered list of objects, and then meta data about that filtered list of objects.
+
+To achieve this, use the `filterQuery` function:
+
+```ts
+import { filterQuery } from "orchid-graphql"
+
+const posts = await filterQuery(
+  // Base query to filter
+  db.post.all(),
+  // Filter object, e.g. { public: true }
+  filterObject,
+  // Option - not required
+  {
+    modifiers,
+    context, // Pass to modifiers
+  }
+)
+```
