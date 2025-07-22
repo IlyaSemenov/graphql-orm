@@ -46,10 +46,10 @@ export function filterQuery<Orm extends OrmAdapter, Context>(
 		if (modifiers?.[field]) {
 			query = modifiers[field](query, value, context!) // TODO improve types, get rid of !
 		} else {
-			const [table_field, op0] = field.split("__")
+			const [tableField, op0] = field.split("__")
 			const op = op0?.toLowerCase()
 			// TODO: validate op
-			query = orm.where(query, table_field, op, value)
+			query = orm.where(query, tableField, op, value)
 		}
 	}
 	return query

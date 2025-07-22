@@ -68,7 +68,7 @@ test("root pagination", async () => {
 		{ name: "Charlie" },
 	])
 
-	function test_users(
+	function testUsers(
 		name: string,
 		response: any,
 		users: any[],
@@ -84,7 +84,7 @@ test("root pagination", async () => {
 		return cursor
 	}
 
-	test_users(
+	testUsers(
 		"without args",
 		await client.request(gql`
 			{
@@ -100,7 +100,7 @@ test("root pagination", async () => {
 		true,
 	)
 
-	const take_1_cursor = test_users(
+	const take_1_cursor = testUsers(
 		"take 1",
 		await client.request(gql`
 			{
@@ -116,7 +116,7 @@ test("root pagination", async () => {
 		true,
 	)
 
-	const take_2_more_after_1_cursor = test_users(
+	const take_2_more_after_1_cursor = testUsers(
 		"take 2 more after 1",
 		await client.request(
 			gql`
@@ -141,7 +141,7 @@ test("root pagination", async () => {
 		true,
 	)
 
-	test_users(
+	testUsers(
 		"take the rest",
 		await client.request(
 			gql`
@@ -163,7 +163,7 @@ test("root pagination", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 4",
 		await client.request(gql`
 			{
@@ -185,7 +185,7 @@ test("root pagination", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 100",
 		await client.request(gql`
 			{

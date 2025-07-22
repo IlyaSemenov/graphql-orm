@@ -3,12 +3,12 @@ import type {
 	OrmModifier,
 	SortOrder,
 } from "graphql-orm"
-import { run_after_query } from "graphql-orm"
+import { runAfterQuery } from "graphql-orm"
 import type { AnyModelConstructor, AnyQueryBuilder, Model, ModelClass, RelationMappings } from "objection"
 import { QueryBuilder, raw, ref } from "objection"
 
 // Get rid of this once https://github.com/Vincit/objection.js/issues/2364 is fixed
-export function field_ref(query: AnyQueryBuilder, field: string) {
+export function fieldRef(query: AnyQueryBuilder, field: string) {
 	return ref(field).from(query.tableRefFor(query.modelClass() as typeof Model))
 }
 
@@ -25,18 +25,18 @@ export const orm: ObjectionOrm = {
 
 	// Reflection
 
-	get_table_table(table) {
+	getTableName(table) {
 		return (table as ModelClass<Model>).tableName
 	},
 
-	get_table_relations(table) {
+	getTableRelations(table) {
 		// Static-cast the value to RelationMappings, because if it was a thunk, it would have been already resolved by now.
 		const relations = (table as ModelClass<Model>)
 			.relationMappings as RelationMappings
 		return relations && Object.keys(relations)
 	},
 
-	get_table_virtual_fields(table) {
+	getTableVirtualFields(table) {
 		// Pull the list of getter names from Model
 		// See https://stackoverflow.com/a/39310917/189806
 		return Object.entries(Object.getOwnPropertyDescriptors(table.prototype))
@@ -44,7 +44,7 @@ export const orm: ObjectionOrm = {
 			.map(([key]) => key)
 	},
 
-	get_table_modifiers(table) {
+	getTableModifiers(table) {
 		const modifiers = (table as ModelClass<Model>).modifiers
 		return modifiers
 			? Object.entries(modifiers).reduce<
@@ -62,17 +62,17 @@ export const orm: ObjectionOrm = {
 			: undefined
 	},
 
-	get_query_table(query) {
+	getQueryTable(query) {
 		return query.modelClass().tableName
 	},
 
 	// Select
 
-	select_field(query, { field, as }) {
-		return query.select(field_ref(query, field).as(as))
+	selectField(query, { field, as }) {
+		return query.select(fieldRef(query, field).as(as))
 	},
 
-	select_relation(query, { relation, as, modify }) {
+	selectRelation(query, { relation, as, modify }) {
 		return query
 			.withGraphFetched(`${relation} as ${as}`)
 			.modifyGraph(as, query => modify(query))
@@ -94,21 +94,21 @@ export const orm: ObjectionOrm = {
 		}
 	},
 
-	where_raw(query, expression, bindings) {
+	whereRaw(query, expression, bindings) {
 		return query.where(raw(expression.replace(/\$/g, ":"), bindings))
 	},
 
 	// Order & Limit
 
-	reset_query_order(query) {
+	resetQueryOrder(query) {
 		return query.clearOrder()
 	},
 
-	add_query_order(query, { field, dir }) {
+	addQueryOrder(query, { field, dir }) {
 		return query.orderBy(field, dir)
 	},
 
-	get_query_order(query) {
+	getQueryOrder(query) {
 		const sortOrders: SortOrder[] = []
 		;(query as any).forEachOperation(/orderBy/, (op: any) => {
 			if (op.name === "orderBy") {
@@ -119,33 +119,33 @@ export const orm: ObjectionOrm = {
 		return sortOrders
 	},
 
-	set_query_limit(query, limit) {
+	setQueryLimit(query, limit) {
 		return query.limit(limit)
 	},
 
 	// Pagination helpers
 
-	set_query_page_result(query, get_page) {
+	setQueryPageResult(query, getPage) {
 		query.runAfter((nodes) => {
 			if (!Array.isArray(nodes)) {
 				throw new TypeError(`Paginator called for single result query.`)
 			}
-			return get_page(nodes)
+			return getPage(nodes)
 		})
 		return query
 	},
 
-	modify_subquery_pagination(subquery, context) {
+	modifySubqueryPagination(subquery, context) {
 		subquery.runAfter((results) => {
 			// withGraphFetched will disregard paginator's runAfter callback (which converts object list into cursor and nodes).
-			// Save the results to context and then re-inject in finish_subquery_pagination.
+			// Save the results to context and then re-inject in finishSubqueryPagination.
 			context.results = results
 		})
 		return subquery
 	},
 
-	finish_query_pagination(query, field, context) {
-		run_after_query(this, query, (instance) => {
+	finishQueryPagination(query, field, context) {
+		runAfterQuery(this, query, (instance) => {
 			instance[field] = context.results
 			return instance
 		})
@@ -154,17 +154,17 @@ export const orm: ObjectionOrm = {
 
 	// Misc
 
-	run_after_query(query, fn) {
+	runAfterQuery(query, fn) {
 		return query.runAfter(result => fn(result))
 	},
 
-	prevent_select_all(query) {
-		const id_column = query.modelClass().idColumn
+	preventSelectAll(query) {
+		const { idColumn } = query.modelClass()
 		if (!query.has((QueryBuilder as any).SelectSelector)) {
 			query.select(
-				field_ref(
+				fieldRef(
 					query,
-					typeof id_column === "string" ? id_column : id_column[0],
+					typeof idColumn === "string" ? idColumn : idColumn[0],
 				),
 			)
 		}

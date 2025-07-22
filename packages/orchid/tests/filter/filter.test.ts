@@ -2,7 +2,7 @@ import type { FilterModifiers } from "orchid-graphql"
 import { filterQuery } from "orchid-graphql"
 import { expect, test } from "vitest"
 
-import { BaseTable, create_db } from "../setup"
+import { BaseTable, createDb } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
@@ -31,7 +31,7 @@ class PostTable extends BaseTable {
 	}))
 }
 
-const db = await create_db({
+const db = await createDb({
 	post: PostTable,
 	user: UserTable,
 })

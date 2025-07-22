@@ -4,7 +4,7 @@ import type { FilterModifiers } from "objection-graphql-resolver"
 import { filterQuery } from "objection-graphql-resolver"
 import { expect, test } from "vitest"
 
-import { setup_db } from "../setup"
+import { setupDb } from "../setup"
 
 class UserModel extends Model {
 	static tableName = "user"
@@ -50,7 +50,7 @@ class PostModel extends Model {
 	author?: UserModel
 }
 
-const knex = await setup_db()
+const knex = await setupDb()
 
 await knex.schema.createTable("user", (user) => {
 	user.increments("id").notNullable().primary()

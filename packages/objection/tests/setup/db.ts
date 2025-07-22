@@ -2,7 +2,7 @@ import Knex from "knex"
 import { Model } from "objection"
 import { afterAll } from "vitest"
 
-export async function setup_db() {
+export async function setupDb() {
 	const knex = Knex({
 		client: "sqlite3",
 		connection: ":memory:",

@@ -1,7 +1,7 @@
 import type { FilterModifier, FilterValue } from "../filter"
 import { filterQuery } from "../filter"
 import type { OrmAdapter } from "../orm/orm"
-import { run_after_query } from "../utils/run-after"
+import { runAfterQuery } from "../utils/run-after"
 
 import type { FieldResolver } from "./field"
 import { defineFieldResolver } from "./field"
@@ -41,24 +41,24 @@ export type TableFilterModifier<Orm extends OrmAdapter, Context> = FilterModifie
 export class TableResolver<Orm extends OrmAdapter, Context> {
 	// Introspection results
 	readonly relations: Set<string>
-	readonly virtual_fields: Set<string>
+	readonly virtualFields: Set<string>
 	readonly modifiers?: Record<string, TableFilterModifier<Orm, Context>>
 
-	readonly table_field_resolvers?: Record<string, FieldResolver<Orm, Context>>
+	readonly tableFieldResolvers?: Record<string, FieldResolver<Orm, Context>>
 
 	constructor(
 		readonly orm: Orm,
 		readonly table: Orm["Table"],
 		readonly options: TableResolverOptions<Orm, Context> = {},
 	) {
-		this.relations = new Set(orm.get_table_relations(table))
-		this.virtual_fields = new Set(orm.get_table_virtual_fields(table))
-		this.modifiers = { ...orm.get_table_modifiers(table), ...options.modifiers }
+		this.relations = new Set(orm.getTableRelations(table))
+		this.virtualFields = new Set(orm.getTableVirtualFields(table))
+		this.modifiers = { ...orm.getTableModifiers(table), ...options.modifiers }
 
 		// Pre-create field resolvers
 		const { fields } = options
 		if (fields) {
-			this.table_field_resolvers = Object.keys(fields).reduce<
+			this.tableFieldResolvers = Object.keys(fields).reduce<
 				Record<string, FieldResolver<Orm, Context>>
 			>((resolvers, field) => {
 				const r0 = fields[field]
@@ -66,9 +66,9 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 					= typeof r0 === "function"
 						? r0
 						: r0 === true
-							? this._get_default_field_resolver(field)
+							? this._getDefaultFieldResolver(field)
 							: typeof r0 === "string"
-								? this._get_default_field_resolver(field, r0)
+								? this._getDefaultFieldResolver(field, r0)
 								: undefined
 				if (r === undefined) {
 					throw new Error(
@@ -86,21 +86,21 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 		const { modify, transform } = this.options
 		const { graph, tree, type, filters } = context
 
-		const query_table = this.orm.get_query_table(query)
-		const table_table = this.orm.get_table_table(this.table)
+		const queryTable = this.orm.getQueryTable(query)
+		const tableName = this.orm.getTableName(this.table)
 
-		if (query_table !== table_table) {
+		if (queryTable !== tableName) {
 			throw new Error(
-				`Mismatching query table for type ${type}: expected ${table_table}, received ${query_table}.`,
+				`Mismatching query table for type ${type}: expected ${tableName}, received ${queryTable}.`,
 			)
 		}
 
-		const allow_all_fields
+		const allowAllFields
 			= this.options.allowAllFields
 				?? graph.options.allowAllFields
 				?? !this.options.fields
 
-		if (!allow_all_fields && !this.table_field_resolvers) {
+		if (!allowAllFields && !this.tableFieldResolvers) {
 			throw new Error(
 				`Resolver for type ${type} must either allow all fields or specify options.fields.`,
 			)
@@ -113,8 +113,8 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 		for (const subtree of Object.values(tree.fieldsByTypeName[type])) {
 			const field = subtree.name
 			const r: FieldResolver<Orm, Context> | undefined
-				= this.table_field_resolvers?.[field]
-					|| (allow_all_fields ? this._get_default_field_resolver(field) : undefined)
+				= this.tableFieldResolvers?.[field]
+					|| (allowAllFields ? this._getDefaultFieldResolver(field) : undefined)
 			if (!r) {
 				throw new Error(`No field resolver defined for field ${type}.${field}.`)
 			}
@@ -137,12 +137,12 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 		}
 
 		if (transform) {
-			query = run_after_query(this.orm, query, (instance) => {
+			query = runAfterQuery(this.orm, query, (instance: any) => {
 				return transform(instance, context)
 			})
 		}
 
-		query = this.orm.prevent_select_all(query)
+		query = this.orm.preventSelectAll(query)
 
 		return query
 	}
@@ -150,18 +150,18 @@ export class TableResolver<Orm extends OrmAdapter, Context> {
 	/**
 	 * Create field resolver which will modify query to resolve GraphQL field.
 	 */
-	_get_default_field_resolver(
+	_getDefaultFieldResolver(
 		field: string,
 		tableField?: string,
 	): FieldResolver<Orm, Context> {
-		const table_field_lookup = tableField || field
+		const tableFieldLookup = tableField || field
 		if (
-			this.options.modifiers?.[table_field_lookup]
-			|| this.virtual_fields.has(table_field_lookup)
+			this.options.modifiers?.[tableFieldLookup]
+			|| this.virtualFields.has(tableFieldLookup)
 		) {
 			// Keep query as is.
 			return query => query
-		} else if (this.relations.has(table_field_lookup)) {
+		} else if (this.relations.has(tableFieldLookup)) {
 			// TODO: pre-create and cache
 			return defineRelationResolver({ tableField })
 		} else {

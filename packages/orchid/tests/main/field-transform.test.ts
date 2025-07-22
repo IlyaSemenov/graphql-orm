@@ -3,7 +3,7 @@ import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
 import type { Resolvers } from "../setup"
-import { BaseTable, create_client, create_db } from "../setup"
+import { BaseTable, createClient, createDb } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
@@ -15,7 +15,7 @@ class UserTable extends BaseTable {
 	}))
 }
 
-const db = await create_db({
+const db = await createDb({
 	user: UserTable,
 })
 
@@ -40,14 +40,14 @@ const schema = gql`
 	}
 `
 
-const graph = r.graph<{ user_id: string }>({
+const graph = r.graph<{ userId: string }>({
 	User: r.table(db.user, {
 		fields: {
 			id: true,
 			name: true,
 			password: r.field({
 				transform(password, user, { context }) {
-					if (context.user_id && context.user_id === user.id) {
+					if (context.userId && context.userId === user.id) {
 						return password
 					} else {
 						return undefined
@@ -66,7 +66,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const client = await createClient({ typeDefs: schema, resolvers })
 
 test("field transform", async () => {
 	await db.user.create({ name: "Alice", password: "secret" })

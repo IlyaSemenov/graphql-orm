@@ -31,7 +31,7 @@ export type GraphResolveContext<Context> = Omit<
 export class GraphResolver<Orm extends OrmAdapter, Context> {
 	constructor(
 		readonly orm: Orm,
-		readonly type_resolvers: Record<string, TableResolver<Orm, Context>>,
+		readonly typeResolvers: Record<string, TableResolver<Orm, Context>>,
 		readonly options: GraphResolverOptions<Orm, Context> = {},
 	) {}
 
@@ -39,8 +39,8 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		query: Orm["Query"],
 		{ info, ...context }: GraphResolveOptions<Context>,
 	): Promise<T> {
-		const tree = this._get_resolve_tree(info)
-		return this._resolve_type(query, { ...context, tree })
+		const tree = this._getResolveTree(info)
+		return this._resolveType(query, { ...context, tree })
 	}
 
 	resolvePage(
@@ -48,15 +48,15 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		paginator: Paginator<Orm, Context>,
 		{ info, ...context }: GraphResolveOptions<Context>,
 	) {
-		const tree = this._get_resolve_tree(info)
-		return this._resolve_page(query, paginator, { ...context, tree })
+		const tree = this._getResolveTree(info)
+		return this._resolvePage(query, paginator, { ...context, tree })
 	}
 
-	_get_resolve_tree(info: GraphQLResolveInfo) {
+	_getResolveTree(info: GraphQLResolveInfo) {
 		return parseResolveInfo(info) as ResolveTree
 	}
 
-	_resolve_type(
+	_resolveType(
 		query: Orm["Query"],
 		context: GraphResolveContext<Context>,
 	): Orm["Query"] {
@@ -76,11 +76,11 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 			}
 		}
 		const type = Object.keys(tree.fieldsByTypeName)[0]
-		const type_resolver = this.type_resolvers[type]
-		if (!type_resolver) {
+		const typeResolver = this.typeResolvers[type]
+		if (!typeResolver) {
 			throw new Error(`Resolver not found for type ${type}.`)
 		}
-		return type_resolver.resolve(query, {
+		return typeResolver.resolve(query, {
 			...context,
 			graph: this,
 			tree,
@@ -89,7 +89,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 		})
 	}
 
-	_resolve_page(
+	_resolvePage(
 		query: Orm["Query"],
 		paginator: Paginator<Orm, Context>,
 		context: GraphResolveContext<Context>,
@@ -98,7 +98,7 @@ export class GraphResolver<Orm extends OrmAdapter, Context> {
 			// TODO: handle non-empty context.path
 			throw new Error("Paginating under non-root path not yet supported.")
 		}
-		query = this._resolve_type(query, { ...context, path: paginator.path })
+		query = this._resolveType(query, { ...context, path: paginator.path })
 		return paginator.paginate(query, {
 			...context,
 			graph: this,

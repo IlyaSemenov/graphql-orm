@@ -16,24 +16,24 @@ export const orm: OrchidOrm = {
 
 	// Reflection
 
-	get_table_table(table) {
+	getTableName(table) {
 		return table.table!
 	},
 
-	get_table_relations(table) {
+	getTableRelations(table) {
 		return Object.keys(table.relations)
 	},
 
-	get_table_virtual_fields() {
+	getTableVirtualFields() {
 		// Not supported by Orchid.
 		return []
 	},
 
-	get_table_modifiers() {
+	getTableModifiers() {
 		return undefined
 	},
 
-	get_query_table(query) {
+	getQueryTable(query) {
 		if (!query.table) {
 			throw new Error("Query must have table.")
 		}
@@ -42,11 +42,11 @@ export const orm: OrchidOrm = {
 
 	// Select
 
-	select_field(query, { field, as }) {
+	selectField(query, { field, as }) {
 		return query.select({ [as]: field })
 	},
 
-	select_relation(query, { relation, as, modify }) {
+	selectRelation(query, { relation, as, modify }) {
 		// as any casts needed in orchid-orm 1.31+
 		return query.select({
 			[as]: (q: any) => modify(q[relation]),
@@ -59,21 +59,21 @@ export const orm: OrchidOrm = {
 		return query.where({ [field]: op ? { [op]: value } : value })
 	},
 
-	where_raw(query, expression, bindings) {
+	whereRaw(query, expression, bindings) {
 		return query.where(raw({ raw: expression, values: bindings }))
 	},
 
 	// Order & Limit
 
-	reset_query_order(query) {
+	resetQueryOrder(query) {
 		return query.clear("order")
 	},
 
-	add_query_order(query, { field, dir }) {
+	addQueryOrder(query, { field, dir }) {
 		return query.order({ [field]: dir })
 	},
 
-	get_query_order(query) {
+	getQueryOrder(query) {
 		return (
 			(query.q as SelectQueryData).order?.flatMap<SortOrder>((orderItem) => {
 				if (typeof orderItem === "string") {
@@ -94,31 +94,31 @@ export const orm: OrchidOrm = {
 		)
 	},
 
-	set_query_limit(query, limit) {
+	setQueryLimit(query, limit) {
 		return query.limit(limit)
 	},
 
 	// Pagination helpers
 
-	set_query_page_result(query, get_page) {
+	setQueryPageResult(query, get_page) {
 		return query.transform(nodes => get_page(nodes as any))
 	},
 
-	modify_subquery_pagination(subquery) {
+	modifySubqueryPagination(subquery) {
 		return subquery
 	},
 
-	finish_query_pagination(query) {
+	finishQueryPagination(query) {
 		return query
 	},
 
 	// Misc
 
-	run_after_query(query, fn) {
+	runAfterQuery(query, fn) {
 		return query.afterQuery(data => fn(data))
 	},
 
-	prevent_select_all(query) {
+	preventSelectAll(query) {
 		// Not needed in Orchid
 		return query
 	},

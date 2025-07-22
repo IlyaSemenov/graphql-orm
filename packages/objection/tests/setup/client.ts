@@ -1,9 +1,9 @@
 import { GraphQLClient } from "graphql-request"
 
 import type { ServerConfig } from "./apollo"
-import { create_server } from "./apollo"
+import { createServer } from "./apollo"
 
-export async function create_client(config: ServerConfig) {
-	const url = await create_server(config)
+export async function createClient(config: ServerConfig) {
+	const url = await createServer(config)
 	return new GraphQLClient(url)
 }

@@ -16,4 +16,4 @@ export {
 	TableResolver,
 	TableResolverOptions,
 } from "./resolvers/table"
-export { run_after_query } from "./utils/run-after"
+export { runAfterQuery } from "./utils/run-after"

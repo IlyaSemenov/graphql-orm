@@ -10,7 +10,7 @@ import { afterAll, afterEach, beforeEach } from "vitest"
 
 export const BaseTable = createBaseTable()
 
-export async function create_db<T extends TableClasses>(tables: T) {
+export async function createDb<T extends TableClasses>(tables: T) {
 	const db = orchidORM(
 		{
 			databaseURL: env.DATABASE_URL,

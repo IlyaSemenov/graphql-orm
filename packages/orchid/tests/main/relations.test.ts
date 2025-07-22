@@ -3,7 +3,7 @@ import * as r from "orchid-graphql"
 import { expect, test } from "vitest"
 
 import type { Resolvers } from "../setup"
-import { BaseTable, create_client, create_db } from "../setup"
+import { BaseTable, createClient, createDb } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
@@ -39,7 +39,7 @@ class PostTable extends BaseTable {
 	}
 }
 
-const db = await create_db({
+const db = await createDb({
 	post: PostTable,
 	user: UserTable,
 })
@@ -101,7 +101,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const client = await createClient({ typeDefs: schema, resolvers })
 
 test("filters", async () => {
 	await db.user.createMany([

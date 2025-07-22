@@ -8,8 +8,8 @@ import type {
 } from "../setup"
 import {
 	BaseTable,
-	create_client,
-	create_db,
+	createClient,
+	createDb,
 } from "../setup"
 
 class UserTable extends BaseTable {
@@ -21,7 +21,7 @@ class UserTable extends BaseTable {
 	}))
 }
 
-const db = await create_db({
+const db = await createDb({
 	user: UserTable,
 })
 
@@ -46,8 +46,8 @@ const schema = gql`
 const graph = r.graph<ResolverContext>({
 	User: r.table(db.user, {
 		modify(query, { context }) {
-			const { user_id } = context
-			return user_id ? query.whereNot({ id: user_id }) : query
+			const { userId } = context
+			return userId ? query.whereNot({ id: userId }) : query
 		},
 	}),
 })
@@ -60,7 +60,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const client = await createClient({ typeDefs: schema, resolvers })
 
 test("table modify", async () => {
 	await db.user.create({ name: "Alice" })

@@ -54,7 +54,7 @@ implements Paginator<Orm, Context> {
 		const pageSize = (args.take as number | undefined) ?? this.pageSize
 		const cursor = args.cursor as string | undefined
 
-		const table = orm.get_query_table(query)
+		const table = orm.getQueryTable(query)
 
 		const orderFields = (
 			this.fields
@@ -62,13 +62,13 @@ implements Paginator<Orm, Context> {
 						field: f.name,
 						dir: f.desc ? "DESC" : "ASC",
 					}))
-				: orm.get_query_order(query)
+				: orm.getQueryOrder(query)
 		).map(o => ({ ...o, alias: "_order_" + o.field }))
 
 		if (this.fields) {
-			query = orm.reset_query_order(query)
+			query = orm.resetQueryOrder(query)
 			for (const { alias, dir } of orderFields) {
-				query = orm.add_query_order(query, { field: alias, dir })
+				query = orm.addQueryOrder(query, { field: alias, dir })
 			}
 		}
 
@@ -77,7 +77,7 @@ implements Paginator<Orm, Context> {
 		}
 
 		for (const { field, alias } of orderFields) {
-			query = orm.select_field(query, { field, as: alias })
+			query = orm.selectField(query, { field, as: alias })
 		}
 
 		if (cursor) {
@@ -98,9 +98,9 @@ implements Paginator<Orm, Context> {
 			const bindings = Object.fromEntries(
 				orderFields.map(({ alias }, i) => [alias, parsedCursor[i]]),
 			)
-			query = orm.where_raw(query, sqlExpr, bindings)
+			query = orm.whereRaw(query, sqlExpr, bindings)
 		}
-		query = orm.set_query_limit(query, pageSize + 1)
+		query = orm.setQueryLimit(query, pageSize + 1)
 
 		// TODO add support for reverse cursor, borrow implementation from orchid-pagination.
 		function createNodeCursor(node: any) {
@@ -118,7 +118,7 @@ implements Paginator<Orm, Context> {
 			)
 		}
 
-		return orm.set_query_page_result(query, (nodes) => {
+		return orm.setQueryPageResult(query, (nodes) => {
 			let cursor: string | undefined
 			if (nodes.length > pageSize) {
 				cursor = createNodeCursor(nodes[pageSize - 1])

@@ -1,5 +1,5 @@
 import type { OrmAdapter } from "../orm/orm"
-import { run_after_query } from "../utils/run-after"
+import { runAfterQuery } from "../utils/run-after"
 
 import type { TableResolveContext } from "./table"
 
@@ -35,7 +35,7 @@ export type FieldResolver<
 	Context,
 > = FieldResolveModifier<Orm, Context>
 
-export function parse_field_options<
+export function parseFieldOptions<
 	O extends Pick<FieldResolverOptions<any, any>, "modelField" | "tableField">,
 >(options: O): Omit<O, "modelField"> {
 	const { tableField, modelField } = options
@@ -50,20 +50,20 @@ export function parse_field_options<
 export function defineFieldResolver<Orm extends OrmAdapter, Context>(
 	options: FieldResolverOptions<Orm, Context> = {},
 ): FieldResolver<Orm, Context> {
-	const { tableField, modify, transform } = parse_field_options(options)
+	const { tableField, modify, transform } = parseFieldOptions(options)
 
 	return function resolve(query, context) {
 		const { field } = context
 		if (modify) {
 			query = modify(query, context)
 		} else {
-			query = context.graph.orm.select_field(query, {
+			query = context.graph.orm.selectField(query, {
 				field: tableField || field,
 				as: field,
 			})
 		}
 		if (transform) {
-			query = run_after_query(context.graph.orm, query, async (instance) => {
+			query = runAfterQuery(context.graph.orm, query, async (instance) => {
 				instance[field] = await transform(instance[field], instance, context)
 				return instance
 			})

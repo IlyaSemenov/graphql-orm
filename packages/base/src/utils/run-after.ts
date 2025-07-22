@@ -1,11 +1,11 @@
 import type { OrmAdapter } from "../orm/orm"
 
-export function run_after_query<Orm extends OrmAdapter>(
+export function runAfterQuery<Orm extends OrmAdapter>(
 	orm: Orm,
 	query: Orm["Query"],
 	transform: (instance: any) => any,
 ): Orm["Query"] {
-	return orm.run_after_query(query, async (result) => {
+	return orm.runAfterQuery(query, async (result) => {
 		// FIXME: returning result is ignored in orchid (unlike objection). Add some hacks instead.
 		if (Array.isArray(result)) {
 			const result1 = await Promise.all(result.map(transform))

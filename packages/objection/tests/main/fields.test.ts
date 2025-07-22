@@ -30,18 +30,18 @@ const schema = gql`
 	}
 `
 
-const default_graph = r.graph({
+const defaultGraph = r.graph({
 	User: r.model(UserModel),
 })
 
-const default_graph1 = r.graph(
+const defaultGraph1 = r.graph(
 	{
 		User: r.model(UserModel),
 	},
 	{ allowAllFields: false },
 )
 
-const secure_graph = r.graph({
+const secureGraph = r.graph({
 	User: r.model(UserModel, {
 		fields: {
 			id: true,
@@ -75,19 +75,19 @@ const graph2 = r.graph(
 const resolvers: Resolvers = {
 	Query: {
 		default_user(_parent, { id }, context, info) {
-			return default_graph.resolve(UserModel.query().findById(id), {
+			return defaultGraph.resolve(UserModel.query().findById(id), {
 				context,
 				info,
 			})
 		},
 		default_user1(_parent, { id }, context, info) {
-			return default_graph1.resolve(UserModel.query().findById(id), {
+			return defaultGraph1.resolve(UserModel.query().findById(id), {
 				context,
 				info,
 			})
 		},
 		secure_user(_parent, { id }, context, info) {
-			return secure_graph.resolve(UserModel.query().findById(id), {
+			return secureGraph.resolve(UserModel.query().findById(id), {
 				context,
 				info,
 			})

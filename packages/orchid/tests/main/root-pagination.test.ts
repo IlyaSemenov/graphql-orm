@@ -3,7 +3,7 @@ import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
 import type { Resolvers } from "../setup"
-import { BaseTable, create_client, create_db } from "../setup"
+import { BaseTable, createClient, createDb } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
@@ -14,7 +14,7 @@ class UserTable extends BaseTable {
 	}))
 }
 
-const db = await create_db({
+const db = await createDb({
 	user: UserTable,
 })
 
@@ -89,7 +89,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const client = await createClient({ typeDefs: schema, resolvers })
 
 await db.user.createMany([
 	{ id: 1, name: "Alice" },
@@ -98,7 +98,7 @@ await db.user.createMany([
 	{ id: 4, name: "Charlie" },
 ])
 
-function test_users(
+function testUsers(
 	name: string,
 	response: any,
 	users: any[],
@@ -115,7 +115,7 @@ function test_users(
 }
 
 test("users (by ID)", async () => {
-	test_users(
+	testUsers(
 		"without args",
 		await client.request(gql`
 			{
@@ -133,7 +133,7 @@ test("users (by ID)", async () => {
 })
 
 test("users (by name)", async () => {
-	test_users(
+	testUsers(
 		"without args",
 		await client.request(gql`
 			{
@@ -149,7 +149,7 @@ test("users (by name)", async () => {
 		true,
 	)
 
-	const take_1_cursor = test_users(
+	const take_1_cursor = testUsers(
 		"take 1 by name",
 		await client.request(gql`
 			{
@@ -165,7 +165,7 @@ test("users (by name)", async () => {
 		true,
 	)
 
-	const take_2_more_after_1_cursor = test_users(
+	const take_2_more_after_1_cursor = testUsers(
 		"take 2 more after 1",
 		await client.request(
 			gql`
@@ -190,7 +190,7 @@ test("users (by name)", async () => {
 		true,
 	)
 
-	test_users(
+	testUsers(
 		"take the rest",
 		await client.request(
 			gql`
@@ -212,7 +212,7 @@ test("users (by name)", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 4",
 		await client.request(gql`
 			{
@@ -234,7 +234,7 @@ test("users (by name)", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 100",
 		await client.request(gql`
 			{
@@ -257,7 +257,7 @@ test("users (by name)", async () => {
 })
 
 test("users (by name reverse)", async () => {
-	test_users(
+	testUsers(
 		"without args",
 		await client.request(gql`
 			{
@@ -277,7 +277,7 @@ test("users (by name reverse)", async () => {
 		true,
 	)
 
-	const take_1_cursor = test_users(
+	const take_1_cursor = testUsers(
 		"take 1",
 		await client.request(gql`
 			{
@@ -293,7 +293,7 @@ test("users (by name reverse)", async () => {
 		true,
 	)
 
-	const take_2_more_after_1_cursor = test_users(
+	const take_2_more_after_1_cursor = testUsers(
 		"take 2 more after 1",
 		await client.request(
 			gql`
@@ -318,7 +318,7 @@ test("users (by name reverse)", async () => {
 		true,
 	)
 
-	test_users(
+	testUsers(
 		"take the rest",
 		await client.request(
 			gql`
@@ -339,7 +339,7 @@ test("users (by name reverse)", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 4",
 		await client.request(gql`
 			{
@@ -361,7 +361,7 @@ test("users (by name reverse)", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 100",
 		await client.request(gql`
 			{
@@ -384,7 +384,7 @@ test("users (by name reverse)", async () => {
 })
 
 test("users_by_name", async () => {
-	test_users(
+	testUsers(
 		"without args",
 		await client.request(gql`
 			{
@@ -400,7 +400,7 @@ test("users_by_name", async () => {
 		true,
 	)
 
-	const take_1_cursor = test_users(
+	const take_1_cursor = testUsers(
 		"take 1",
 		await client.request(gql`
 			{
@@ -416,7 +416,7 @@ test("users_by_name", async () => {
 		true,
 	)
 
-	const take_2_more_after_1_cursor = test_users(
+	const take_2_more_after_1_cursor = testUsers(
 		"take 2 more after 1",
 		await client.request(
 			gql`
@@ -441,7 +441,7 @@ test("users_by_name", async () => {
 		true,
 	)
 
-	test_users(
+	testUsers(
 		"take the rest",
 		await client.request(
 			gql`
@@ -463,7 +463,7 @@ test("users_by_name", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 4",
 		await client.request(gql`
 			{
@@ -485,7 +485,7 @@ test("users_by_name", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 100",
 		await client.request(gql`
 			{
@@ -508,7 +508,7 @@ test("users_by_name", async () => {
 })
 
 test("users_by_name_reverse", async () => {
-	test_users(
+	testUsers(
 		"without args",
 		await client.request(gql`
 			{
@@ -528,7 +528,7 @@ test("users_by_name_reverse", async () => {
 		true,
 	)
 
-	const take_1_cursor = test_users(
+	const take_1_cursor = testUsers(
 		"take 1",
 		await client.request(gql`
 			{
@@ -544,7 +544,7 @@ test("users_by_name_reverse", async () => {
 		true,
 	)
 
-	const take_2_more_after_1_cursor = test_users(
+	const take_2_more_after_1_cursor = testUsers(
 		"take 2 more after 1",
 		await client.request(
 			gql`
@@ -569,7 +569,7 @@ test("users_by_name_reverse", async () => {
 		true,
 	)
 
-	test_users(
+	testUsers(
 		"take the rest",
 		await client.request(
 			gql`
@@ -590,7 +590,7 @@ test("users_by_name_reverse", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 4",
 		await client.request(gql`
 			{
@@ -612,7 +612,7 @@ test("users_by_name_reverse", async () => {
 		false,
 	)
 
-	test_users(
+	testUsers(
 		"take 100",
 		await client.request(gql`
 			{

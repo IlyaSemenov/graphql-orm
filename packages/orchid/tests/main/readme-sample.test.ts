@@ -5,7 +5,7 @@ import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
 import type { Resolvers } from "../setup"
-import { BaseTable, create_client, create_db } from "../setup"
+import { BaseTable, createClient, createDb } from "../setup"
 
 class PostTable extends BaseTable {
 	readonly table = "post"
@@ -16,7 +16,7 @@ class PostTable extends BaseTable {
 	}))
 }
 
-const db = await create_db({
+const db = await createDb({
 	post: PostTable,
 })
 
@@ -63,7 +63,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs, resolvers })
+const client = await createClient({ typeDefs, resolvers })
 
 test("readme demo sample", async () => {
 	await client.request(

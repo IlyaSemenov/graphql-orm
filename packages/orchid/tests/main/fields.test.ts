@@ -3,7 +3,7 @@ import * as r from "orchid-graphql"
 import { assert, expect, test } from "vitest"
 
 import type { Resolvers } from "../setup"
-import { BaseTable, create_client, create_db } from "../setup"
+import { BaseTable, createClient, createDb } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
@@ -15,7 +15,7 @@ class UserTable extends BaseTable {
 	}))
 }
 
-const db = await create_db({
+const db = await createDb({
 	user: UserTable,
 })
 
@@ -43,18 +43,18 @@ const schema = gql`
 	}
 `
 
-const default_graph = r.graph({
+const defaultGraph = r.graph({
 	User: r.table(db.user),
 })
 
-const default_graph1 = r.graph(
+const defaultGraph1 = r.graph(
 	{
 		User: r.table(db.user),
 	},
 	{ allowAllFields: false },
 )
 
-const secure_graph = r.graph({
+const secureGraph = r.graph({
 	User: r.table(db.user, {
 		fields: {
 			id: true,
@@ -88,19 +88,19 @@ const graph2 = r.graph(
 const resolvers: Resolvers = {
 	Query: {
 		async default_user(_parent, { id }, context, info) {
-			return await default_graph.resolve(db.user.findOptional(id), {
+			return await defaultGraph.resolve(db.user.findOptional(id), {
 				context,
 				info,
 			})
 		},
 		async default_user1(_parent, { id }, context, info) {
-			return await default_graph1.resolve(db.user.findOptional(id), {
+			return await defaultGraph1.resolve(db.user.findOptional(id), {
 				context,
 				info,
 			})
 		},
 		async secure_user(_parent, { id }, context, info) {
-			return await secure_graph.resolve(db.user.findOptional(id), {
+			return await secureGraph.resolve(db.user.findOptional(id), {
 				context,
 				info,
 			})
@@ -114,7 +114,7 @@ const resolvers: Resolvers = {
 	},
 }
 
-const client = await create_client({ typeDefs: schema, resolvers })
+const client = await createClient({ typeDefs: schema, resolvers })
 
 test("table resolver fields access", async () => {
 	await db.user.create({ name: "Alice", password: "secret" })

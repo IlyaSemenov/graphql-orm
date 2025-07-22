@@ -27,14 +27,14 @@ const schema = gql`
 	}
 `
 
-const graph = r.graph<{ user_id: string }>({
+const graph = r.graph<{ userId: string }>({
 	User: r.model(UserModel, {
 		fields: {
 			id: true,
 			name: true,
 			password: r.field({
 				transform(password, user, { context }) {
-					if (context.user_id && context.user_id === user.id) {
+					if (context.userId && context.userId === user.id) {
 						return password
 					} else {
 						return undefined

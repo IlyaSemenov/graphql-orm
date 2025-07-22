@@ -22,7 +22,7 @@ export function filterQuery<Q extends AnyQueryBuilder, Context = undefined>(
 	filter: FilterValue,
 	options?: FilterQueryOptions<Context>,
 ): Q {
-	const modifiers = orm.get_table_modifiers(qb.modelClass())
+	const modifiers = orm.getTableModifiers(qb.modelClass())
 	return _filterQuery(orm, qb, filter, {
 		...options,
 		modifiers: {

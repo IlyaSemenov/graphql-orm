@@ -21,26 +21,26 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 	// Reflection
 
 	/** ORM table -> db table */
-	get_table_table(table: Table): string
+	getTableName(table: Table): string
 
 	/** ORM table -> relation names */
-	get_table_relations(table: Table): string[]
+	getTableRelations(table: Table): string[]
 
 	/** ORM table -> virtual fields */
-	get_table_virtual_fields(table: Table): string[]
+	getTableVirtualFields(table: Table): string[]
 
-	get_table_modifiers(
+	getTableModifiers(
 		table: Table,
 	): Record<string, OrmModifier<this>> | undefined
 
 	/** ORM query -> db table */
-	get_query_table(query: Query): string
+	getQueryTable(query: Query): string
 
 	// Select
 
-	select_field(query: Query, opts: { field: string, as: string }): Query
+	selectField(query: Query, opts: { field: string, as: string }): Query
 
-	select_relation(
+	selectRelation(
 		query: Query,
 		opts: {
 			relation: string
@@ -53,7 +53,7 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 
 	where(query: Query, field: string, op: string | undefined, value: any): Query
 
-	where_raw(
+	whereRaw(
 		query: Query,
 		expression: string,
 		bindings: Record<string, any>,
@@ -61,24 +61,24 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 
 	// Order & Limit
 
-	reset_query_order(query: Query): Query
+	resetQueryOrder(query: Query): Query
 
-	add_query_order(query: Query, order: SortOrder): Query
+	addQueryOrder(query: Query, order: SortOrder): Query
 
-	get_query_order(query: Query): SortOrder[]
+	getQueryOrder(query: Query): SortOrder[]
 
-	set_query_limit(query: Query, limit: number): Query
+	setQueryLimit(query: Query, limit: number): Query
 
 	// Pagination helpers
 
-	set_query_page_result(query: Query, get_page: GetPageFn): QueryTransform
+	setQueryPageResult(query: Query, getPage: GetPageFn): QueryTransform
 
-	modify_subquery_pagination(
+	modifySubqueryPagination(
 		subquery: Query,
 		context: Record<string, any>,
 	): Query
 
-	finish_query_pagination(
+	finishQueryPagination(
 		query: Query,
 		field: string,
 		context: Record<string, any>,
@@ -87,8 +87,8 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 	// Misc
 
 	/** Set ORM query to run callback afterwards */
-	run_after_query(query: Query, fn: (result: any) => any): Query
+	runAfterQuery(query: Query, fn: (result: any) => any): Query
 
 	/** Prevent `SELECT *` by explicitly selecting ID */
-	prevent_select_all(query: Query): Query
+	preventSelectAll(query: Query): Query
 }
