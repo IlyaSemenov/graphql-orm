@@ -45,11 +45,11 @@
     "graphql-tag": "^2.12.6",
     "orchid-orm": "^1.31.5",
     "tsconfig-vite-node": "^1.1.2",
-    "tstyche": "^2.0.0",
-    "tsup": "^8.1.0",
-    "vite": "^5.3.1",
-    "vite-node": "^1.6.0",
-    "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
+    "tstyche": "^4.3.0",
+    "tsup": "^8.5.0",
+    "vite": "^7.0.5",
+    "vite-node": "^3.2.4",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }
