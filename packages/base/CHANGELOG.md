@@ -1,5 +1,11 @@
 # graphql-orm
 
+## 1.6.0
+
+### Minor Changes
+
+- e94f2f6: Export `filterQuery` function.
+
 ## 1.5.0
 
 ### Minor Changes

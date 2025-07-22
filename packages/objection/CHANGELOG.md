@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.6.0
+
+### Minor Changes
+
+- e94f2f6: Export `filterQuery` function.
+
 ## 7.5.1
 
 ### Patch Changes

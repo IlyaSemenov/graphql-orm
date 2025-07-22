@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.9.0
+
+### Minor Changes
+
+- e94f2f6: Export `filterQuery` function.
+
 ## 1.8.1
 
 ### Patch Changes
