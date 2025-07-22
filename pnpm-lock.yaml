@@ -104,9 +104,6 @@ importers:
       graphql:
         specifier: ^16.6.0
         version: 16.6.0
-      graphql-orm:
-        specifier: workspace:*
-        version: link:../base
       graphql-request:
         specifier: ^6.0.0
         version: 6.0.0(encoding@0.1.13)(graphql@16.6.0)

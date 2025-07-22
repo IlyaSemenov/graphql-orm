@@ -1,7 +1,6 @@
 {
   "name": "graphql-orm",
   "type": "module",
-  "version": "1.6.0",
   "private": true,
   "description": "Common base for objection-graphql-resolver and orchid-graphql",
   "author": "Ilya Semenov",
