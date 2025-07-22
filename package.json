@@ -1,11 +1,10 @@
 {
-  "description": "graphql-orm monorepo root",
+  "type": "module",
   "private": true,
-  "version": "0.0.0",
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
+  "description": "graphql-orm monorepo root",
   "author": "Ilya Semenov",
   "license": "MIT",
-  "type": "module",
-  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -14,19 +13,15 @@
     }
   },
   "scripts": {
-    "lint": "eslint --fix . && prettier --write '**/*.{json,md}'",
+    "lint": "eslint --fix .",
     "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
-    "eslint": "^9.5.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-simple-import-sort": "^12.1.0",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^8.0.0-alpha.10"
+    "@ilyasemenov/eslint-config": "^1.4.2",
+    "eslint": "^9.31.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
+    "typescript": "^5.8.3"
   }
 }

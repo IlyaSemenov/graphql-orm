@@ -1,5 +1,5 @@
-import { OrmAdapter } from "../orm/orm"
-import { TableResolveContext } from "../resolvers/table"
+import type { OrmAdapter } from "../orm/orm"
+import type { TableResolveContext } from "../resolvers/table"
 import { is_plain_object } from "../utils/is-plain-object"
 
 // TODO: per-field definitions

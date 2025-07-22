@@ -1,17 +1,19 @@
 {
-	"[javascript][typescript]": {
-		"editor.formatOnSave": false
-	},
-	"[json][jsonc][markdown]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": true
-	},
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
 		"source.organizeImports": "never"
 	},
+	"editor.formatOnSave": false,
 	"eslint.useFlatConfig": true,
-	"eslint.validate": ["javascript", "typescript"],
+	"eslint.validate": [
+		"javascript",
+		"typescript",
+		"markdown",
+		"json",
+		"jsonc",
+		"yaml",
+		"toml"
+	],
 	"search.exclude": {
 		"**/node_modules": true,
 		"packages/*/dist": true

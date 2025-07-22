@@ -53,7 +53,7 @@ type Query {
 class UserTable extends BaseTable {
   readonly table = "user"
 
-  columns = this.setColumns((t) => ({
+  columns = this.setColumns(t => ({
     id: t.identity().primaryKey(),
     name: t.text(),
   }))
@@ -69,7 +69,7 @@ class UserTable extends BaseTable {
 class PostTable extends BaseTable {
   readonly table = "post"
 
-  columns = this.setColumns((t) => ({
+  columns = this.setColumns(t => ({
     id: t.identity().primaryKey(),
     text: t.text(),
     author_id: t.integer(),

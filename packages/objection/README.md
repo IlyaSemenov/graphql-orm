@@ -301,7 +301,7 @@ const graph = r.graph(
           // (related model must be also registered in this graph resolver)
           author: true,
           // Modify query when this field is resolved
-          preview: (query) =>
+          preview: query =>
             query.select(raw("substr(text,1,100) as preview")),
           // Same as text: true
           text: r.field(),
@@ -312,7 +312,7 @@ const graph = r.graph(
           }),
           preview2: r.field({
             // Modify query
-            modify: (query) =>
+            modify: query =>
               query.select(raw("substr(text,1,100) as preview2")),
             // Post-process selected value
             transform(

@@ -5,7 +5,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class CompanyModel extends Model {
 	static tableName = "company"

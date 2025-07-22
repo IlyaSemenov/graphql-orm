@@ -2,12 +2,13 @@ import gql from "graphql-tag"
 import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
-import { BaseTable, create_client, create_db, Resolvers } from "../setup"
+import type { Resolvers } from "../setup"
+import { BaseTable, create_client, create_db } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		name: t.text(),
 	}))
@@ -23,7 +24,7 @@ class UserTable extends BaseTable {
 class PostTable extends BaseTable {
 	readonly table = "post"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		text: t.text(),
 		author_id: t.integer(),
@@ -87,7 +88,7 @@ const graph1 = r.graph({
 	}),
 	Post: r.table(db.post, {
 		modifiers: {
-			published: (query) => query.where({ is_draft: false }),
+			published: query => query.where({ is_draft: false }),
 			search: (query, term: string) =>
 				query.where({ text: { contains: `%${term}%` } }),
 		},

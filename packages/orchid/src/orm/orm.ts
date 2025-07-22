@@ -1,4 +1,4 @@
-import { OrmAdapter, SortOrder } from "graphql-orm"
+import type { OrmAdapter, SortOrder } from "graphql-orm"
 import type { Query, SelectQueryData, Table } from "orchid-orm"
 import { raw } from "orchid-orm"
 
@@ -101,7 +101,7 @@ export const orm: OrchidOrm = {
 	// Pagination helpers
 
 	set_query_page_result(query, get_page) {
-		return query.transform((nodes) => get_page(nodes as any))
+		return query.transform(nodes => get_page(nodes as any))
 	},
 
 	modify_subquery_pagination(subquery) {
@@ -115,7 +115,7 @@ export const orm: OrchidOrm = {
 	// Misc
 
 	run_after_query(query, fn) {
-		return query.afterQuery((data) => fn(data))
+		return query.afterQuery(data => fn(data))
 	},
 
 	prevent_select_all(query) {

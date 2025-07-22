@@ -2,12 +2,13 @@ import gql from "graphql-tag"
 import * as r from "orchid-graphql"
 import { assert, test } from "vitest"
 
-import { BaseTable, create_client, create_db, Resolvers } from "../setup"
+import type { Resolvers } from "../setup"
+import { BaseTable, create_client, create_db } from "../setup"
 
 class AuthorTable extends BaseTable {
 	readonly table = "author"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		name: t.text(),
 		country: t.text().nullable(),
@@ -29,7 +30,7 @@ class AuthorTable extends BaseTable {
 class BookTable extends BaseTable {
 	readonly table = "book"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		title: t.text(),
 	}))

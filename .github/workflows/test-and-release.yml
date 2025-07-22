@@ -40,7 +40,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22.17
-          cache: "pnpm"
+          cache: pnpm
 
       - name: Install deps
         run: pnpm install --frozen-lockfile

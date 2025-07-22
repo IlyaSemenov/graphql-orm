@@ -2,18 +2,20 @@ import gql from "graphql-tag"
 import * as r from "orchid-graphql"
 import { expect, test } from "vitest"
 
+import type {
+	ResolverContext,
+	Resolvers,
+} from "../setup"
 import {
 	BaseTable,
 	create_client,
 	create_db,
-	ResolverContext,
-	Resolvers,
 } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		name: t.text(),
 	}))

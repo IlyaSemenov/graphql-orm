@@ -1,14 +1,14 @@
 {
   "name": "orchid-graphql",
-  "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
+  "type": "module",
   "version": "1.8.1",
+  "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
+  "author": "Ilya Semenov",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/IlyaSemenov/orchid-graphql"
   },
-  "author": "Ilya Semenov",
-  "license": "MIT",
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,12 +30,12 @@
     "test": "vitest run && tsc --noEmit && tstyche",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
-    "graphql-parse-resolve-info": "^4.13.0"
-  },
   "peerDependencies": {
     "graphql": "^16",
     "orchid-orm": "^1.31.5"
+  },
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.13.0"
   },
   "devDependencies": {
     "@apollo/server": "^4.7.1",

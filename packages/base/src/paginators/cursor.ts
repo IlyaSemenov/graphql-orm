@@ -1,7 +1,8 @@
 import { Buffer } from "node:buffer"
 
-import { OrmAdapter, SortOrder } from "../orm/orm"
-import { PaginateContext, Paginator } from "./base"
+import type { OrmAdapter, SortOrder } from "../orm/orm"
+
+import type { PaginateContext, Paginator } from "./base"
 
 export function defineCursorPaginator(
 	options: Partial<CursorPaginatorOptions> = {},
@@ -25,8 +26,7 @@ export interface CursorPaginatorPage<M> {
 }
 
 class CursorPaginator<Orm extends OrmAdapter, Context>
-	implements Paginator<Orm, Context>
-{
+implements Paginator<Orm, Context> {
 	readonly path = ["nodes"]
 
 	readonly pageSize: number
@@ -58,12 +58,12 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 
 		const orderFields = (
 			this.fields
-				? this.fields.map<SortOrder>((f) => ({
+				? this.fields.map<SortOrder>(f => ({
 						field: f.name,
 						dir: f.desc ? "DESC" : "ASC",
 					}))
 				: orm.get_query_order(query)
-		).map((o) => ({ ...o, alias: "_order_" + o.field }))
+		).map(o => ({ ...o, alias: "_order_" + o.field }))
 
 		if (this.fields) {
 			query = orm.reset_query_order(query)
@@ -89,8 +89,8 @@ class CursorPaginator<Orm extends OrmAdapter, Context>
 			const right: string[] = []
 			for (let i = 0; i < orderFields.length; ++i) {
 				const { field, alias, dir } = orderFields[i]
-				const [expressions, placeholders] =
-					dir === "ASC" ? [left, right] : [right, left]
+				const [expressions, placeholders]
+					= dir === "ASC" ? [left, right] : [right, left]
 				expressions.push(`"${table}"."${field}"`)
 				placeholders.push("$" + alias)
 			}

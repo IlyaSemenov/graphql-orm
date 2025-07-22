@@ -7,7 +7,7 @@ const BaseTable = createBaseTable()
 class PostTable extends BaseTable {
 	readonly table = "post"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.serial().primaryKey(),
 		text: t.text(),
 	}))

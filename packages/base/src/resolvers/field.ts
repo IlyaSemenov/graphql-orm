@@ -1,6 +1,7 @@
-import { OrmAdapter } from "../orm/orm"
+import type { OrmAdapter } from "../orm/orm"
 import { run_after_query } from "../utils/run-after"
-import { TableResolveContext } from "./table"
+
+import type { TableResolveContext } from "./table"
 
 export interface FieldResolverOptions<Orm extends OrmAdapter, Context> {
 	/** Table field (if different from GraphQL field) */

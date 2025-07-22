@@ -5,7 +5,8 @@ import { Model } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class AuthorModel extends Model {
 	static tableName = "author"
@@ -119,12 +120,12 @@ test("m2m: naming clash with column in relation table", async () => {
 			{
 				id: 1,
 				title: "1984",
-				authors: [{ "#id": "George Orwell", name: "George Orwell" }],
+				authors: [{ "#id": "George Orwell", "name": "George Orwell" }],
 			},
 			{
 				id: 2,
 				title: "Tom Sawyer",
-				authors: [{ "#id": "Mark Twain", name: "Mark Twain" }],
+				authors: [{ "#id": "Mark Twain", "name": "Mark Twain" }],
 			},
 			{
 				id: 3,

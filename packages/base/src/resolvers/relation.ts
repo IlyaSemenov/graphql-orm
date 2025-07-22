@@ -1,11 +1,12 @@
-import { FiltersDef } from "../filters/filters"
-import { OrmAdapter } from "../orm/orm"
-import {
+import type { FiltersDef } from "../filters/filters"
+import type { OrmAdapter } from "../orm/orm"
+
+import type {
 	FieldResolver,
 	FieldResolverOptions,
-	parse_field_options,
 } from "./field"
-import { TableResolveModifier } from "./table"
+import { parse_field_options } from "./field"
+import type { TableResolveModifier } from "./table"
 
 export interface RelationResolverOptions<Orm extends OrmAdapter, Context>
 	extends Omit<FieldResolverOptions<Orm, Context>, "modify"> {

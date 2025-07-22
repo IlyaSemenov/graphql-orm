@@ -1,14 +1,14 @@
 {
   "name": "objection-graphql-resolver",
-  "description": "objection.js plugin: resolve GraphQL query using withGraphFetched",
+  "type": "module",
   "version": "7.5.1",
+  "description": "objection.js plugin: resolve GraphQL query using withGraphFetched",
+  "author": "Ilya Semenov",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/IlyaSemenov/objection-graphql-resolver.git"
   },
-  "author": "Ilya Semenov",
-  "license": "MIT",
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,12 +30,12 @@
     "test": "vitest run && tsc --noEmit",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
-    "graphql-parse-resolve-info": "^4.13.0"
-  },
   "peerDependencies": {
     "graphql": "^16",
     "objection": "^2 || ^3"
+  },
+  "dependencies": {
+    "graphql-parse-resolve-info": "^4.13.0"
   },
   "devDependencies": {
     "@apollo/server": "^4.7.1",

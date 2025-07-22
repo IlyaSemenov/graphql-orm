@@ -3,7 +3,10 @@
 // In real projects, you will want to separate tables, typedefs,
 // resolvers, and the server into their own modules.
 
-import { ApolloServer, ApolloServerOptions } from "@apollo/server"
+import { env } from "node:process"
+
+import type { ApolloServerOptions } from "@apollo/server"
+import { ApolloServer } from "@apollo/server"
 import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
 import * as r from "orchid-graphql"
@@ -15,7 +18,7 @@ const BaseTable = createBaseTable()
 
 class PostTable extends BaseTable {
 	readonly table = "post"
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		text: t.text(),
 	}))
@@ -23,7 +26,7 @@ class PostTable extends BaseTable {
 
 const db = orchidORM(
 	{
-		databaseURL: process.env.DATABASE_URL,
+		databaseURL: env.DATABASE_URL,
 		log: true,
 	},
 	{

@@ -62,7 +62,7 @@ const graph = r.graph({
     fields: {
       id: true,
       title: true,
-      url: (query) => query.select("slug"),
+      url: query => query.select("slug"),
     },
   }),
 })
@@ -86,7 +86,7 @@ const graph = r.graph({
     fields: {
       id: true,
       title: true,
-      upper_title: (query) => query.select(raw("upper(title) as upper_title")),
+      upper_title: query => query.select(raw("upper(title) as upper_title")),
     },
   }),
 })

@@ -2,12 +2,13 @@ import gql from "graphql-tag"
 import * as r from "orchid-graphql"
 import { expect, test } from "vitest"
 
-import { BaseTable, create_client, create_db, Resolvers } from "../setup"
+import type { Resolvers } from "../setup"
+import { BaseTable, create_client, create_db } from "../setup"
 
 class UserTable extends BaseTable {
 	readonly table = "user"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		name: t.text(),
 	}))
@@ -31,7 +32,7 @@ class UserTable extends BaseTable {
 class PostTable extends BaseTable {
 	readonly table = "post"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		text: t.text(),
 		author_id: t.integer(),
@@ -53,7 +54,7 @@ class PostTable extends BaseTable {
 class CommentTable extends BaseTable {
 	readonly table = "comment"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		text: t.text(),
 		user_id: t.integer(),
@@ -80,7 +81,7 @@ class CommentTable extends BaseTable {
 class LikeTable extends BaseTable {
 	readonly table = "like"
 
-	columns = this.setColumns((t) => ({
+	columns = this.setColumns(t => ({
 		id: t.identity().primaryKey(),
 		user_id: t.integer(),
 		comment_id: t.integer(),

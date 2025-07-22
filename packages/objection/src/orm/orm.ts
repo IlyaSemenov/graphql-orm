@@ -1,12 +1,11 @@
-import {
+import type {
 	OrmAdapter,
 	OrmModifier,
-	run_after_query,
 	SortOrder,
 } from "graphql-orm"
-import { QueryBuilder, raw, ref, RelationMappings } from "objection"
-import { Model } from "objection"
-import { AnyModelConstructor, AnyQueryBuilder, ModelClass } from "objection"
+import { run_after_query } from "graphql-orm"
+import type { AnyModelConstructor, AnyQueryBuilder, Model, ModelClass, RelationMappings } from "objection"
+import { QueryBuilder, raw, ref } from "objection"
 
 // Get rid of this once https://github.com/Vincit/objection.js/issues/2364 is fixed
 export function field_ref(query: AnyQueryBuilder, field: string) {
@@ -76,7 +75,7 @@ export const orm: ObjectionOrm = {
 	select_relation(query, { relation, as, modify }) {
 		return query
 			.withGraphFetched(`${relation} as ${as}`)
-			.modifyGraph(as, (query) => modify(query))
+			.modifyGraph(as, query => modify(query))
 	},
 
 	// Find
@@ -129,7 +128,7 @@ export const orm: ObjectionOrm = {
 	set_query_page_result(query, get_page) {
 		query.runAfter((nodes) => {
 			if (!Array.isArray(nodes)) {
-				throw new Error(`Paginator called for single result query.`)
+				throw new TypeError(`Paginator called for single result query.`)
 			}
 			return get_page(nodes)
 		})
@@ -156,7 +155,7 @@ export const orm: ObjectionOrm = {
 	// Misc
 
 	run_after_query(query, fn) {
-		return query.runAfter((result) => fn(result))
+		return query.runAfter(result => fn(result))
 	},
 
 	prevent_select_all(query) {

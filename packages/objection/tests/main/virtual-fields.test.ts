@@ -3,7 +3,8 @@ import { Model, ref } from "objection"
 import * as r from "objection-graphql-resolver"
 import { assert, expect, test } from "vitest"
 
-import { Resolvers, setup } from "../setup"
+import type { Resolvers } from "../setup"
+import { setup } from "../setup"
 
 class UserModel extends Model {
 	static tableName = "user"
@@ -41,7 +42,7 @@ const graph = r.graph({
 			id: true,
 			name: true,
 			// Guarded
-			url: (query) => query.select(ref("user.id")),
+			url: query => query.select(ref("user.id")),
 			// Naive
 			upper_name: true,
 		},
@@ -58,7 +59,7 @@ const resolvers: Resolvers = {
 
 const { client, knex } = await setup({ typeDefs: schema, resolvers })
 
-await knex.schema.createTable("user", function (table) {
+await knex.schema.createTable("user", (table) => {
 	table.increments("id").notNullable().primary()
 	table.string("name").notNullable()
 })

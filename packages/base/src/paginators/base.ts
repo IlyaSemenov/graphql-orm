@@ -1,5 +1,5 @@
-import { OrmAdapter } from "../orm/orm"
-import { GraphResolveContext, GraphResolver } from "../resolvers/graph"
+import type { OrmAdapter } from "../orm/orm"
+import type { GraphResolveContext, GraphResolver } from "../resolvers/graph"
 
 export interface Paginator<Orm extends OrmAdapter, Context> {
 	/** GraphQL path, for example: `["nodes"]` */

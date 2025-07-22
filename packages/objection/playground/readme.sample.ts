@@ -3,7 +3,8 @@
 // In real projects, you will want to separate models, typedefs,
 // model resolvers, and the server into their own modules.
 
-import { ApolloServer, ApolloServerOptions } from "@apollo/server"
+import type { ApolloServerOptions } from "@apollo/server"
+import { ApolloServer } from "@apollo/server"
 import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
 import Knex from "knex"

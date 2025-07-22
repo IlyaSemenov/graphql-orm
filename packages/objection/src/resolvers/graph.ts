@@ -1,13 +1,14 @@
-import {
+import type {
 	GraphResolveOptions,
-	GraphResolver,
 	GraphResolverOptions,
 	Paginator,
 	TableResolver,
 } from "graphql-orm"
-import { AnyQueryBuilder, Model, QueryBuilder } from "objection"
+import { GraphResolver } from "graphql-orm"
+import type { AnyQueryBuilder, Model, QueryBuilder } from "objection"
 
-import { ObjectionOrm, orm } from "../orm/orm"
+import type { ObjectionOrm } from "../orm/orm"
+import { orm } from "../orm/orm"
 
 export function createGraphResolver<Context = unknown>(
 	types: Record<string, TableResolver<ObjectionOrm, Context>>,

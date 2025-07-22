@@ -1,7 +1,9 @@
+import { env } from "node:process"
+
+import type { TableClasses } from "orchid-orm"
 import {
 	createBaseTable,
 	orchidORM,
-	TableClasses,
 	testTransaction,
 } from "orchid-orm"
 import { afterAll, afterEach, beforeEach } from "vitest"
@@ -11,8 +13,8 @@ export const BaseTable = createBaseTable()
 export async function create_db<T extends TableClasses>(tables: T) {
 	const db = orchidORM(
 		{
-			databaseURL: process.env.DATABASE_URL,
-			log: !process.env.CI,
+			databaseURL: env.DATABASE_URL,
+			log: !env.CI,
 		},
 		tables,
 	)

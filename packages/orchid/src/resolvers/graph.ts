@@ -1,12 +1,13 @@
-import {
+import type {
 	GraphResolveOptions,
-	GraphResolver,
 	GraphResolverOptions,
 	TableResolver,
 } from "graphql-orm"
-import { Query } from "orchid-orm"
+import { GraphResolver } from "graphql-orm"
+import type { Query } from "orchid-orm"
 
-import { OrchidOrm, orm } from "../orm/orm"
+import type { OrchidOrm } from "../orm/orm"
+import { orm } from "../orm/orm"
 
 export function createGraphResolver<Context = unknown>(
 	types: Record<string, TableResolver<OrchidOrm, Context>>,

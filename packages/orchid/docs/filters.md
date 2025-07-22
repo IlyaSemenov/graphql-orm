@@ -86,7 +86,7 @@ const resolvers = {
 ## Syntax
 
 ```js
-{
+const filter = {
   field: value,
   field__operator: value,
 }
@@ -107,7 +107,7 @@ Define modifiers in a table resolver:
 const graph = r.graph({
   Post: r.table(db.post, {
     modifiers: {
-      public: (q) => q.where({ delete_time: null }),
+      public: q => q.where({ delete_time: null }),
       search: (q, term: string) => q.where({ text: { contains: `%${term}%` } }),
     },
   }),

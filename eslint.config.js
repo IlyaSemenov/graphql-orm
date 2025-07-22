@@ -1,24 +1,23 @@
-import eslint from "@eslint/js"
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
-import simpleImportSort from "eslint-plugin-simple-import-sort"
-import tseslint from "typescript-eslint"
+// @ts-check
 
-export default tseslint.config(
-	eslint.configs.recommended,
-	...tseslint.configs.recommended,
-	{
-		plugins: {
-			"simple-import-sort": simpleImportSort,
-		},
-		rules: {
-			"simple-import-sort/imports": "warn",
-			"simple-import-sort/exports": "warn",
-			"@typescript-eslint/no-explicit-any": "off",
-			"@typescript-eslint/no-empty-interface": "off",
-		},
+import { defineConfig } from "@ilyasemenov/eslint-config"
+
+export default defineConfig({
+	stylistic: {
+		indent: "tab",
 	},
-	{
-		ignores: ["packages/*/dist/"],
+	rules: {
+		"antfu/no-top-level-await": "off",
 	},
-	eslintPluginPrettierRecommended,
-)
+}).append({
+	files: ["**/*.md/*"],
+	rules: {
+		"@stylistic/indent": ["error", 2],
+		"jsonc/indent": ["error", 2],
+	},
+}).append({
+	files: ["**/*.md/*.{js,ts}", "packages/*/playground/**/*.ts"],
+	rules: {
+		"no-console": "off",
+	},
+})
