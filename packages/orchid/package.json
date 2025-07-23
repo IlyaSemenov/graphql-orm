@@ -1,7 +1,7 @@
 {
   "name": "orchid-graphql",
   "type": "module",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "orchid-orm plugin: resolve GraphQL query with Orchid ORM",
   "author": "Ilya Semenov",
   "license": "MIT",

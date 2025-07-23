@@ -1,5 +1,11 @@
 # objection-graphql-resolver
 
+## 7.6.1
+
+### Patch Changes
+
+- 8a6739d: Allow null and undefined as filter value.
+
 ## 7.6.0
 
 ### Minor Changes

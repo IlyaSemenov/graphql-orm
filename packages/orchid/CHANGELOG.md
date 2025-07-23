@@ -1,5 +1,11 @@
 # orchid-graphql
 
+## 1.9.1
+
+### Patch Changes
+
+- 8a6739d: Allow null and undefined as filter value.
+
 ## 1.9.0
 
 ### Minor Changes
