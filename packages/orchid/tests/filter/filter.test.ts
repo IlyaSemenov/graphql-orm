@@ -1,4 +1,4 @@
-import type { FilterModifiers } from "orchid-graphql"
+import type { FilterModifiers, FilterValue } from "orchid-graphql"
 import { filterQuery } from "orchid-graphql"
 import { expect, test } from "vitest"
 
@@ -174,4 +174,22 @@ test("filter by parametrized modifier (search)", async () => {
 		  "Good news from China.",
 		]
 	`)
+})
+
+test("no filter", async () => {
+	await expect(
+		filterQuery(db.post.count(), null),
+	).resolves.toMatchInlineSnapshot(`6`)
+	await expect(
+		filterQuery(db.post.count(), undefined),
+	).resolves.toMatchInlineSnapshot(`6`)
+})
+
+test("invalid filter type", async () => {
+	expect(
+		() => filterQuery(db.post.count(), true as unknown as FilterValue),
+	).toThrowError("Invalid filter")
+	expect(
+		() => filterQuery(db.post.count(), "published" as unknown as FilterValue),
+	).toThrowError("Invalid filter")
 })

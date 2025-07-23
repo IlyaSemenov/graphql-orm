@@ -6,7 +6,7 @@ export type FilterConfig = boolean
 
 export type FieldFilterScalarValue = null | string | number | boolean
 export type FieldFilterValue = FieldFilterScalarValue | Exclude<FieldFilterScalarValue, null>[]
-export type FilterValue = { [property: string]: FieldFilterValue }
+export type FilterValue = { [property: string]: FieldFilterValue } | null | undefined
 
 export type FilterQueryOptions<Orm extends OrmAdapter, Context = unknown> = {
 	modifiers?: FilterModifiers<Orm, Context>

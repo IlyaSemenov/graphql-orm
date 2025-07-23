@@ -1,6 +1,6 @@
 import type { QueryBuilder } from "objection"
 import { Model, ref } from "objection"
-import type { FilterModifiers } from "objection-graphql-resolver"
+import type { FilterModifiers, FilterValue } from "objection-graphql-resolver"
 import { filterQuery } from "objection-graphql-resolver"
 import { expect, test } from "vitest"
 
@@ -219,4 +219,34 @@ test("filter by parametrized modifier (search)", async () => {
 	await expect(
 		filterQuery(PostModel.query().select("text"), { search: "news" }, { modifiers }),
 	).resolves.toMatchInlineSnapshot(`[]`)
+})
+
+test("no filter", async () => {
+	await expect(
+		filterQuery(PostModel.query().count(), null),
+	).resolves.toMatchInlineSnapshot(`
+		[
+		  {
+		    "count(*)": 6,
+		  },
+		]
+	`)
+	await expect(
+		filterQuery(PostModel.query().count(), undefined),
+	).resolves.toMatchInlineSnapshot(`
+		[
+		  {
+		    "count(*)": 6,
+		  },
+		]
+	`)
+})
+
+test("invalid filter type", async () => {
+	expect(
+		() => filterQuery(PostModel.query().count(), true as unknown as FilterValue),
+	).toThrowError("Invalid filter")
+	expect(
+		() => filterQuery(PostModel.query().count(), "published" as unknown as FilterValue),
+	).toThrowError("Invalid filter")
 })
