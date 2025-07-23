@@ -1,7 +1,7 @@
 {
   "name": "objection-graphql-resolver",
   "type": "module",
-  "version": "7.6.0",
+  "version": "7.6.1",
   "description": "objection.js plugin: resolve GraphQL query using withGraphFetched",
   "author": "Ilya Semenov",
   "license": "MIT",
