@@ -1,16 +1,16 @@
 import { env } from "node:process"
 
-import type { TableClasses } from "orchid-orm"
+import type { OrmTableThunks } from "orchid-orm"
 import {
 	createBaseTable,
-	orchidORM,
 	testTransaction,
 } from "orchid-orm"
+import { orchidORM } from "orchid-orm/postgres-js"
 import { afterAll, afterEach, beforeEach } from "vitest"
 
 export const BaseTable = createBaseTable()
 
-export async function createDb<T extends TableClasses>(tables: T) {
+export async function createDb<T extends OrmTableThunks>(tables: T) {
 	const db = orchidORM(
 		{
 			databaseURL: env.DATABASE_URL,

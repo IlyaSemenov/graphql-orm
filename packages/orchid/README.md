@@ -20,7 +20,7 @@ In particular the typings are not ready. The resolver returns a generic `Query` 
 ## Install
 
 ```sh
-npm i orchid-graphql
+npm i orchid-graphql postgres
 ```
 
 ## Minimal all-in-one example
@@ -37,7 +37,8 @@ import { ApolloServer, ApolloServerOptions } from "@apollo/server"
 import { startStandaloneServer } from "@apollo/server/standalone"
 import gql from "graphql-tag"
 import * as r from "orchid-graphql"
-import { createBaseTable, orchidORM } from "orchid-orm"
+import { createBaseTable } from "orchid-orm"
+import { orchidORM } from "orchid-orm/postgres-js"
 
 // Define database tables
 

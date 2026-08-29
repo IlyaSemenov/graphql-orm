@@ -66,12 +66,16 @@ await db.post.createMany([
 
 const modifiers: FilterModifiers = {
 	published: query => query.where({ is_draft: false }),
-	search: (query, term: string) => query.where({ text: { contains: `%${term}%` } }),
+	search: (query, term: string) => query.where({ text: { contains: term } }),
+}
+
+async function asArray<T>(query: PromiseLike<T[]>): Promise<T[]> {
+	return [...await query]
 }
 
 test("filter by id", async () => {
 	await expect(
-		filterQuery(db.post.pluck("text"), { author_id: 1 }),
+		asArray(filterQuery(db.post.pluck("text"), { author_id: 1 })),
 	).resolves.toMatchInlineSnapshot(`
 		[
 		  "Oil price rising.",
@@ -83,7 +87,7 @@ test("filter by id", async () => {
 
 test("filter by is_draft", async () => {
 	await expect(
-		filterQuery(db.post.pluck("text"), { is_draft: true }),
+		asArray(filterQuery(db.post.pluck("text"), { is_draft: true })),
 	).resolves.toMatchInlineSnapshot(`
 		[
 		  "This is draft...",
@@ -93,7 +97,7 @@ test("filter by is_draft", async () => {
 
 test("filter by id__in", async () => {
 	await expect(
-		filterQuery(db.post.pluck("id"), { id__in: [3, 5] }),
+		asArray(filterQuery(db.post.pluck("id"), { id__in: [3, 5] })),
 	).resolves.toMatchInlineSnapshot(`
 		[
 		  3,
@@ -104,7 +108,7 @@ test("filter by id__in", async () => {
 
 test("filter by id__lt", async () => {
 	await expect(
-		filterQuery(db.post.pluck("id"), { id__lt: 3 }),
+		asArray(filterQuery(db.post.pluck("id"), { id__lt: 3 })),
 	).resolves.toMatchInlineSnapshot(`
     [
       1,
@@ -115,7 +119,7 @@ test("filter by id__lt", async () => {
 
 test("filter by id__lte", async () => {
 	await expect(
-		filterQuery(db.post.pluck("id"), { id__lte: 3 }),
+		asArray(filterQuery(db.post.pluck("id"), { id__lte: 3 })),
 	).resolves.toMatchInlineSnapshot(`
     [
       1,
@@ -127,7 +131,7 @@ test("filter by id__lte", async () => {
 
 test("filter by id__gt", async () => {
 	await expect(
-		filterQuery(db.post.pluck("id"), { id__gt: 4 }),
+		asArray(filterQuery(db.post.pluck("id"), { id__gt: 4 })),
 	).resolves.toMatchInlineSnapshot(`
     [
       5,
@@ -138,7 +142,7 @@ test("filter by id__gt", async () => {
 
 test("filter by id__gte", async () => {
 	await expect(
-		filterQuery(db.post.pluck("id"), { id__gte: 4 }),
+		asArray(filterQuery(db.post.pluck("id"), { id__gte: 4 })),
 	).resolves.toMatchInlineSnapshot(`
     [
       4,
@@ -150,7 +154,7 @@ test("filter by id__gte", async () => {
 
 test("filter by text__contains", async () => {
 	await expect(
-		filterQuery(db.post.pluck("text"), { text__contains: "COVID" }),
+		asArray(filterQuery(db.post.pluck("text"), { text__contains: "COVID" })),
 	).resolves.toMatchInlineSnapshot(`
     [
       "Latest COVID news.",
@@ -167,7 +171,7 @@ test("filter by modifier (published)", async () => {
 
 test("filter by parametrized modifier (search)", async () => {
 	await expect(
-		filterQuery(db.post.pluck("text"), { search: "news" }, { modifiers }),
+		asArray(filterQuery(db.post.pluck("text"), { search: "news" }, { modifiers })),
 	).resolves.toMatchInlineSnapshot(`
 		[
 		  "Latest COVID news.",

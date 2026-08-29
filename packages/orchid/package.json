@@ -39,17 +39,19 @@
   },
   "peerDependencies": {
     "graphql": "^16",
-    "orchid-orm": "^1.31.5"
+    "orchid-orm": "^1.51.0"
   },
   "dependencies": {
-    "graphql-parse-resolve-info": "^4.13.0"
+    "graphql-parse-resolve-info": "^4.13.0",
+    "orchid-pagination": "^2.4.2"
   },
   "devDependencies": {
     "@apollo/server": "^4.7.1",
     "graphql": "^16.6.0",
     "graphql-request": "^6.0.0",
     "graphql-tag": "^2.12.6",
-    "orchid-orm": "^1.31.5",
+    "orchid-orm": "~1.78.5",
+    "postgres": "^3.4.9",
     "tsconfig-vite-node": "^1.1.2",
     "tstyche": "^4.3.0",
     "vite": "^7.0.5",

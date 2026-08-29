@@ -1,5 +1,6 @@
 import * as r from "orchid-graphql"
-import { createBaseTable, orchidORM } from "orchid-orm"
+import { createBaseTable } from "orchid-orm"
+import { orchidORM } from "orchid-orm/postgres-js"
 import { expect, test } from "tstyche"
 
 const BaseTable = createBaseTable()

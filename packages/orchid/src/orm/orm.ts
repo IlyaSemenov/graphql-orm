@@ -1,6 +1,6 @@
-import type { OrmAdapter, SortOrder } from "graphql-orm"
-import type { Query, SelectQueryData, Table } from "orchid-orm"
-import { raw } from "orchid-orm"
+import type { OrmAdapter } from "graphql-orm"
+import type { Query, Table } from "orchid-orm"
+import { prepareCursorPagination as prepareOrchidCursorPagination } from "orchid-pagination"
 
 export type OrchidOrm = OrmAdapter<
 	Table,
@@ -59,46 +59,28 @@ export const orm: OrchidOrm = {
 		return query.where({ [field]: op ? { [op]: value } : value })
 	},
 
-	whereRaw(query, expression, bindings) {
-		return query.where(raw({ raw: expression, values: bindings }))
-	},
-
-	// Order & Limit
-
-	resetQueryOrder(query) {
-		return query.clear("order")
-	},
-
-	addQueryOrder(query, { field, dir }) {
-		return query.order({ [field]: dir })
-	},
-
-	getQueryOrder(query) {
-		return (
-			(query.q as SelectQueryData).order?.flatMap<SortOrder>((orderItem) => {
-				if (typeof orderItem === "string") {
-					return { field: "orderItem", dir: "ASC" }
-				} else if (typeof orderItem === "object") {
-					return Object.entries(orderItem).map<SortOrder>(([field, order]) => {
-						const [dir] = order.split(" ", 1)
-						if (dir === "ASC" || dir === "DESC") {
-							return { field, dir }
-						} else {
-							throw new Error("Unsupported order: " + order)
-						}
-					})
-				} else {
-					throw new TypeError("Unsupported order type: " + orderItem)
-				}
-			}) || []
-		)
-	},
-
-	setQueryLimit(query, limit) {
-		return query.limit(limit)
-	},
-
 	// Pagination helpers
+
+	prepareCursorPagination(query, { cursor, fields, limit }) {
+		if (fields) {
+			query = query.clear("order")
+			for (const { field, dir } of fields) {
+				query = query.order({ [field]: dir })
+			}
+		}
+		const prepared = prepareOrchidCursorPagination(
+			query as never,
+			{ limit },
+			{ cursor },
+		)
+		return {
+			query: prepared.query,
+			getPage(nodes) {
+				const page = prepared.finalize(nodes as never)
+				return { nodes: page.items, cursor: page.nextCursor }
+			},
+		}
+	},
 
 	setQueryPageResult(query, get_page) {
 		return query.transform(nodes => get_page(nodes as any))

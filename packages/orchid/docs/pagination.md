@@ -20,6 +20,13 @@ The library includes simple `CursorPaginator` implementation which traverses ord
 
 Different paginators such as providing Relay-style pagination can be implemented similarly.
 
+Cursor pagination follows the complete query `ORDER BY`, including mixed directions and explicit `NULLS FIRST` or `NULLS LAST` ordering.
+Nullable order fields are supported when their nullability is declared in the Orchid schema.
+Include a unique final order field to make pagination deterministic.
+
+When `cursor({ fields })` is used, PostgreSQL's default null ordering applies: `NULLS LAST` for ascending fields and `NULLS FIRST` for descending fields.
+To choose a different null ordering, omit `fields` and apply the complete order to the query.
+
 ## Example
 
 This example demonstrates both root query and relation pagination.

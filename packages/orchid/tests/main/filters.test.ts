@@ -90,7 +90,7 @@ const graph1 = r.graph({
 		modifiers: {
 			published: query => query.where({ is_draft: false }),
 			search: (query, term: string) =>
-				query.where({ text: { contains: `%${term}%` } }),
+				query.where({ text: { contains: term } }),
 		},
 	}),
 })
@@ -228,7 +228,7 @@ test("filters", async () => {
 	assert.deepEqual(
 		await client.request(gql`
 			{
-				posts(filter: { text__contains: "%COVID%" }) {
+				posts(filter: { text__contains: "COVID" }) {
 					text
 				}
 			}
@@ -240,7 +240,7 @@ test("filters", async () => {
 	assert.deepEqual(
 		await client.request(gql`
 			{
-				posts(filter: { text__contains: "%COVID%" }) {
+				posts(filter: { text__contains: "COVID" }) {
 					text
 				}
 			}
@@ -333,7 +333,7 @@ test("allowAllFilters", async () => {
 	assert.deepEqual(
 		await client.request(gql`
 			{
-				users: users1(filter: { name__contains: "%ob" }) {
+				users: users1(filter: { name__contains: "ob" }) {
 					id
 				}
 			}
@@ -347,7 +347,7 @@ test("allowAllFilters", async () => {
 	assert.deepEqual(
 		await client.request(gql`
 			{
-				users: users2(filter: { name__contains: "%ob" }) {
+				users: users2(filter: { name__contains: "ob" }) {
 					id
 				}
 			}
@@ -361,7 +361,7 @@ test("allowAllFilters", async () => {
 	assert.deepEqual(
 		await client.request(gql`
 			{
-				users: users3(filter: { name__contains: "%ob" }) {
+				users: users3(filter: { name__contains: "ob" }) {
 					id
 				}
 			}

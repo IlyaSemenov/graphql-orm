@@ -1,11 +1,11 @@
 import type {
 	OrmAdapter,
 	OrmModifier,
-	SortOrder,
 } from "graphql-orm"
 import { runAfterQuery } from "graphql-orm"
 import type { AnyModelConstructor, AnyQueryBuilder, Model, ModelClass, RelationMappings } from "objection"
-import { QueryBuilder, raw, ref } from "objection"
+import { QueryBuilder, ref } from "objection"
+import { prepareCursorPagination as prepareObjectionCursorPagination } from "objection-pagination"
 
 // Get rid of this once https://github.com/Vincit/objection.js/issues/2364 is fixed
 export function fieldRef(query: AnyQueryBuilder, field: string) {
@@ -94,36 +94,18 @@ export const orm: ObjectionOrm = {
 		}
 	},
 
-	whereRaw(query, expression, bindings) {
-		return query.where(raw(expression.replace(/\$/g, ":"), bindings))
-	},
-
-	// Order & Limit
-
-	resetQueryOrder(query) {
-		return query.clearOrder()
-	},
-
-	addQueryOrder(query, { field, dir }) {
-		return query.orderBy(field, dir)
-	},
-
-	getQueryOrder(query) {
-		const sortOrders: SortOrder[] = []
-		;(query as any).forEachOperation(/orderBy/, (op: any) => {
-			if (op.name === "orderBy") {
-				const [field, dir] = op.args
-				sortOrders.push({ field, dir })
-			}
-		})
-		return sortOrders
-	},
-
-	setQueryLimit(query, limit) {
-		return query.limit(limit)
-	},
-
 	// Pagination helpers
+
+	prepareCursorPagination(query, options) {
+		const prepared = prepareObjectionCursorPagination(query, options)
+		return {
+			query: prepared.query,
+			getPage(nodes) {
+				const page = prepared.finalize(nodes)
+				return { nodes: page.items, cursor: page.nextCursor }
+			},
+		}
+	},
 
 	setQueryPageResult(query, getPage) {
 		query.runAfter((nodes) => {

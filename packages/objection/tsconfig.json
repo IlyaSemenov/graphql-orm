@@ -6,6 +6,7 @@
 		"target": "ES2021",
 		"paths": {
 			"objection-graphql-resolver": ["./src"],
+			"objection-pagination": ["../objection-pagination/src"],
 			"graphql-orm": ["../base/src"]
 		}
 	}

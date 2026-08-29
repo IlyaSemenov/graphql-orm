@@ -1,0 +1,9 @@
+{
+  "name": "objection-pagination",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "peerDependencies": {
+    "objection": "^2 || ^3"
+  }
+}

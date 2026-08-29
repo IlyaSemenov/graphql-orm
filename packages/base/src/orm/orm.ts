@@ -53,23 +53,12 @@ export interface OrmAdapter<Table = any, Query = any, QueryTransform = any> {
 
 	where(query: Query, field: string, op: string | undefined, value: any): Query
 
-	whereRaw(
-		query: Query,
-		expression: string,
-		bindings: Record<string, any>,
-	): Query
-
-	// Order & Limit
-
-	resetQueryOrder(query: Query): Query
-
-	addQueryOrder(query: Query, order: SortOrder): Query
-
-	getQueryOrder(query: Query): SortOrder[]
-
-	setQueryLimit(query: Query, limit: number): Query
-
 	// Pagination helpers
+
+	prepareCursorPagination(
+		query: Query,
+		options: { cursor?: string, fields?: SortOrder[], limit: number },
+	): { query: Query, getPage: GetPageFn }
 
 	setQueryPageResult(query: Query, getPage: GetPageFn): QueryTransform
 
