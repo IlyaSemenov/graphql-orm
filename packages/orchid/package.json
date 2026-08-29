@@ -7,7 +7,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IlyaSemenov/orchid-graphql.git"
+    "url": "git+https://github.com/IlyaSemenov/graphql-orm.git",
+    "directory": "packages/orchid"
   },
   "sideEffects": false,
   "exports": {
