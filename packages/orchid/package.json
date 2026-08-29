@@ -31,7 +31,7 @@
     "dev": "vite-node --watch playground/readme.sample.ts",
     "build": "tsdown",
     "test": "vitest run && tsc --noEmit && tstyche --target 6.0.3",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "bun run build"
   },
   "peerDependencies": {
     "graphql": "^16",

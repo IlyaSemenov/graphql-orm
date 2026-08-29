@@ -38,21 +38,27 @@ jobs:
         with:
           version: 2026.8.14
 
+      # for npx publish
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm run -r build
+        run: bun run build
 
       - name: Test packages
-        run: pnpm run -r test
+        run: bun run test
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost
 
       - name: Capture new release versions
         if: ${{ github.ref == env.MAIN_REF }}
         run: |
-          if pnpx @changesets/cli status --output=release.json; then
+          if npx @changesets/cli status --output=release.json; then
             echo "CHANGED_PACKAGES=$(jq -r '.releases | map(.name + "@" + .newVersion) | join(", ")' release.json)" >> "$GITHUB_ENV"
             rm release.json
           fi
@@ -61,7 +67,7 @@ jobs:
         if: ${{ github.ref == env.MAIN_REF }}
         uses: changesets/action@v1
         with:
-          publish: pnpm changeset publish
+          publish: npx changeset publish
           title: "Release ${{env.CHANGED_PACKAGES}}"
           commit: "Release ${{env.CHANGED_PACKAGES}}"
         env:

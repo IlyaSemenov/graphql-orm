@@ -1,9 +1,6 @@
 [settings]
 lockfile = true
 
-[settings.node]
-corepack = true
-
 [tools]
-node = "24"
+bun = "1.4.0"
 lefthook = "latest"

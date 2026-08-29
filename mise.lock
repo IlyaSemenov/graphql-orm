@@ -2,6 +2,55 @@
 
 lockfile_version = 1
 
+[[tools.bun]]
+version = "1.4.0"
+backend = "core:bun"
+specifiers = ["1.4.0"]
+
+[tools.bun."platforms.linux-arm64"]
+checksum = "sha256:4b1a332ee861983eb93bcfe6f770fff94e3e31b2c388bdaea3c8ed35e58eed0e"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-aarch64.zip"
+
+[tools.bun."platforms.linux-arm64-musl"]
+checksum = "sha256:576300ce33ff16ffcd455bf178c2f095f9df845c6cc3d0284ba1c96ca0e80473"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-aarch64-musl.zip"
+
+[tools.bun."platforms.linux-x64"]
+checksum = "sha256:2d03fb5fb83ac8b567aca0a281b2ce1a1a19d488f56c2968d88c3f25e92fe452"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-x64.zip"
+
+[tools.bun."platforms.linux-x64-baseline"]
+checksum = "sha256:184fb4595f0d401a217cf7c78c1bc430ba83314dab7a8b94805babbf7fa7097f"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-x64-baseline.zip"
+
+[tools.bun."platforms.linux-x64-musl"]
+checksum = "sha256:83b5f12fd258dd8d4fdcaea65ede954366aa717dab399e20093ecab280d54e7a"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-x64-musl.zip"
+
+[tools.bun."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:618c4bc1f94b02337ee210003c0b7c066f11548a8cdc5109df10db043dc47ca2"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-x64-musl-baseline.zip"
+
+[tools.bun."platforms.macos-arm64"]
+checksum = "sha256:c669e97f6164e1c96e0701748db98dfa77492908cbd8394c7557134a735de381"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-darwin-aarch64.zip"
+
+[tools.bun."platforms.macos-x64"]
+checksum = "sha256:1d0211b8f1dc991182344687ad15e72ee86f154845a5f7fa477994cd341dd9b0"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-darwin-x64.zip"
+
+[tools.bun."platforms.macos-x64-baseline"]
+checksum = "sha256:da9b9f1b4ba766c6f299711f38dfaa98623e1ed9c40896aa53db803c52ec1fa0"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-darwin-x64-baseline.zip"
+
+[tools.bun."platforms.windows-x64"]
+checksum = "sha256:e6f093d39da486b20262ca8cdd5ed6a9e8bc9c2f275b78e6d3a0c5b28cc95901"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-windows-x64.zip"
+
+[tools.bun."platforms.windows-x64-baseline"]
+checksum = "sha256:b929c54a9badb104a16dedd23aab6152c86793ae653d4e6b13983ffd0c882a66"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-windows-x64-baseline.zip"
+
 [[tools.lefthook]]
 version = "2.1.9"
 backend = "aqua:evilmartians/lefthook"
@@ -72,52 +121,3 @@ checksum = "sha256:1f29681dfbc36b9bdde52139cca6c4668ea4d51fd81e9127a3b78f49369db
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_Windows_x86_64.gz"
 url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862077"
 provenance = "github-attestations"
-
-[[tools.node]]
-version = "24.18.1"
-backend = "core:node"
-specifiers = ["24"]
-
-[tools.node."platforms.linux-arm64"]
-checksum = "sha256:df224555a083b918e46260cc969838501b9f9a87140c1195e5b9597b56d5dae2"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-arm64.tar.gz"
-
-[tools.node."platforms.linux-arm64-musl"]
-checksum = "sha256:ae1b6457edb875fd98130b37c853e51a53ac0cc40850ecccd490b61c5a3558fa"
-url = "https://unofficial-builds.nodejs.org/download/release/v24.18.1/node-v24.18.1-linux-arm64-musl.tar.gz"
-
-[tools.node."platforms.linux-x64"]
-checksum = "sha256:9f5eb6ac21845a66c493c91a253b1da32fd684e89e9b7202d4936982336be4ca"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.gz"
-
-[tools.node."platforms.linux-x64-baseline"]
-checksum = "sha256:9f5eb6ac21845a66c493c91a253b1da32fd684e89e9b7202d4936982336be4ca"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.gz"
-
-[tools.node."platforms.linux-x64-musl"]
-checksum = "sha256:696979caef92505ad7566a3674ca9a93d8558e282f34e7899181c0321821ae5f"
-url = "https://unofficial-builds.nodejs.org/download/release/v24.18.1/node-v24.18.1-linux-x64-musl.tar.gz"
-
-[tools.node."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:696979caef92505ad7566a3674ca9a93d8558e282f34e7899181c0321821ae5f"
-url = "https://unofficial-builds.nodejs.org/download/release/v24.18.1/node-v24.18.1-linux-x64-musl.tar.gz"
-
-[tools.node."platforms.macos-arm64"]
-checksum = "sha256:eb02f7fab96d3d67de40c5ec8566096fcb4c2026728787683ae5a97eb612b941"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-darwin-arm64.tar.gz"
-
-[tools.node."platforms.macos-x64"]
-checksum = "sha256:6fb20fceacbb157c2f95825b80df4a454a0f6d81cdcd7bb81eeae9147e0e76ec"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-darwin-x64.tar.gz"
-
-[tools.node."platforms.macos-x64-baseline"]
-checksum = "sha256:6fb20fceacbb157c2f95825b80df4a454a0f6d81cdcd7bb81eeae9147e0e76ec"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-darwin-x64.tar.gz"
-
-[tools.node."platforms.windows-x64"]
-checksum = "sha256:ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-win-x64.zip"
-
-[tools.node."platforms.windows-x64-baseline"]
-checksum = "sha256:ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765"
-url = "https://nodejs.org/dist/v24.18.1/node-v24.18.1-win-x64.zip"
