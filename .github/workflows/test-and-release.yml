@@ -31,16 +31,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Enable corepack
-        run: corepack enable
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v4
         with:
-          node-version: 22.17
-          cache: pnpm
+          version: 2026.8.14
 
       - name: Install deps
         run: pnpm install --frozen-lockfile

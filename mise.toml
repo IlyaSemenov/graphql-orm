@@ -1,0 +1,8 @@
+[settings]
+lockfile = true
+
+[settings.node]
+corepack = true
+
+[tools]
+node = "24"
