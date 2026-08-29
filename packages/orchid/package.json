@@ -7,16 +7,19 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/IlyaSemenov/orchid-graphql"
+    "url": "git+https://github.com/IlyaSemenov/orchid-graphql.git"
   },
+  "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
-  "main": "dist/index.cjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "files": [
     "dist",
     "src"
@@ -26,8 +29,8 @@
   },
   "scripts": {
     "dev": "vite-node --watch playground/readme.sample.ts",
-    "build": "tsup",
-    "test": "vitest run && tsc --noEmit && tstyche",
+    "build": "tsdown",
+    "test": "vitest run && tsc --noEmit && tstyche --target 6.0.3",
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
@@ -45,7 +48,6 @@
     "orchid-orm": "^1.31.5",
     "tsconfig-vite-node": "^1.1.2",
     "tstyche": "^4.3.0",
-    "tsup": "^8.5.0",
     "vite": "^7.0.5",
     "vite-node": "^3.2.4",
     "vite-tsconfig-paths": "^5.1.4",

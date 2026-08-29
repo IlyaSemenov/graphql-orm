@@ -17,9 +17,13 @@
     "prepare": "lefthook install"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "^0.18.5",
     "@changesets/cli": "^2.27.1",
     "@ilyasemenov/eslint-config": "^1.4.2",
-    "eslint": "^9.31.0",
-    "typescript": "^5.8.3"
+    "@typescript/native": "npm:typescript@~7.0.2",
+    "eslint": "^9.35.0",
+    "publint": "^0.3.22",
+    "tsdown": "^0.22.14",
+    "typescript": "~6.0.3"
   }
 }

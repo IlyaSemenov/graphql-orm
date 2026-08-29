@@ -1,19 +1,19 @@
 export * from "./filter"
-export { OrmAdapter, OrmModifier, SortOrder } from "./orm/orm"
-export { Paginator } from "./paginators/base"
+export type { OrmAdapter, OrmModifier, SortOrder } from "./orm/orm"
+export type { Paginator } from "./paginators/base"
 export { defineCursorPaginator } from "./paginators/cursor"
 export { defineFieldResolver } from "./resolvers/field"
-export {
+export type {
 	GraphResolveContext,
 	GraphResolveOptions,
-	GraphResolver,
 	GraphResolverOptions,
 } from "./resolvers/graph"
+export { GraphResolver } from "./resolvers/graph"
 export { definePageResolver } from "./resolvers/page"
 export { defineRelationResolver } from "./resolvers/relation"
-export {
+export type {
 	TableResolveContext,
-	TableResolver,
 	TableResolverOptions,
 } from "./resolvers/table"
+export { TableResolver } from "./resolvers/table"
 export { runAfterQuery } from "./utils/run-after"
