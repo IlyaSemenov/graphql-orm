@@ -9,6 +9,12 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+# Publish to npm with OIDC
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   test-and-release:
     name: Test and Release
@@ -72,4 +78,3 @@ jobs:
           commit: "Release ${{env.CHANGED_PACKAGES}}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
