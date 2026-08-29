@@ -14,14 +14,12 @@
   },
   "scripts": {
     "lint": "eslint --fix .",
-    "prepare": "husky"
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@ilyasemenov/eslint-config": "^1.4.2",
     "eslint": "^9.31.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.2",
     "typescript": "^5.8.3"
   }
 }
